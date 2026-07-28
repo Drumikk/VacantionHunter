@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="VacationHunter — объяснимый агрегатор вакансий">
+  <title>VacationHunter — вакансии без шума</title>
+  <link rel="stylesheet" href="/styles.css?v=20260729-2">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="VacationHunter, на главную">
+      <span class="brand-mark">VH</span>
+      <span>VacationHunter</span>
+    </a>
+    <div class="source-health" id="sourceHealth"><span class="pulse"></span><span>Источники готовы</span></div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <p class="eyebrow">Поиск по нескольким источникам · без дублей</p>
+      <h1>Опишите работу,<br><span>которую хотите найти</span></h1>
+      <p class="lede">Должность, стек, зарплата, локация и формат — обычной фразой. Мы разберём запрос и покажем, почему каждая вакансия оказалась на своём месте.</p>
+      <form id="searchForm" class="search-form">
+        <label class="sr-only" for="query">Поисковый запрос</label>
+        <textarea id="query" rows="2" placeholder="Например: .NET разработчик удалённо, от 4000$ в месяц, Европа" required>.NET разработчик удалённо, от 4000$ в месяц</textarea>
+        <div class="search-actions">
+          <label class="switch"><input type="checkbox" id="refreshSources"><span></span>Обновить данные из источников</label>
+          <button type="submit" class="primary-button"><span>Найти вакансии</span><span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+      <div id="queryTags" class="tag-list" aria-live="polite"></div>
+      <div id="clarifications" class="clarifications hidden"></div>
+    </section>
+
+    <section id="processing" class="processing hidden" aria-live="polite">
+      <div class="loader"><span></span><span></span><span></span></div>
+      <div><strong>Собираем и ранжируем вакансии</strong><p id="processingText">Проверяем источники, нормализуем зарплаты и удаляем дубли…</p></div>
+    </section>
+
+    <section id="resultsSection" class="results-section hidden">
+      <div class="results-head">
+        <div><p class="eyebrow">Результаты</p><h2><span id="resultCount">0</span> подходящих вакансий</h2><p id="resultSummary" class="muted"></p></div>
+        <div class="toolbar">
+          <label>Сначала
+            <select id="primarySort">
+              <option value="score:desc">Максимально подходящие</option>
+              <option value="salaryMonthlyUsd:desc">Высокая зарплата</option>
+              <option value="postedAt:desc">Свежие</option>
+              <option value="company:asc">Работодатель А–Я</option>
+            </select>
+          </label>
+          <label>Затем
+            <select id="secondarySort">
+              <option value="salaryMonthlyUsd:desc">Зарплата</option>
+              <option value="score:desc">Подходящесть</option>
+              <option value="postedAt:desc">Свежесть</option>
+              <option value="company:asc">Работодатель</option>
+            </select>
+          </label>
+          <label class="switch compact"><input type="checkbox" id="watchSearch"><span></span>Следить за новыми</label>
+        </div>
+      </div>
+      <div class="legend"><span><i class="legend-dot great"></i>полное «И»</span><span><i class="legend-dot partial"></i>частичное «ИЛИ»</span><span><span class="icon verified">✓</span>компания подтверждена</span><span><span class="icon warning">!</span>есть риск-сигналы</span></div>
+      <div id="sourceReport" class="source-report hidden" role="status"></div>
+      <div id="results" class="results-grid"></div>
+    </section>
+  </main>
+
+  <template id="jobTemplate">
+    <article class="job-card">
+      <div class="match-rail"><span></span></div>
+      <div class="job-main">
+        <div class="job-topline"><span class="match-badge"></span><span class="bucket-badge"></span><span class="freshness"></span></div>
+        <h3></h3>
+        <div class="company-row"><span class="company"></span><span class="company-status"></span></div>
+        <p class="description"></p>
+        <div class="job-tags"></div>
+        <details class="explanation"><summary>Почему эта позиция здесь</summary><div class="score-bars"></div><p class="missing"></p></details>
+      </div>
+      <aside class="job-facts">
+        <div class="salary"></div>
+        <dl><div><dt>Локация</dt><dd class="location"></dd></div><div><dt>Источник</dt><dd class="source"></dd></div><div><dt>Проверка</dt><dd class="verification"></dd></div></dl>
+        <a class="open-job" target="_blank" rel="noopener noreferrer">Открыть вакансию <span>↗</span></a>
+      </aside>
+    </article>
+  </template>
+
+  <script type="module" src="/app.js?v=20260729-2"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "scope": {
+    "included": ["europe", "north-america", "global-remote"],
+    "excludedRegional": ["asia", "middle-east", "africa"]
+  },
+  "greenhouseBoards": [
+    {
+      "slug": "company-board-token",
+      "name": "Название компании",
+      "homepage": "https://company.example/careers",
+      "regions": ["europe", "global-remote"],
+      "enabled": true
+    }
+  ],
+  "ashbyBoards": [],
+  "leverSites": []
+}

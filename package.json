@@ -1,0 +1,17 @@
+{
+  "name": "vacation-hunter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Explainable vacancy aggregator and ranking engine",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --test",
+    "smoke:live": "node scripts/smoke-live.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

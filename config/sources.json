@@ -1,0 +1,102 @@
+{
+  "scope": {
+    "included": ["russia-cis", "europe", "north-america", "latin-america", "oceania", "global-remote"],
+    "excludedRegional": ["asia", "middle-east", "africa"]
+  },
+  "greenhouseBoards": [
+    {
+      "slug": "canonical",
+      "name": "Canonical",
+      "homepage": "https://canonical.com/careers",
+      "regions": ["europe", "north-america", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "grafanalabs",
+      "name": "Grafana Labs",
+      "homepage": "https://grafana.com/about/careers/open-positions/",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "elastic",
+      "name": "Elastic",
+      "homepage": "https://www.elastic.co/about/careers",
+      "regions": ["europe", "north-america", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "gitlab",
+      "name": "GitLab",
+      "homepage": "https://about.gitlab.com/jobs/",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "cloudflare",
+      "name": "Cloudflare",
+      "homepage": "https://www.cloudflare.com/careers/jobs/",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    }
+  ],
+  "ashbyBoards": [
+    {
+      "slug": "qdrant.tech",
+      "name": "Qdrant",
+      "homepage": "https://qdrant.tech/careers/",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "enode",
+      "name": "Enode",
+      "homepage": "https://enode.com/careers",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "percona",
+      "name": "Percona",
+      "homepage": "https://www.percona.com/about-us/careers",
+      "regions": ["europe", "north-america", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "reedsy",
+      "name": "Reedsy",
+      "homepage": "https://reedsy.com/about/careers",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "granular-energy.com",
+      "name": "Granular Energy",
+      "homepage": "https://www.granular-energy.com/careers",
+      "regions": ["europe", "global-remote"]
+    }
+  ],
+  "leverSites": [
+    {
+      "slug": "swissborg",
+      "name": "SwissBorg",
+      "homepage": "https://swissborg.com/careers",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "zartis",
+      "name": "Zartis",
+      "homepage": "https://www.zartis.com/careers/",
+      "regions": ["europe", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "aircall",
+      "name": "Aircall",
+      "homepage": "https://aircall.io/careers/",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "payugpo",
+      "name": "PayU GPO",
+      "homepage": "https://careers.payu.com/",
+      "regions": ["europe", "latin-america"]
+    },
+    {
+      "slug": "matchgroup",
+      "name": "Match Group",
+      "homepage": "https://mtch.com/careers",
+      "regions": ["europe", "north-america"]
+    }
+  ]
+}
