@@ -54,6 +54,24 @@ a { color: inherit; }
 .source-actions button:disabled { color: #8c9792; background: #e8ece9; cursor: default; }
 .source-actions a { color: var(--green); font-size: 12px; font-weight: 750; text-decoration: none; }
 .source-static { color: var(--muted); font-size: 11px; }
+.notification-center { margin: 18px 0 12px; padding: 17px; border: 1px solid #cbded2; border-radius: 13px; background: #fafffb; }
+.notification-loading { color: var(--muted); font-size: 12px; }
+.notification-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.notification-head h3 { margin: 2px 0 0; font-size: 18px; }
+.notification-head b { padding: 4px 8px; border-radius: 999px; color: #14623f; background: #def1e5; font-size: 10px; }
+.notification-head b[data-notification-status="disabled"] { color: #85510d; background: #fff0cf; }
+.notification-head b[data-notification-status="degraded"] { color: #9a4f32; background: #fbe5dc; }
+.notification-center > p { margin: 10px 0; color: var(--muted); font-size: 12px; }
+.notification-center .source-problem { color: #925333; }
+.notification-stats { display: flex; flex-wrap: wrap; gap: 5px 13px; color: var(--muted); font-size: 11px; }
+.notification-message { padding: 8px 10px; border-radius: 8px; }
+.notification-message.ok { color: #14623f; background: #e4f3e9; }
+.notification-message.error { color: #8b452b; background: #fbe9e2; }
+.notification-actions { flex-wrap: wrap; }
+.notification-actions .secondary-action { color: var(--green); background: #e2eee6; }
+.discovered-chats { display: grid; gap: 6px; margin-top: 12px; padding: 10px; border-radius: 9px; background: #eef5f0; font-size: 11px; }
+.discovered-chats > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.discovered-chats small { color: var(--muted); }
 main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .hero { padding: 92px 0 70px; max-width: 970px; }
 .eyebrow { margin: 0 0 14px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }

@@ -20,11 +20,12 @@ function publicWatch(watch) {
 }
 
 export class JobService extends EventEmitter {
-  constructor({ connectors, store, watchStore = null, config }) {
+  constructor({ connectors, store, watchStore = null, notificationService = null, config }) {
     super();
     this.connectors = connectors;
     this.store = store;
     this.watchStore = watchStore;
+    this.notificationService = notificationService;
     this.config = config;
     this.sourceStatus = new Map(connectors.map((source) => [source.id, {
       id: source.id,
@@ -53,7 +54,7 @@ export class JobService extends EventEmitter {
   parse(raw) { return parseQuery(raw); }
 
   async initialize() {
-    await Promise.all([this.store.load(), this.watchStore?.load()]);
+    await Promise.all([this.store.load(), this.watchStore?.load(), this.notificationService?.initialize()]);
     const demo = this.connectors.find((connector) => connector.id === "demo");
     if (demo) await this.ingestConnector(demo, parseQuery("работа"));
   }
@@ -164,11 +165,23 @@ export class JobService extends EventEmitter {
       throw error;
     }
     const report = await this.refresh(existing.query);
-    const { watch, newJobIds } = await this.watchStore.recordResults(id, this.matchingJobIds(existing.query));
+    const matchingIds = this.matchingJobIds(existing.query);
+    const knownIds = new Set(existing.knownJobIds || []);
+    const anticipatedNewIds = matchingIds.filter((jobId) => !knownIds.has(jobId));
+    if (anticipatedNewIds.length) {
+      const wanted = new Set(anticipatedNewIds);
+      const jobs = this.store.jobs.filter((job) => wanted.has(job.id));
+      await this.notificationService?.enqueueWatchJobs(publicWatch(existing), jobs);
+    }
+    const { watch, newJobIds } = await this.watchStore.recordResults(id, matchingIds);
     const exposed = publicWatch(watch);
-    if (newJobIds.length) this.emit("watch-jobs", { watch: exposed, newJobIds });
+    let notificationReport = [];
+    if (newJobIds.length) {
+      notificationReport = await this.notificationService?.flush() || [];
+      this.emit("watch-jobs", { watch: exposed, newJobIds });
+    }
     this.emit("watch", { action: "updated", watch: exposed });
-    return { watch: exposed, newJobIds, report };
+    return { watch: exposed, newJobIds, report, notificationReport };
   }
 
   async acknowledgeWatch(id) {
@@ -180,6 +193,11 @@ export class JobService extends EventEmitter {
 
   getWatches() { return (this.watchStore?.watches || []).map(publicWatch); }
   getWatchQueries() { return (this.watchStore?.watches || []).map((watch) => watch.query); }
+  getNotificationStatus() { return this.notificationService?.status() || { id: "telegram", enabled: false, status: "disabled" }; }
+  async flushNotifications() { return this.notificationService?.flush() || []; }
+  async retryNotifications() { return this.notificationService?.retryFailed() || []; }
+  async sendTestNotification() { return this.notificationService?.sendTest(); }
+  async discoverNotificationChats() { return this.notificationService?.discoverChats(); }
 
   async verify(ids) {
     const wanted = new Set(ids);

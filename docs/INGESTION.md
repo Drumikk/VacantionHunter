@@ -78,6 +78,14 @@ $env:HH_USER_AGENT='VacationHunter/0.2 (contact: ваш-email@example.com)'
 - Одинаковый запрос к tokenized API кэшируется на `AGGREGATOR_CACHE_MS` (по умолчанию 15 минут).
 - 401/403 дают длительный cooldown, 429 учитывает `Retry-After`, временные ошибки получают exponential backoff.
 - Система не обходит CAPTCHA, Cloudflare, paywall, login wall или ограничения выдачи.
+
+## Автоматическая доставка результатов
+
+Сохранённый поиск обновляется планировщиком и сравнивается с `knownJobIds`. Для новых ID формируется Telegram-дайджест максимум из `NOTIFICATION_MAX_JOBS` вакансий. Событие сначала кладётся в `data/notification-outbox.json` и получает детерминированный dedupe key из watch ID и набора вакансий; только после этого новые ID фиксируются в durable watch store. Такой порядок не теряет событие при остановке процесса между записями, а повторная постановка схлопывается dedupe key.
+
+Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`. Токен создаётся официальным `@BotFather`; пользователь должен сначала написать боту, поскольку бот не может сам начать личный диалог. Если задан только токен, `POST /api/notifications/discover` читает `getUpdates` и возвращает безопасный список последних chat ID без токена. `POST /api/notifications/test` проверяет готовую конфигурацию.
+
+Доставка использует `sendMessage`, plain text не длиннее 4000 символов и отключённые link previews. Очередь сериализует отправку, сохраняет попытки и `message_id`; для flood control применяется полученный `retry_after`, для остальных ошибок — exponential backoff. После исчерпания попыток запись становится `failed`, а ручная команда «Повторить очередь» возвращает dead-letter записи в доставку. Статус доступен в `GET /api/notifications/status` без значений credentials.
 - Adzuna по умолчанию не включён: официальные условия указывают базовые лимиты 25 запросов/минуту и 250/день, обязательную атрибуцию при публикации объявлений и возможную лицензию для длительного использования.
 
 ## Первичные документы
@@ -89,3 +97,5 @@ $env:HH_USER_AGENT='VacationHunter/0.2 (contact: ваш-email@example.com)'
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>
 - Indeed Partner API guides: <https://docs.indeed.com/api-guides/>
+- Telegram Bot API `sendMessage`, `getUpdates` и `retry_after`: <https://core.telegram.org/bots/api>
+- Официальное создание бота через BotFather: <https://core.telegram.org/bots/features#botfather>

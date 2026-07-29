@@ -1,5 +1,5 @@
 const $ = (selector) => document.querySelector(selector);
-const state = { parsed: null, response: null, searching: false, watches: [], watchBusy: false, sources: [], sourceBusy: new Set() };
+const state = { parsed: null, response: null, searching: false, watches: [], watchBusy: false, sources: [], sourceBusy: new Set(), notification: null, notificationBusy: false, discoveredChats: [] };
 const formatter = new Intl.NumberFormat("ru-RU");
 
 function escapeHtml(value = "") { return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char])); }
@@ -190,6 +190,55 @@ async function loadSources() {
   catch (error) { $("#sourcesSummary").textContent = `Не удалось загрузить источники: ${error.message}`; }
 }
 
+function renderNotification(notification = state.notification, message = null, tone = "") {
+  state.notification = notification;
+  const box = $("#notificationCenter");
+  if (!notification) { box.innerHTML = '<div class="notification-loading">Проверяем канал уведомлений…</div>'; return; }
+  const ready = notification.enabled;
+  const statusText = ready ? notification.status === "degraded" ? "Требует внимания" : "Подключён" : "Не настроен";
+  const lastSent = notification.lastSentAt ? dateTimeText(notification.lastSentAt) : "ещё не отправлялись";
+  const missing = [!notification.botConfigured ? "TELEGRAM_BOT_TOKEN" : null, !notification.chatConfigured ? "TELEGRAM_CHAT_ID" : null].filter(Boolean);
+  box.innerHTML = `<div class="notification-head">
+      <div><p class="eyebrow">Доставка новых вакансий</p><h3 id="notificationTitle">Telegram</h3></div>
+      <b data-notification-status="${escapeHtml(notification.status)}">${escapeHtml(statusText)}</b>
+    </div>
+    <p>${ready ? "Новые совпадения из сохранённых поисков автоматически отправляются в настроенный чат." : "Создайте бота через @BotFather, напишите ему /start и добавьте реквизиты в .env."}</p>
+    <div class="notification-stats"><span>В очереди: <strong>${notification.pending || 0}</strong></span><span>Отправлено: <strong>${notification.sent || 0}</strong></span><span>Ошибок: <strong>${notification.failed || 0}</strong></span><span>Последняя доставка: <strong>${escapeHtml(lastSent)}</strong></span></div>
+    ${missing.length ? `<div class="source-credentials"><span>Добавьте в <code>.env</code></span>${missing.map((field) => `<code>${field}</code>`).join("")}</div>` : ""}
+    ${state.discoveredChats.length ? `<div class="discovered-chats"><strong>Найденные чаты</strong>${state.discoveredChats.map((chat) => `<div><span>${escapeHtml(chat.title)} · ${escapeHtml(chat.type)}</span><code>${escapeHtml(chat.id)}</code></div>`).join("")}<small>Скопируйте нужный ID в <code>TELEGRAM_CHAT_ID</code> и перезапустите приложение.</small></div>` : ""}
+    ${notification.lastError ? `<p class="source-problem">${escapeHtml(notification.lastError)}</p>` : ""}
+    ${message ? `<p class="notification-message ${escapeHtml(tone)}" role="status">${escapeHtml(message)}</p>` : ""}
+    <div class="source-actions notification-actions">
+      <button type="button" data-test-notification ${ready && !state.notificationBusy ? "" : "disabled"}>${state.notificationBusy ? "Отправляем…" : "Отправить тест"}</button>
+      ${notification.canDiscover && !notification.chatConfigured ? `<button type="button" class="secondary-action" data-discover-chats ${state.notificationBusy ? "disabled" : ""}>Найти chat ID</button>` : ""}
+      ${notification.pending || notification.failed ? `<button type="button" class="secondary-action" data-flush-notifications ${state.notificationBusy ? "disabled" : ""}>Повторить очередь</button>` : ""}
+      <a href="${escapeHtml(notification.setupUrl || "https://core.telegram.org/bots/features#botfather")}" target="_blank" rel="noopener noreferrer">Настройка бота ↗</a>
+    </div>`;
+}
+
+async function loadNotification() {
+  try { renderNotification(await api("/api/notifications/status", undefined, "GET")); }
+  catch (error) { $("#notificationCenter").innerHTML = `<p class="source-problem">Не удалось загрузить уведомления: ${escapeHtml(error.message)}</p>`; }
+}
+
+async function notificationAction(action) {
+  if (state.notificationBusy) return;
+  state.notificationBusy = true;
+  renderNotification();
+  try {
+    const result = await api(`/api/notifications/${action}`, {});
+    if (action === "discover") state.discoveredChats = result.chats || [];
+    const status = result.status || await api("/api/notifications/status", undefined, "GET");
+    state.notificationBusy = false;
+    const successText = action === "test" ? "Тестовое сообщение отправлено." : action === "discover" ? state.discoveredChats.length ? `Найдено чатов: ${state.discoveredChats.length}.` : "Чаты не найдены. Напишите боту /start и повторите." : "Очередь обработана.";
+    renderNotification(status, successText, "ok");
+  } catch (error) {
+    const status = await api("/api/notifications/status", undefined, "GET").catch(() => state.notification);
+    state.notificationBusy = false;
+    renderNotification(status, `Не удалось отправить: ${error.message}`, "error");
+  }
+}
+
 async function refreshSource(sourceId) {
   if (state.sourceBusy.has(sourceId)) return;
   state.sourceBusy.add(sourceId);
@@ -214,6 +263,7 @@ async function refreshSource(sourceId) {
 }
 
 function openSources() {
+  loadNotification();
   $("#sourcesPanel").classList.remove("hidden");
   $("#sourcesBackdrop").classList.remove("hidden");
   $("#sourceHealth").setAttribute("aria-expanded", "true");
@@ -271,6 +321,11 @@ $("#sourcesBackdrop").addEventListener("click", closeSources);
 $("#sourceList").addEventListener("click", (event) => {
   const button = event.target.closest("[data-refresh-source]");
   if (button) refreshSource(button.dataset.refreshSource);
+});
+$("#notificationCenter").addEventListener("click", (event) => {
+  if (event.target.closest("[data-test-notification]")) notificationAction("test");
+  if (event.target.closest("[data-flush-notifications]")) notificationAction("flush");
+  if (event.target.closest("[data-discover-chats]")) notificationAction("discover");
 });
 document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !$("#sourcesPanel").classList.contains("hidden")) closeSources(); });
 $("#watchSearch").addEventListener("change", async (event) => {
@@ -351,9 +406,11 @@ events.addEventListener("watch-jobs", (event) => {
     state.watches = [watch, ...state.watches.filter((item) => item.id !== watch.id)];
     renderWatches();
     syncWatchState(state.response?.query?.raw || $("#query").value);
+    loadNotification();
   } catch { /* a later watch snapshot will resynchronize state */ }
 });
 
 loadWatches();
 loadSources();
+loadNotification();
 parseCurrent();

@@ -12,6 +12,8 @@
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
 | Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination; вакансии из множества интернет-источников | `src/connectors/jooble.js` |
 | USAJOBS Search API | <https://developer.usajobs.gov/api-reference/get-api-search> | API key + email headers, keyword/location/remote/date filters, salary и application close date | `src/connectors/usajobs.js` |
+| Telegram Bot API | <https://core.telegram.org/bots/api> | HTTPS JSON, `sendMessage` до 4096 символов, `getUpdates`, flood-control `retry_after` | `src/services/notification-service.js` |
+| Telegram BotFather | <https://core.telegram.org/bots/features#botfather> | `/newbot` создаёт бота и выдаёт секретный authentication token | `.env` + центр уведомлений |
 | LinkedIn automation limits | <https://www.linkedin.com/legal/user-agreement> | scraping, bots и копирование cookies запрещены без отдельного разрешения | policy: connector disabled without partnership |
 | Indeed Partner APIs | <https://docs.indeed.com/api-guides/> | текущие API ориентированы на employer/job posting/candidate sync, не публичную выгрузку search results | policy: connector disabled without partnership |
 | Актуальность JobPosting | <https://developers.google.com/search/docs/appearance/structured-data/job-posting> | `datePosted`, `validThrough`, полный текст, способ отклика; запрет expired/fake/pay-to-apply | `src/core/authenticity.js` |

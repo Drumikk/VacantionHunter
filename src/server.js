@@ -5,6 +5,8 @@ import { config } from "./config.js";
 import { createConnectors } from "./connectors/index.js";
 import { JobStore } from "./services/store.js";
 import { WatchStore } from "./services/watch-store.js";
+import { NotificationOutbox } from "./services/notification-outbox.js";
+import { NotificationService } from "./services/notification-service.js";
 import { JobService } from "./services/job-service.js";
 import { startScheduler } from "./services/scheduler.js";
 
@@ -13,7 +15,8 @@ const contentTypes = { ".html": "text/html; charset=utf-8", ".js": "text/javascr
 
 const store = new JobStore(config.storePath);
 const watchStore = new WatchStore(config.watchStorePath);
-const service = new JobService({ connectors: createConnectors(config), store, watchStore, config });
+const notificationService = new NotificationService({ outbox: new NotificationOutbox(config.notificationOutboxPath), config });
+const service = new JobService({ connectors: createConnectors(config), store, watchStore, notificationService, config });
 await service.initialize();
 startScheduler(service, config.refreshIntervalMs);
 
@@ -47,8 +50,12 @@ async function serveStatic(urlPath, res) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   try {
-    if (req.method === "GET" && url.pathname === "/api/health") return json(res, 200, { ok: true, jobs: store.jobs.length, watches: service.getWatches().length, scope: config.sourceScope, sources: service.getSources() });
+    if (req.method === "GET" && url.pathname === "/api/health") return json(res, 200, { ok: true, jobs: store.jobs.length, watches: service.getWatches().length, scope: config.sourceScope, sources: service.getSources(), notifications: service.getNotificationStatus() });
     if (req.method === "GET" && url.pathname === "/api/sources") return json(res, 200, service.getSources());
+    if (req.method === "GET" && url.pathname === "/api/notifications/status") return json(res, 200, service.getNotificationStatus());
+    if (req.method === "POST" && url.pathname === "/api/notifications/test") return json(res, 200, await service.sendTestNotification());
+    if (req.method === "POST" && url.pathname === "/api/notifications/discover") return json(res, 200, await service.discoverNotificationChats());
+    if (req.method === "POST" && url.pathname === "/api/notifications/flush") return json(res, 200, { report: await service.retryNotifications(), status: service.getNotificationStatus() });
     if (req.method === "GET" && url.pathname === "/api/watches") return json(res, 200, { watches: service.getWatches() });
     if (req.method === "GET" && url.pathname === "/api/events") {
       res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });

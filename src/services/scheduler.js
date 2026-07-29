@@ -14,6 +14,7 @@ export async function refreshWatchedQueries(service) {
   for (const query of recentQueries) {
     try { await service.refresh(query); } catch { /* each source is isolated and reported */ }
   }
+  try { await service.flushNotifications?.(); } catch { /* durable outbox keeps failed deliveries for the next cycle */ }
 }
 
 export function startScheduler(service, intervalMs) {

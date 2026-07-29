@@ -77,7 +77,14 @@ test("job service baselines an observation and emits only later matching jobs", 
   }];
   const store = { jobs, async load() {}, async merge() {} };
   const watchStore = new WatchStore(path.join(directory, "watches.json"));
-  const service = new JobService({ connectors: [], store, watchStore, config: {} });
+  const notificationCalls = [];
+  const notificationService = {
+    async initialize() {},
+    async enqueueWatchJobs(savedWatch, newJobs) { notificationCalls.push({ watch: savedWatch, jobs: newJobs }); },
+    async flush() { return [{ status: "sent" }]; },
+    status() { return { enabled: true, status: "ready" }; },
+  };
+  const service = new JobService({ connectors: [], store, watchStore, notificationService, config: {} });
   await service.initialize();
 
   const watch = await service.addWatch("Python developer remote");
@@ -92,5 +99,40 @@ test("job service baselines an observation and emits only later matching jobs", 
   assert.equal(refreshed.watch.newCount, 1);
   assert.equal(notification.watch.id, watch.id);
   assert.deepEqual(notification.newJobIds, ["job:new"]);
+  assert.equal(notificationCalls.length, 1);
+  assert.equal(notificationCalls[0].watch.id, watch.id);
+  assert.deepEqual(notificationCalls[0].jobs.map((job) => job.id), ["job:new"]);
+  assert.deepEqual(refreshed.notificationReport, [{ status: "sent" }]);
   assert.equal((await service.acknowledgeWatch(watch.id)).newCount, 0);
+});
+
+test("does not mark a new job as known when durable notification enqueue fails", async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "vacation-hunter-outbox-order-"));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const jobs = [{
+    id: "job:known", externalId: "known", title: "Python Developer", company: "Known Co",
+    description: "Python backend remote", skills: ["python"], remote: true, location: "Remote",
+    postedAt: new Date().toISOString(), url: "https://example.test/known",
+    source: { id: "test", name: "Test" }, verification: { status: "verified", score: 90, risks: [] },
+  }];
+  const watchStore = new WatchStore(path.join(directory, "watches.json"));
+  const notificationService = {
+    async initialize() {},
+    async enqueueWatchJobs() { throw new Error("outbox disk unavailable"); },
+    async flush() { return []; },
+    status() { return { enabled: true }; },
+  };
+  const service = new JobService({
+    connectors: [],
+    store: { jobs, async load() {}, async merge() {} },
+    watchStore,
+    notificationService,
+    config: {},
+  });
+  await service.initialize();
+  const watch = await service.addWatch("Python developer remote");
+  jobs.push({ ...jobs[0], id: "job:new", externalId: "new", company: "New Co", url: "https://example.test/new" });
+
+  await assert.rejects(service.refreshWatch(watch.id), /outbox disk unavailable/);
+  assert.equal(watchStore.get(watch.id).knownJobIds.includes("job:new"), false);
 });

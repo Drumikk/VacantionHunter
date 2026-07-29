@@ -9,10 +9,10 @@
 | 3 | Проверка существования и подлинности | provenance, trusted employer, archived/closed, HTTPS/HTTP, JSON-LD, validThrough, риск-фразы, SSRF-защита | `src/core/authenticity.js`, `tests/authenticity.test.js` | Реализовано; внешняя проверка вероятностная |
 | 4 | Минималистичный UI, уточнения, обработка, multi-sort | natural-language form, chips, clarifications, progress, карточки, две сортировки | `public/`, проверка desktop/mobile в браузере | Реализовано |
 | 5 | Информативные поля и визуальные статусы | employer, source/link, description, match rail, salary, verification, suspicion, location, freshness, tags, score explanation | `public/index.html`, `public/app.js` | Реализовано |
-| 6 | Эффективная загрузка и опциональные свежие результаты | параллельные адаптеры, timeout, retry policy, background scheduler, durable watch store, SSE, watch toggle, cooldown | `src/services/`, `tests/source-resilience.test.js`, `tests/watch-store.test.js` | Реализовано локально |
+| 6 | Эффективная загрузка и опциональные свежие результаты | параллельные адаптеры, timeout, retry policy, background scheduler, durable watch store, SSE, watch toggle, cooldown, Telegram outbox/retry/dedupe | `src/services/`, `tests/source-resilience.test.js`, `tests/watch-store.test.js`, `tests/notifications.test.js` | Реализовано локально, включая внешнюю доставку |
 | 7 | Эффективная агрегация и политика авторизации | tokenized aggregator/official API → public ATS → feed → разрешённый HTML; OAuth/key/partner для закрытого; без bypass | `src/connectors/`, `docs/INGESTION.md`, `docs/RESEARCH.md` | Реализованы 9 типов коннекторов, включая Jooble и USAJOBS |
 | 8 | Возможность менять требования | изолированные core/connectors/services/UI, нормализованный Job contract | `docs/ARCHITECTURE.md` | Реализовано |
-| 9 | Решения с доказательствами и тест-кейсами | первичные документы API/стандартов, 24 автоматизированных теста | `docs/RESEARCH.md`, `docs/INGESTION.md`, `tests/` | Реализовано для MVP |
+| 9 | Решения с доказательствами и тест-кейсами | первичные документы API/стандартов, 31 автоматизированный тест | `docs/RESEARCH.md`, `docs/INGESTION.md`, `tests/` | Реализовано для MVP |
 | 10 | Отсутствие скрытых белых пятен | источник сообщает disabled/cooldown/error; UI показывает частичные сбои; ограничения документированы | `/api/sources`, source report в UI | Реализовано для известных состояний |
 
 ## Что ещё требуется перед production
@@ -22,6 +22,6 @@
 3. Реальные credentials/slug-реестр разрешённых источников и юридическая матрица ToS/DPA.
 4. Размеченный relevance dataset и сравнение baseline/BM25/hybrid/RRF по nDCG@10 и Recall@50.
 5. Наблюдаемость, алерты, лимиты бюджета источников и нагрузочные тесты.
-6. Пользовательские аккаунты и durable delivery для email/Telegram, если это войдёт в продуктовый scope.
+6. Пользовательские аккаунты и привязка отдельных Telegram/email-каналов к каждому пользователю. Однопользовательская durable Telegram delivery уже реализована.
 
 Эти пункты не нужны для демонстрации текущей логики, но обязательны для эксплуатации агрегатора с большим числом источников и пользователей.

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="VacationHunter — объяснимый агрегатор вакансий">
   <title>VacationHunter — вакансии без шума</title>
-  <link rel="stylesheet" href="/styles.css?v=20260729-4">
+  <link rel="stylesheet" href="/styles.css?v=20260729-5">
 </head>
 <body>
   <header class="topbar">
@@ -23,6 +23,9 @@
       <button type="button" class="sources-close" id="sourcesClose" aria-label="Закрыть">×</button>
     </div>
     <p class="sources-intro">Здесь видны API и карьерные системы, их готовность и последняя синхронизация. Секреты хранятся только на сервере в <code>.env</code>.</p>
+    <section class="notification-center" id="notificationCenter" aria-labelledby="notificationTitle">
+      <div class="notification-loading">Проверяем канал уведомлений…</div>
+    </section>
     <div class="sources-summary" id="sourcesSummary" aria-live="polite"></div>
     <div class="source-list" id="sourceList"></div>
   </aside>
@@ -107,6 +110,6 @@
     </article>
   </template>
 
-  <script type="module" src="/app.js?v=20260729-4"></script>
+  <script type="module" src="/app.js?v=20260729-5"></script>
 </body>
 </html>
