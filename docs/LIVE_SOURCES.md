@@ -23,7 +23,7 @@
 
 ## Независимая проверка GitHub Actions
 
-[Workflow run 30499284727](https://github.com/Drumikk/VacantionHunter/actions/runs/30499284727) на commit `76a9e90` завершился успешно 2026-07-29:
+[Workflow run 30499493796](https://github.com/Drumikk/VacantionHunter/actions/runs/30499493796) на commit `66fb7cc` завершился успешно 2026-07-29:
 
 | Метрика | GitHub Actions |
 |---|---:|
@@ -32,6 +32,7 @@
 | Отключены до настройки доступа | 5 |
 | Ошибки включённых источников | 0 |
 | Полные совпадения обязательных условий | 1 |
+| Релевантные частичные совпадения | 5 |
 
 В CI успешно ответили Remotive, Arbeitnow и все пять Greenhouse boards, которые частично блокировались или зависали из локального Windows egress. Это подтверждает, что их коннекторы и официальные endpoints работоспособны, а локальные ошибки являются инфраструктурно-зависимыми. Machine-readable JSON сохранён как artifact запуска.
 
