@@ -21,6 +21,20 @@
 
 Полное совпадение: [Sola — Software Engineer, Windows AI Automation](https://jobs.ashbyhq.com/sola/9a9c39a9-6a15-4b76-b538-f7d219fdb92e), remote, relocation support, USD 160–300k/year, нормализованный нижний порог USD 13,333/month, match 100%.
 
+## Независимая проверка GitHub Actions
+
+[Workflow run 30499284727](https://github.com/Drumikk/VacantionHunter/actions/runs/30499284727) на commit `76a9e90` завершился успешно 2026-07-29:
+
+| Метрика | GitHub Actions |
+|---|---:|
+| Всего наблюдаемых источников | 23 |
+| Успешно ответили | 18 |
+| Отключены до настройки доступа | 5 |
+| Ошибки включённых источников | 0 |
+| Полные совпадения обязательных условий | 1 |
+
+В CI успешно ответили Remotive, Arbeitnow и все пять Greenhouse boards, которые частично блокировались или зависали из локального Windows egress. Это подтверждает, что их коннекторы и официальные endpoints работоспособны, а локальные ошибки являются инфраструктурно-зависимыми. Machine-readable JSON сохранён как artifact запуска.
+
 ## Матрица
 
 | Группа | Источник | Статус | Результат / действие |

@@ -2,7 +2,7 @@ import { config } from "../src/config.js";
 import { createConnectors } from "../src/connectors/index.js";
 import { assessJob } from "../src/core/authenticity.js";
 import { parseQuery } from "../src/core/query-parser.js";
-import { rankJobs } from "../src/core/ranker.js";
+import { isRelevantMatch, rankJobs } from "../src/core/ranker.js";
 
 const strict = process.argv.includes("--strict");
 const sourceFilter = process.argv.find((argument) => argument.startsWith("--source="))?.slice("--source=".length) || null;
@@ -25,7 +25,7 @@ const results = await Promise.all(connectors.map(async (connector) => {
   }
   try {
     const jobs = (await connector.search(query)).map((job) => ({ ...job, verification: assessJob(job) }));
-    const ranked = rankJobs(jobs, query);
+    const ranked = rankJobs(jobs, query).filter((job) => isRelevantMatch(job, query));
     const full = ranked.filter((job) => job.andMatch && !job.unsafe);
     const partial = ranked.filter((job) => job.matchPercent > 0 && !job.andMatch && !job.unsafe);
     const best = full[0] || partial[0] || ranked[0];
