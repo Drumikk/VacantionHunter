@@ -9,10 +9,10 @@
 | 3 | Проверка существования и подлинности | provenance, trusted employer, archived/closed, HTTPS/HTTP, JSON-LD, validThrough, риск-фразы, SSRF-защита | `src/core/authenticity.js`, `tests/authenticity.test.js` | Реализовано; внешняя проверка вероятностная |
 | 4 | Минималистичный UI, уточнения, обработка, multi-sort | natural-language form, chips, clarifications, progress, карточки, две сортировки | `public/`, проверка desktop/mobile в браузере | Реализовано |
 | 5 | Информативные поля и визуальные статусы | employer, source/link, description, match rail, salary, verification, suspicion, location, freshness, tags, score explanation | `public/index.html`, `public/app.js` | Реализовано |
-| 6 | Эффективная загрузка и опциональные свежие результаты | параллельные адаптеры, timeout, retry policy, background scheduler, SSE, watch toggle, cooldown | `src/services/`, `tests/source-resilience.test.js` | Реализовано локально |
-| 7 | Эффективная агрегация и политика авторизации | official API → public ATS → feed → разрешённый HTML; OAuth/key/partner для закрытого; без bypass | `src/connectors/`, `docs/RESEARCH.md` | Реализован каркас и 6 типов коннекторов |
+| 6 | Эффективная загрузка и опциональные свежие результаты | параллельные адаптеры, timeout, retry policy, background scheduler, durable watch store, SSE, watch toggle, cooldown | `src/services/`, `tests/source-resilience.test.js`, `tests/watch-store.test.js` | Реализовано локально |
+| 7 | Эффективная агрегация и политика авторизации | tokenized aggregator/official API → public ATS → feed → разрешённый HTML; OAuth/key/partner для закрытого; без bypass | `src/connectors/`, `docs/INGESTION.md`, `docs/RESEARCH.md` | Реализованы 9 типов коннекторов, включая Jooble и USAJOBS |
 | 8 | Возможность менять требования | изолированные core/connectors/services/UI, нормализованный Job contract | `docs/ARCHITECTURE.md` | Реализовано |
-| 9 | Решения с доказательствами и тест-кейсами | первичные документы API/стандартов, 13 автоматизированных тестов | `docs/RESEARCH.md`, `tests/` | Реализовано для MVP |
+| 9 | Решения с доказательствами и тест-кейсами | первичные документы API/стандартов, 24 автоматизированных теста | `docs/RESEARCH.md`, `docs/INGESTION.md`, `tests/` | Реализовано для MVP |
 | 10 | Отсутствие скрытых белых пятен | источник сообщает disabled/cooldown/error; UI показывает частичные сбои; ограничения документированы | `/api/sources`, source report в UI | Реализовано для известных состояний |
 
 ## Что ещё требуется перед production

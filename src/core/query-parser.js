@@ -1,5 +1,6 @@
 import { normalizeText, tokens } from "./text.js";
 import { parseSalaryText, monthlyUsd } from "./salary.js";
+import { extractLocations, matchedLocationTokens } from "./location.js";
 
 const SKILLS = [
   ".net", "dotnet", "c#", "asp.net", "java", "kotlin", "python", "django", "flask", "fastapi",
@@ -12,8 +13,6 @@ const ROLE_PATTERNS = [
   /((?:senior|middle|mid|junior|lead|principal|старший|младший|ведущий)?\s*(?:\.net|dotnet|c#|java|python|javascript|typescript|react|node(?:\.js)?|go|golang|data|backend|frontend|full\s*stack|qa|devops|product)?\s*(?:developer|engineer|разработчик|программист|аналитик|designer|дизайнер|manager|менеджер|tester|тестировщик|architect|архитектор))/iu,
   /((?:data scientist|data engineer|product manager|project manager|business analyst|system analyst|системный аналитик|бизнес аналитик|продакт менеджер))/iu,
 ];
-
-const LOCATIONS = ["москва", "санкт-петербург", "петербург", "россия", "германия", "берлин", "европа", "польша", "сербия", "испания", "португалия", "нидерланды", "канада", "сша", "uk", "великобритания", "remote", "удаленно", "удалённо"];
 
 function unique(values) { return [...new Set(values.filter(Boolean))]; }
 
@@ -34,11 +33,7 @@ export function parseQuery(rawQuery) {
     return normalized.includes(normalizedSkill) || (normalizedSkill === "dotnet" && normalized.includes(".net"));
   }).map((skill) => skill === "dotnet" ? ".net" : skill));
 
-  const locations = unique(LOCATIONS.filter((location) => normalized.includes(normalizeText(location))).map((location) => {
-    if (["remote", "удаленно", "удалённо"].includes(location)) return "remote";
-    if (location === "петербург") return "санкт-петербург";
-    return location;
-  }));
+  const locations = unique(extractLocations(raw));
   const remote = /(remote|удален|удалён|из дома|worldwide)/iu.test(raw);
   const relocation = /relocat|visa sponsorship|рабоч(?:ая|ей) виз|переезд|релокац/iu.test(raw);
   const experienceMatch = raw.match(/\b(intern|стаж[её]р|junior|middle|mid|senior|lead|principal|architect|младший|старший|ведущий)\b/iu);
@@ -46,13 +41,14 @@ export function parseQuery(rawQuery) {
   const employment = /частичн|part[- ]?time/i.test(raw) ? "part-time" : /контракт|contract|freelance|фриланс/i.test(raw) ? "contract" : /стажиров|internship/i.test(raw) ? "internship" : null;
   const exclusions = [...raw.matchAll(/(?:не|без|exclude|-)(?:\s+)([\p{L}\p{N}+#.\-]+)/giu)].map((m) => normalizeText(m[1]));
 
-  const fallbackTerms = tokens(raw).filter((term) => !/\d/.test(term) && ![...skills, ...locations].some((known) => normalizeText(known) === term));
+  const locationTerms = matchedLocationTokens(raw);
+  const fallbackTerms = tokens(raw).filter((term) => !/\d/.test(term) && !locationTerms.has(term) && !["remote", "удаленно", "удаленка"].includes(term) && !skills.some((known) => normalizeText(known) === term));
   if (!role && fallbackTerms.length) role = fallbackTerms.slice(0, 3).join(" ");
 
   const tags = [];
   if (role) tags.push({ id: "role", type: "role", value: role, weight: 5, required: true });
   for (const skill of skills) tags.push({ id: `skill:${skill}`, type: "skill", value: skill, weight: 4, required: true });
-  for (const location of locations.filter((item) => item !== "remote")) tags.push({ id: `location:${location}`, type: "location", value: location, weight: 3, required: true });
+  for (const location of locations) tags.push({ id: `location:${location}`, type: "location", value: location, weight: 3, required: true });
   if (remote) tags.push({ id: "remote", type: "remote", value: true, weight: 3, required: true });
   if (relocation) tags.push({ id: "relocation", type: "relocation", value: true, weight: 3, required: false });
   if (experience) tags.push({ id: "experience", type: "experience", value: experience, weight: 2, required: false });

@@ -41,11 +41,11 @@ async function responseError(response, url) {
   });
 }
 
-export async function fetchJson(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1" } = {}) {
+export async function fetchJson(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1", method = "GET", body = undefined } = {}) {
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
-      const response = await fetchImpl(url, { headers: { Accept: "application/json", "User-Agent": userAgent, ...headers }, signal: AbortSignal.timeout(timeoutMs) });
+      const response = await fetchImpl(url, { method, body, headers: { Accept: "application/json", "User-Agent": userAgent, ...headers }, signal: AbortSignal.timeout(timeoutMs) });
       if (response.status === 429 || response.status >= 500) {
         const retryAfter = Math.min(2_000, Number(response.headers.get("retry-after") || 0) * 1_000 || 250 * (attempt + 1));
         if (attempt < retries) { await new Promise((resolve) => setTimeout(resolve, retryAfter)); continue; }

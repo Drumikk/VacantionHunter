@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadEnvFile } from "./env.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+loadEnvFile(path.join(rootDir, ".env"));
 
 function csv(name) {
   return (process.env[name] || "").split(",").map((item) => item.trim()).filter(Boolean);
@@ -33,6 +35,10 @@ export const config = {
   enableLiveSources: process.env.ENABLE_LIVE_SOURCES !== "false",
   httpUserAgent: process.env.HTTP_USER_AGENT || "VacationHunter/0.1",
   hhUserAgent: process.env.HH_USER_AGENT || "",
+  joobleApiKey: process.env.JOOBLE_API_KEY || "",
+  usajobsApiKey: process.env.USAJOBS_API_KEY || "",
+  usajobsEmail: process.env.USAJOBS_EMAIL || "",
+  aggregatorCacheMs: Number(process.env.AGGREGATOR_CACHE_MS || 15 * 60 * 1000),
   sourceAuthCooldownMs: Number(process.env.SOURCE_AUTH_COOLDOWN_MS || 6 * 60 * 60 * 1000),
   sourceRateLimitCooldownMs: Number(process.env.SOURCE_RATE_LIMIT_COOLDOWN_MS || 15 * 60 * 1000),
   sourceErrorCooldownMs: Number(process.env.SOURCE_ERROR_COOLDOWN_MS || 60 * 1000),
@@ -42,5 +48,6 @@ export const config = {
   ashbyBoards: registryEntries(registry.data, "ashbyBoards", "ASHBY_BOARDS"),
   leverSites: registryEntries(registry.data, "leverSites", "LEVER_SITES"),
   storePath: path.join(rootDir, "data", "job-store.json"),
+  watchStorePath: path.join(rootDir, "data", "watch-store.json"),
   demoPath: path.join(rootDir, "data", "demo-jobs.json"),
 };

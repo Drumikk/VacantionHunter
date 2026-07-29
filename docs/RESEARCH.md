@@ -10,6 +10,10 @@
 | Ashby public Job Postings API | <https://developers.ashbyhq.com/docs/public-job-posting-api> | Список опубликованных вакансий и `includeCompensation=true` | `src/connectors/ashby.js` |
 | Remotive public API | <https://remotive.com/remote-jobs/api> | Разрешена републикация с атрибуцией; public jobs задержаны на 24 часа | `src/connectors/remotive.js` |
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
+| Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination; вакансии из множества интернет-источников | `src/connectors/jooble.js` |
+| USAJOBS Search API | <https://developer.usajobs.gov/api-reference/get-api-search> | API key + email headers, keyword/location/remote/date filters, salary и application close date | `src/connectors/usajobs.js` |
+| LinkedIn automation limits | <https://www.linkedin.com/legal/user-agreement> | scraping, bots и копирование cookies запрещены без отдельного разрешения | policy: connector disabled without partnership |
+| Indeed Partner APIs | <https://docs.indeed.com/api-guides/> | текущие API ориентированы на employer/job posting/candidate sync, не публичную выгрузку search results | policy: connector disabled without partnership |
 | Актуальность JobPosting | <https://developers.google.com/search/docs/appearance/structured-data/job-posting> | `datePosted`, `validThrough`, полный текст, способ отклика; запрет expired/fake/pay-to-apply | `src/core/authenticity.js` |
 | Robots Exclusion Protocol | <https://www.rfc-editor.org/rfc/rfc9309> | Стандартизированный robots.txt для HTML crawler | production policy |
 | Hybrid retrieval | <https://www.elastic.co/docs/solutions/search/hybrid-search> | lexical + vector search, рекомендация RRF | production roadmap |

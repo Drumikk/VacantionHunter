@@ -63,8 +63,8 @@ export function parseSalaryText(text, { fallbackPeriod = "month", fallbackCurren
 export function monthlyUsd(salary, rates = DEFAULT_USD_RATES) {
   if (!salary || !salary.currency) return { min: null, max: null, known: false, approximate: true };
   const rate = rates[salary.currency.toUpperCase()];
-  if (!rate) return { min: null, max: null, known: false, approximate: true };
-  const factor = { hour: 173.33, day: 21.67, week: 52 / 12, month: 1, year: 1 / 12 }[salary.period || "month"] || 1;
+  const factor = { hour: 173.33, day: 21.67, week: 52 / 12, month: 1, year: 1 / 12 }[salary.period];
+  if (!rate || !factor) return { min: null, max: null, known: false, approximate: true };
   const convert = (amount) => amount == null ? null : Math.round(amount * factor * rate);
   return { min: convert(salary.min), max: convert(salary.max), known: salary.min != null || salary.max != null, approximate: salary.currency !== "USD" || salary.period !== "month" };
 }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="VacationHunter — объяснимый агрегатор вакансий">
   <title>VacationHunter — вакансии без шума</title>
-  <link rel="stylesheet" href="/styles.css?v=20260729-2">
+  <link rel="stylesheet" href="/styles.css?v=20260729-4">
 </head>
 <body>
   <header class="topbar">
@@ -13,8 +13,19 @@
       <span class="brand-mark">VH</span>
       <span>VacationHunter</span>
     </a>
-    <div class="source-health" id="sourceHealth"><span class="pulse"></span><span>Источники готовы</span></div>
+    <button type="button" class="source-health" id="sourceHealth" aria-expanded="false" aria-controls="sourcesPanel"><span class="pulse"></span><span>Источники готовы</span></button>
   </header>
+
+  <div class="sources-backdrop hidden" id="sourcesBackdrop"></div>
+  <aside class="sources-panel hidden" id="sourcesPanel" role="dialog" aria-modal="true" aria-labelledby="sourcesTitle">
+    <div class="sources-panel-head">
+      <div><p class="eyebrow">Автоматический сбор</p><h2 id="sourcesTitle">Источники вакансий</h2></div>
+      <button type="button" class="sources-close" id="sourcesClose" aria-label="Закрыть">×</button>
+    </div>
+    <p class="sources-intro">Здесь видны API и карьерные системы, их готовность и последняя синхронизация. Секреты хранятся только на сервере в <code>.env</code>.</p>
+    <div class="sources-summary" id="sourcesSummary" aria-live="polite"></div>
+    <div class="source-list" id="sourceList"></div>
+  </aside>
 
   <main>
     <section class="hero" id="hero">
@@ -31,6 +42,13 @@
       </form>
       <div id="queryTags" class="tag-list" aria-live="polite"></div>
       <div id="clarifications" class="clarifications hidden"></div>
+      <section id="savedSearches" class="saved-searches hidden" aria-labelledby="savedSearchesTitle">
+        <div class="saved-searches-head">
+          <div><p class="eyebrow">Наблюдения</p><h2 id="savedSearchesTitle">Сохранённые поиски</h2></div>
+          <span id="savedSearchCount"></span>
+        </div>
+        <div id="savedSearchList" class="saved-search-list"></div>
+      </section>
     </section>
 
     <section id="processing" class="processing hidden" aria-live="polite">
@@ -58,7 +76,10 @@
               <option value="company:asc">Работодатель</option>
             </select>
           </label>
-          <label class="switch compact"><input type="checkbox" id="watchSearch"><span></span>Следить за новыми</label>
+          <div class="watch-control">
+            <label class="switch compact"><input type="checkbox" id="watchSearch" aria-describedby="watchStatus"><span></span>Следить за новыми</label>
+            <small id="watchStatus" aria-live="polite">Наблюдение выключено</small>
+          </div>
         </div>
       </div>
       <div class="legend"><span><i class="legend-dot great"></i>полное «И»</span><span><i class="legend-dot partial"></i>частичное «ИЛИ»</span><span><span class="icon verified">✓</span>компания подтверждена</span><span><span class="icon warning">!</span>есть риск-сигналы</span></div>
@@ -86,6 +107,6 @@
     </article>
   </template>
 
-  <script type="module" src="/app.js?v=20260729-2"></script>
+  <script type="module" src="/app.js?v=20260729-4"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 import { overlapScore, normalizeText } from "./text.js";
 import { monthlyUsd } from "./salary.js";
+import { locationMatches } from "./location.js";
 
 function includes(value, wanted) { return normalizeText(value).includes(normalizeText(wanted)); }
 
@@ -8,7 +9,7 @@ function tagMatch(tag, job) {
   switch (tag.type) {
     case "role": return overlapScore(normalizeText(tag.value).split(" "), `${job.title || ""} ${job.category || ""}`);
     case "skill": return overlapScore([tag.value], text);
-    case "location": return includes(`${job.location || ""} ${(job.locations || []).join(" ")}`, tag.value) ? 1 : 0;
+    case "location": return locationMatches(`${job.location || ""} ${(job.locations || []).join(" ")}`, tag.value) ? 1 : 0;
     case "remote": return job.remote ? 1 : 0;
     case "relocation": return job.relocation || job.visaSponsorship ? 1 : 0;
     case "experience": return includes(`${job.experience || ""} ${job.title || ""} ${job.description || ""}`, tag.value) ? 1 : 0;

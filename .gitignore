@@ -1,6 +1,7 @@
 node_modules/
 .env
 data/job-store.json
+data/watch-store.json
 data/*.tmp
 coverage/
 outputs/

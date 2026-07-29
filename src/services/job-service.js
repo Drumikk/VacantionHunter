@@ -14,11 +14,17 @@ function nextCooldown(error, failureCount, config) {
   return { reason: error.code || error.name || "source_error", delayMs: exponential };
 }
 
+function publicWatch(watch) {
+  const { knownJobIds, unreadJobIds, ...details } = watch;
+  return { ...details, newCount: unreadJobIds.length, newJobIds: unreadJobIds.slice(0, 100) };
+}
+
 export class JobService extends EventEmitter {
-  constructor({ connectors, store, config }) {
+  constructor({ connectors, store, watchStore = null, config }) {
     super();
     this.connectors = connectors;
     this.store = store;
+    this.watchStore = watchStore;
     this.config = config;
     this.sourceStatus = new Map(connectors.map((source) => [source.id, {
       id: source.id,
@@ -32,6 +38,11 @@ export class JobService extends EventEmitter {
       failureCount: 0,
       cooldownUntil: null,
       attributionUrl: source.attributionUrl,
+      setupUrl: source.setupUrl || null,
+      authType: source.authType || "none",
+      credentialFields: source.credentialFields || [],
+      officialApi: Boolean(source.officialApi),
+      refreshable: source.id !== "demo",
       note: source.note,
       adapter: source.adapter || source.id,
       regions: source.regions || ["global"],
@@ -42,7 +53,7 @@ export class JobService extends EventEmitter {
   parse(raw) { return parseQuery(raw); }
 
   async initialize() {
-    await this.store.load();
+    await Promise.all([this.store.load(), this.watchStore?.load()]);
     const demo = this.connectors.find((connector) => connector.id === "demo");
     if (demo) await this.ingestConnector(demo, parseQuery("работа"));
   }
@@ -97,6 +108,22 @@ export class JobService extends EventEmitter {
     }));
   }
 
+  async checkSource(id, rawQuery) {
+    const source = this.sourceStatus.get(id);
+    if (!source) {
+      const error = new Error("Источник не найден");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!source.refreshable) {
+      const error = new Error("Этот источник не поддерживает ручное обновление");
+      error.statusCode = 400;
+      throw error;
+    }
+    const [result] = await this.refresh(rawQuery || this.lastQueries[0] || "работа", { sourceIds: [id] });
+    return { result, source: this.sourceStatus.get(id) };
+  }
+
   async search({ rawQuery, sort = [], refresh = false, limit = 100 }) {
     const query = this.parse(rawQuery);
     let refreshReport = [];
@@ -104,6 +131,55 @@ export class JobService extends EventEmitter {
     const results = rankJobs(this.store.jobs, query, { sort }).filter((job) => job.matchPercent > 0).slice(0, Math.min(limit, 250));
     return { query, total: results.length, results, refreshReport, sources: this.getSources() };
   }
+
+  async addWatch(rawQuery) {
+    if (!this.watchStore) throw new Error("Хранилище наблюдений не настроено");
+    const query = this.parse(rawQuery);
+    const knownJobIds = this.matchingJobIds(query);
+    const watch = await this.watchStore.add(query.raw, { knownJobIds });
+    if (!this.lastQueries.includes(watch.query)) this.lastQueries = [watch.query, ...this.lastQueries].slice(0, 10);
+    const exposed = publicWatch(watch);
+    this.emit("watch", { action: "added", watch: exposed });
+    return exposed;
+  }
+
+  async removeWatch(id) {
+    if (!this.watchStore) return false;
+    const removed = await this.watchStore.remove(id);
+    if (removed) this.emit("watch", { action: "removed", id });
+    return removed;
+  }
+
+  matchingJobIds(rawQuery) {
+    const query = typeof rawQuery === "string" ? this.parse(rawQuery) : rawQuery;
+    return rankJobs(this.store.jobs, query).filter((job) => job.matchPercent > 0).slice(0, 250).map((job) => job.id);
+  }
+
+  async refreshWatch(id) {
+    if (!this.watchStore) throw new Error("Хранилище наблюдений не настроено");
+    const existing = this.watchStore.get(id);
+    if (!existing) {
+      const error = new Error("Наблюдение не найдено");
+      error.statusCode = 404;
+      throw error;
+    }
+    const report = await this.refresh(existing.query);
+    const { watch, newJobIds } = await this.watchStore.recordResults(id, this.matchingJobIds(existing.query));
+    const exposed = publicWatch(watch);
+    if (newJobIds.length) this.emit("watch-jobs", { watch: exposed, newJobIds });
+    this.emit("watch", { action: "updated", watch: exposed });
+    return { watch: exposed, newJobIds, report };
+  }
+
+  async acknowledgeWatch(id) {
+    if (!this.watchStore) throw new Error("Хранилище наблюдений не настроено");
+    const watch = publicWatch(await this.watchStore.acknowledge(id));
+    this.emit("watch", { action: "acknowledged", watch });
+    return watch;
+  }
+
+  getWatches() { return (this.watchStore?.watches || []).map(publicWatch); }
+  getWatchQueries() { return (this.watchStore?.watches || []).map((watch) => watch.query); }
 
   async verify(ids) {
     const wanted = new Set(ids);

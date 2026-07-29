@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchJson, HttpError } from "../src/connectors/http.js";
 import { hhConnector } from "../src/connectors/hh.js";
+import { joobleConnector } from "../src/connectors/jooble.js";
 import { createConnectors } from "../src/connectors/index.js";
 import { JobService } from "../src/services/job-service.js";
 
@@ -80,4 +81,34 @@ test("creates an independently observable connector for every ATS board", () => 
       ["lever:delta", "Delta"],
     ],
   );
+});
+
+test("exposes source setup metadata without leaking credential values", () => {
+  const secret = "jooble-secret-that-must-not-leak";
+  const connector = joobleConnector({ joobleApiKey: secret, aggregatorCacheMs: 60_000 });
+  const service = new JobService({
+    connectors: [connector],
+    store: { jobs: [], async load() {}, async merge() {} },
+    config: {},
+  });
+  const [source] = service.getSources();
+  assert.equal(source.authType, "api_key");
+  assert.deepEqual(source.credentialFields, ["JOOBLE_API_KEY"]);
+  assert.equal(source.setupUrl, "https://jooble.org/api/about");
+  assert.equal(JSON.stringify(source).includes(secret), false);
+});
+
+test("checks one source without refreshing the others", async () => {
+  const calls = [];
+  const connectors = ["first", "second"].map((id) => ({ id, name: id, async search() { calls.push(id); return []; } }));
+  const service = new JobService({
+    connectors,
+    store: { jobs: [], async load() {}, async merge() {} },
+    config: { sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+  const checked = await service.checkSource("second", "backend developer");
+  assert.deepEqual(calls, ["second"]);
+  assert.equal(checked.result.status, "fulfilled");
+  assert.equal(checked.source.status, "ok");
+  await assert.rejects(service.checkSource("missing", "work"), (error) => error.statusCode === 404);
 });

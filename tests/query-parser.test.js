@@ -18,3 +18,13 @@ test("asks for optional location when it is absent", () => {
   assert.equal(query.experience, "senior");
   assert.ok(query.clarifications.some((item) => item.field === "location"));
 });
+
+test("normalizes Russian and English locations to the same international value", () => {
+  const russian = parseQuery("Python developer Германия");
+  const english = parseQuery("Python developer Germany");
+
+  assert.deepEqual(russian.locations, ["germany"]);
+  assert.deepEqual(english.locations, ["germany"]);
+  assert.equal(russian.role, "python developer");
+  assert.ok(russian.tags.some((tag) => tag.id === "location:germany" && tag.required));
+});

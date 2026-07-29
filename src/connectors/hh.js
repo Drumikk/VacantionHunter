@@ -2,7 +2,15 @@ import { fetchJson } from "./http.js";
 import { stripHtml } from "../core/text.js";
 
 export function hhConnector(config) {
-  const source = { id: "hh", name: "HeadHunter", officialApi: true, attributionUrl: "https://hh.ru/" };
+  const source = {
+    id: "hh",
+    name: "HeadHunter",
+    officialApi: true,
+    attributionUrl: "https://hh.ru/",
+    setupUrl: "https://api.hh.ru/openapi/redoc",
+    authType: "identified_user_agent",
+    credentialFields: ["HH_USER_AGENT"],
+  };
   return {
     ...source,
     enabled: Boolean(config.hhUserAgent),
