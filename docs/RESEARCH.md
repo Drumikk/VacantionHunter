@@ -30,11 +30,13 @@
 
 Такая проверка намеренно различает «API существует по документации» и «API доступен из конкретного окружения сейчас».
 
-Стартовый пакет из 15 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
+Стартовый пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
 
-- Ashby: Qdrant, Enode, Percona, Reedsy, Granular Energy — все вернули `apiVersion=1`, опубликованные вакансии и прямые `jobUrl`;
+- Ashby: Sola, Qdrant, Enode, Percona, Reedsy, Granular Energy — все вернули `apiVersion=1`, опубликованные вакансии и прямые `jobUrl`;
 - Greenhouse: Canonical, Grafana Labs, Elastic, GitLab, Cloudflare — от 131 до 302 опубликованных вакансий на момент проверки;
 - Lever: SwissBorg, Zartis, Aircall, PayU GPO, Match Group — от 4 до 83 опубликованных вакансий на момент проверки.
+
+Точный запрос `.NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией` проверен через общий parser → connector → normalization → ranking контур. Ashby/Sola вернул действующую вакансию `Software Engineer, Windows AI Automation`: remote, relocation support, USD 160–300k/year, 100% обязательных условий. Пять Lever boards завершили полный индексный проход; частичные таймауты отдельных detail pages записываются в diagnostics и не маскируются как падение всей доски. Полная воспроизводимая матрица находится в `docs/LIVE_SOURCES.md`.
 
 ## Географический scope
 

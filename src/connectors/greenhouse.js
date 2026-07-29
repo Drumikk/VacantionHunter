@@ -1,6 +1,8 @@
 import { fetchJson } from "./http.js";
 import { parseSalaryText } from "../core/salary.js";
 import { stripHtml } from "../core/text.js";
+import { retrievalMatches } from "../core/source-query.js";
+import { inferRelocation, inferRemote } from "../core/mobility.js";
 
 function boardEntry(value) {
   return typeof value === "string" ? { slug: value, name: value } : value;
@@ -8,6 +10,7 @@ function boardEntry(value) {
 
 export function greenhouseConnectors(config) {
   return config.greenhouseBoards.map(boardEntry).filter((board) => board?.slug && board.enabled !== false).map((board) => {
+    let lastRun = null;
     const source = {
       id: `greenhouse:${board.slug}`,
       name: board.name || board.slug,
@@ -18,14 +21,41 @@ export function greenhouseConnectors(config) {
     };
     return {
       ...source,
-      async search() {
-        const data = await fetchJson(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board.slug)}/jobs?content=true`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1 });
-        return (data.jobs || []).slice(0, config.maxJobsPerSource).map((item) => ({
-          id: `greenhouse:${board.slug}:${item.id}`, externalId: String(item.id), title: item.title, company: board.name || board.slug, companyVerified: true,
-          description: stripHtml(item.content), url: item.absolute_url, applyUrl: item.absolute_url, location: item.location?.name || "", remote: /remote|worldwide/i.test(item.location?.name || ""),
-          salary: parseSalaryText(stripHtml(item.content), { fallbackPeriod: "year", fallbackCurrency: "USD" }), postedAt: item.updated_at, updatedAt: item.updated_at,
-          source, sourceQuality: 0.96,
+      getDiagnostics() { return lastRun; },
+      async search(query) {
+        const baseUrl = `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board.slug)}`;
+        let data;
+        try {
+          data = await fetchJson(`${baseUrl}/jobs?content=false`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 2, fetchImpl: config.fetchImpl || fetch });
+        } catch (error) {
+          lastRun = { stage: "index", scanned: 0, detailCandidates: 0, detailsLoaded: 0, warnings: [{ error: error.message, code: typeof error.code === "string" ? error.code : error.name || "source_error" }] };
+          throw error;
+        }
+        const candidates = (data.jobs || []).map((item) => ({
+          id: item.id, title: item.title, description: (item.metadata || []).map((field) => Array.isArray(field.value) ? field.value.join(" ") : field.value).filter(Boolean).join(" "),
+          location: item.location?.name || "", url: item.absolute_url, updatedAt: item.updated_at,
+        })).filter((job) => retrievalMatches(job, query)).slice(0, config.maxJobsPerSource);
+        const details = await Promise.all(candidates.map(async (candidate) => {
+          try {
+            const item = await fetchJson(`${baseUrl}/jobs/${encodeURIComponent(candidate.id)}`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 2, fetchImpl: config.fetchImpl || fetch });
+            return { item, warning: null };
+          } catch (error) {
+            return { item: candidate, warning: { postingId: candidate.id, title: candidate.title, error: error.message, code: typeof error.code === "string" ? error.code : error.name || "source_error" } };
+          }
         }));
+        const warnings = details.map((detail) => detail.warning).filter(Boolean);
+        lastRun = { stage: "details", scanned: (data.jobs || []).length, detailCandidates: candidates.length, detailsLoaded: details.length - warnings.length, warnings };
+        return details.map(({ item }) => {
+          const description = stripHtml(item.content || item.description || "");
+          const location = item.location?.name || item.location || "";
+          return {
+            id: `greenhouse:${board.slug}:${item.id}`, externalId: String(item.id), title: item.title, company: board.name || board.slug, companyVerified: true,
+            description, url: item.absolute_url || item.url, applyUrl: item.absolute_url || item.url, location,
+            remote: inferRemote(location, description), relocation: inferRelocation(description), visaSponsorship: inferRelocation(description),
+            salary: parseSalaryText(description, { fallbackPeriod: "year", fallbackCurrency: "USD" }), postedAt: item.updated_at || item.updatedAt, updatedAt: item.updated_at || item.updatedAt,
+            source, sourceQuality: 0.96,
+          };
+        });
       },
     };
   });

@@ -263,7 +263,8 @@ function renderResults(response, { scroll = true } = {}) {
   state.response = response;
   $("#resultCount").textContent = response.total;
   const exact = response.results.filter((job) => job.andMatch).length;
-  $("#resultSummary").textContent = `${exact} полностью соответствуют всем обязательным тегам · остальные отсортированы по числу и весу совпадений`;
+  const exactVerb = exact === 1 ? "соответствует" : "соответствуют";
+  $("#resultSummary").textContent = `${exact} полностью ${exactVerb} всем обязательным тегам · остальные отсортированы по числу и весу совпадений`;
   const container = $("#results"); container.replaceChildren(...response.results.map(renderJob));
   $("#resultsSection").classList.remove("hidden");
   if (scroll) $("#resultsSection").scrollIntoView({ behavior: "smooth", block: "start" });

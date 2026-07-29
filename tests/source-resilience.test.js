@@ -66,14 +66,19 @@ test("source circuit breaker skips repeated calls during cooldown", async () => 
 
 test("creates an independently observable connector for every ATS board", () => {
   const connectors = createConnectors({
-    enableLiveSources: false,
+    enableLiveSources: true,
+    enableDemoSource: false,
     demoPath: "unused.json",
+    hhUserAgent: "",
+    joobleApiKey: "",
+    usajobsApiKey: "",
+    usajobsEmail: "",
     greenhouseBoards: [{ slug: "alpha", name: "Alpha Inc." }, { slug: "beta", name: "Beta Ltd." }],
     ashbyBoards: [{ slug: "gamma", name: "Gamma" }],
     leverSites: [{ slug: "delta", name: "Delta" }],
   });
   assert.deepEqual(
-    connectors.slice(1).map((connector) => [connector.id, connector.name]),
+    connectors.filter((connector) => ["greenhouse", "ashby", "lever"].includes(connector.adapter)).map((connector) => [connector.id, connector.name]),
     [
       ["greenhouse:alpha", "Alpha Inc."],
       ["greenhouse:beta", "Beta Ltd."],
@@ -81,6 +86,18 @@ test("creates an independently observable connector for every ATS board", () => 
       ["lever:delta", "Delta"],
     ],
   );
+});
+
+test("offline mode creates only the demo connector", () => {
+  const connectors = createConnectors({
+    enableLiveSources: false,
+    enableDemoSource: true,
+    demoPath: "unused.json",
+    greenhouseBoards: [{ slug: "alpha" }],
+    ashbyBoards: [{ slug: "beta" }],
+    leverSites: [{ slug: "gamma" }],
+  });
+  assert.deepEqual(connectors.map((connector) => connector.id), ["demo"]);
 });
 
 test("exposes source setup metadata without leaking credential values", () => {

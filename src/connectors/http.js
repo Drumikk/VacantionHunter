@@ -41,7 +41,7 @@ async function responseError(response, url) {
   });
 }
 
-export async function fetchJson(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1", method = "GET", body = undefined } = {}) {
+async function fetchValue(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1", method = "GET", body = undefined } = {}, read) {
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
@@ -51,7 +51,7 @@ export async function fetchJson(url, { timeoutMs = 8_000, headers = {}, retries 
         if (attempt < retries) { await new Promise((resolve) => setTimeout(resolve, retryAfter)); continue; }
       }
       if (!response.ok) throw await responseError(response, url);
-      return await response.json();
+      return await read(response);
     } catch (error) {
       lastError = error;
       const retryable = !(error instanceof HttpError) || error.status === 429 || error.status >= 500;
@@ -63,4 +63,12 @@ export async function fetchJson(url, { timeoutMs = 8_000, headers = {}, retries 
     }
   }
   throw lastError;
+}
+
+export async function fetchJson(url, options = {}) {
+  return fetchValue(url, options, (response) => response.json());
+}
+
+export async function fetchText(url, options = {}) {
+  return fetchValue(url, options, (response) => response.text());
 }

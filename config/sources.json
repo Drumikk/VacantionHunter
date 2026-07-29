@@ -37,6 +37,12 @@
   ],
   "ashbyBoards": [
     {
+      "slug": "sola",
+      "name": "Sola",
+      "homepage": "https://www.sola.ai/careers",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
       "slug": "qdrant.tech",
       "name": "Qdrant",
       "homepage": "https://qdrant.tech/careers/",

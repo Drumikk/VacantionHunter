@@ -4,10 +4,23 @@ import { locationMatches } from "./location.js";
 
 function includes(value, wanted) { return normalizeText(value).includes(normalizeText(wanted)); }
 
+const TITLE_TECHNOLOGIES = [".net", "java", "python", "javascript", "typescript", "go", "golang", "rust", "php", "ruby", "kotlin"];
+
+function roleMatch(wanted, job) {
+  const terms = normalizeText(wanted).split(" ");
+  const title = `${job.title || ""} ${job.category || ""}`;
+  const combined = `${title} ${job.description || ""}`;
+  const wantedTechnologies = TITLE_TECHNOLOGIES.filter((technology) => overlapScore([technology], wanted) === 1);
+  const titleTechnologies = TITLE_TECHNOLOGIES.filter((technology) => overlapScore([technology], title) === 1);
+  const hasWantedTechnologyInTitle = wantedTechnologies.some((technology) => overlapScore([technology], title) === 1);
+  if (wantedTechnologies.length && titleTechnologies.length && !hasWantedTechnologyInTitle) return overlapScore(terms, title);
+  return overlapScore(terms, combined);
+}
+
 function tagMatch(tag, job) {
   const text = `${job.title || ""} ${job.description || ""} ${(job.skills || []).join(" ")} ${job.category || ""}`;
   switch (tag.type) {
-    case "role": return overlapScore(normalizeText(tag.value).split(" "), `${job.title || ""} ${job.category || ""}`);
+    case "role": return roleMatch(tag.value, job);
     case "skill": return overlapScore([tag.value], text);
     case "location": return locationMatches(`${job.location || ""} ${(job.locations || []).join(" ")}`, tag.value) ? 1 : 0;
     case "remote": return job.remote ? 1 : 0;
@@ -89,4 +102,12 @@ export function rankJobs(jobs, query, { sort = [] } = {}) {
     }
     return String(b.postedAt || "").localeCompare(String(a.postedAt || ""));
   });
+}
+
+export function isRelevantMatch(job, query) {
+  if (!job || job.matchPercent <= 0) return false;
+  const matched = new Set(job.matchedTags || []);
+  if (query.role && !matched.has("role")) return false;
+  if (query.skills?.length && !query.skills.some((skill) => matched.has(`skill:${skill}`))) return false;
+  return true;
 }

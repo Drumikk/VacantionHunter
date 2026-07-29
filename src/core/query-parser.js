@@ -50,7 +50,7 @@ export function parseQuery(rawQuery) {
   for (const skill of skills) tags.push({ id: `skill:${skill}`, type: "skill", value: skill, weight: 4, required: true });
   for (const location of locations) tags.push({ id: `location:${location}`, type: "location", value: location, weight: 3, required: true });
   if (remote) tags.push({ id: "remote", type: "remote", value: true, weight: 3, required: true });
-  if (relocation) tags.push({ id: "relocation", type: "relocation", value: true, weight: 3, required: false });
+  if (relocation) tags.push({ id: "relocation", type: "relocation", value: true, weight: 3, required: true });
   if (experience) tags.push({ id: "experience", type: "experience", value: experience, weight: 2, required: false });
   if (employment) tags.push({ id: "employment", type: "employment", value: employment, weight: 2, required: false });
   if (salary?.min != null) tags.push({ id: "salary", type: "salary", value: salary, normalizedMonthlyUsd: salaryUsd.min, weight: 5, required: true });

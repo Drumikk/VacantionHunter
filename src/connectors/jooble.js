@@ -2,18 +2,14 @@ import { fetchJson } from "./http.js";
 import { cachedSearch } from "./cache.js";
 import { parseSalaryText } from "../core/salary.js";
 import { stripHtml } from "../core/text.js";
+import { sourceSearchTerms } from "../core/source-query.js";
+import { inferRelocation } from "../core/mobility.js";
 
 function salary(value) {
   const parsed = parseSalaryText(value || "");
   if (!parsed) return null;
   const hasPeriod = /hour|час|year|annual|год|day|день|week|недел|month|месяц|мес/iu.test(value || "");
   return { ...parsed, period: hasPeriod ? parsed.period : null };
-}
-
-function searchTerms(query) {
-  const role = query.role || "";
-  const skills = (query.skills || []).filter((skill) => !role.toLocaleLowerCase("ru-RU").includes(skill.toLocaleLowerCase("ru-RU")));
-  return [role, ...skills, query.remote ? "remote" : null].filter(Boolean).join(" ") || query.raw;
 }
 
 function searchLocation(query) {
@@ -40,7 +36,7 @@ export function joobleConnector(config) {
     const data = await fetchJson(`https://jooble.org/api/${encodeURIComponent(config.joobleApiKey)}`, {
       method: "POST",
       body: JSON.stringify({
-        keywords: searchTerms(query),
+        keywords: sourceSearchTerms(query, { includeRemote: true }),
         location: searchLocation(query),
         page: "1",
         ResultOnPage: String(Math.min(config.maxJobsPerSource, 100)),
@@ -63,6 +59,7 @@ export function joobleConnector(config) {
       applyUrl: item.link,
       location: item.location || "",
       remote: /remote|worldwide|удален|удалён/iu.test(`${item.title || ""} ${item.location || ""} ${item.snippet || ""}`),
+      relocation: inferRelocation(item.title, item.snippet),
       employmentType: item.type || null,
       salary: salary(item.salary),
       salaryText: item.salary || null,

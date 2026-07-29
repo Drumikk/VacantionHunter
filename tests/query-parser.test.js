@@ -13,6 +13,13 @@ test("parses .NET role and monthly USD threshold", () => {
   assert.ok(query.tags.some((tag) => tag.id === "salary" && tag.required));
 });
 
+test("treats explicitly requested relocation as a required condition", () => {
+  const query = parseQuery(".NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией");
+  const relocation = query.tags.find((tag) => tag.id === "relocation");
+  assert.equal(query.relocation, true);
+  assert.equal(relocation?.required, true);
+});
+
 test("asks for optional location when it is absent", () => {
   const query = parseQuery("Senior Python developer");
   assert.equal(query.experience, "senior");

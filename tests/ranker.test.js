@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { parseQuery } from "../src/core/query-parser.js";
-import { rankJobs } from "../src/core/ranker.js";
+import { isRelevantMatch, rankJobs } from "../src/core/ranker.js";
 
 const source = { id: "demo", name: "Demo", officialApi: true };
 function job(id, title, salary, extra = {}) {
@@ -38,4 +38,14 @@ test("suspicious vacancies are demoted regardless of salary and AND match", () =
   ], query, { sort: [{ field: "salaryMonthlyUsd", direction: "desc" }] });
   assert.equal(ranked[0].id, "safe");
   assert.equal(ranked.at(-1).id, "scam");
+});
+
+test("relevance gate rejects a different technology that only shares a generic role", () => {
+  const query = parseQuery(".NET разработчик удалённо от 4000$ в месяц");
+  const ranked = rankJobs([
+    job("dotnet", "Software Engineer", { min: 80_000, currency: "USD", period: "year" }, { description: "Build ASP.NET and C# services." }),
+    job("java", "Java Developer", { min: 120_000, currency: "USD", period: "year" }, { description: "Build Spring services and collaborate with .NET teams." }),
+  ], query);
+  assert.equal(isRelevantMatch(ranked.find((item) => item.id === "dotnet"), query), true);
+  assert.equal(isRelevantMatch(ranked.find((item) => item.id === "java"), query), false);
 });

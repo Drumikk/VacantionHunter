@@ -1,17 +1,13 @@
 import { fetchJson } from "./http.js";
 import { cachedSearch } from "./cache.js";
 import { stripHtml } from "../core/text.js";
+import { sourceSearchTerms } from "../core/source-query.js";
+import { inferRelocation } from "../core/mobility.js";
 
 const US_LOCATIONS = new Set(["united states", "north america"]);
 
 function period(code) {
   return { PA: "year", PH: "hour", PD: "day", PW: "week", PM: "month" }[code] || null;
-}
-
-function searchTerms(query) {
-  const role = query.role || "";
-  const skills = (query.skills || []).filter((skill) => !role.toLocaleLowerCase("ru-RU").includes(skill.toLocaleLowerCase("ru-RU")));
-  return [role, ...skills].filter(Boolean).join(" ") || query.raw;
 }
 
 export function usajobsConnector(config) {
@@ -31,7 +27,7 @@ export function usajobsConnector(config) {
   const execute = async (query) => {
     if (query.locations?.length && !query.locations.some((location) => US_LOCATIONS.has(location))) return [];
     const params = new URLSearchParams({
-      Keyword: searchTerms(query),
+      Keyword: sourceSearchTerms(query),
       ResultsPerPage: String(Math.min(config.maxJobsPerSource, 100)),
       DatePosted: "30",
       Fields: "Full",
@@ -64,6 +60,7 @@ export function usajobsConnector(config) {
         applyUrl: job.ApplyURI?.[0] || job.PositionURI,
         location: job.PositionLocationDisplay || job.PositionLocation?.[0]?.LocationName || "United States",
         remote: /remote|anywhere in the u\.s\./iu.test(`${job.PositionLocationDisplay || ""} ${description}`),
+        relocation: inferRelocation(description),
         employmentType: job.PositionSchedule?.[0]?.Name || job.PositionOfferingType?.[0]?.Name || null,
         salary: remuneration ? {
           min: Number(remuneration.MinimumRange) || null,

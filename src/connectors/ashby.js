@@ -1,5 +1,7 @@
 import { fetchJson } from "./http.js";
 import { stripHtml } from "../core/text.js";
+import { retrievalMatches } from "../core/source-query.js";
+import { inferRelocation, inferRemote } from "../core/mobility.js";
 
 function ashbySalary(compensation) {
   const salary = compensation?.summaryComponents?.find((item) => item.compensationType === "Salary");
@@ -24,14 +26,19 @@ export function ashbyConnectors(config) {
     };
     return {
       ...source,
-      async search() {
-        const data = await fetchJson(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board.slug)}?includeCompensation=true`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1 });
-        return (data.jobs || []).filter((item) => item.isListed !== false).slice(0, config.maxJobsPerSource).map((item) => ({
-          id: `ashby:${board.slug}:${item.jobUrl}`, externalId: item.jobUrl, title: item.title, company: board.name || board.slug, companyVerified: true,
-          description: stripHtml(item.descriptionHtml || item.descriptionPlain || ""), url: item.jobUrl, applyUrl: item.applyUrl || item.jobUrl, location: item.location || "", locations: (item.secondaryLocations || []).map((location) => location.location),
-          remote: Boolean(item.isRemote) || /remote|worldwide/i.test(item.location || ""), employmentType: item.employmentType, salary: ashbySalary(item.compensation), postedAt: item.publishedAt || null,
-          source, sourceQuality: 0.96,
-        }));
+      async search(query) {
+        const data = await fetchJson(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board.slug)}?includeCompensation=true`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch });
+        return (data.jobs || []).filter((item) => item.isListed !== false).map((item) => {
+          const description = stripHtml(item.descriptionHtml || item.descriptionPlain || "");
+          const locations = (item.secondaryLocations || []).map((location) => location.location);
+          return {
+            id: `ashby:${board.slug}:${item.jobUrl}`, externalId: item.jobUrl, title: item.title, company: board.name || board.slug, companyVerified: true,
+            description, url: item.jobUrl, applyUrl: item.applyUrl || item.jobUrl, location: item.location || "", locations,
+            remote: Boolean(item.isRemote) || inferRemote(item.location, locations, description), relocation: inferRelocation(description), visaSponsorship: inferRelocation(description),
+            employmentType: item.employmentType, salary: ashbySalary(item.compensation), postedAt: item.publishedAt || null,
+            source, sourceQuality: 0.96,
+          };
+        }).filter((job) => retrievalMatches(job, query)).slice(0, config.maxJobsPerSource);
       },
     };
   });

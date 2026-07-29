@@ -7,10 +7,15 @@ import { usajobsConnector } from "./usajobs.js";
 import { greenhouseConnectors } from "./greenhouse.js";
 import { ashbyConnectors } from "./ashby.js";
 import { leverConnectors } from "./lever.js";
+import { restrictedConnectors } from "./restricted.js";
 
 export function createConnectors(config) {
-  const connectors = [demoConnector(config.demoPath)];
-  if (config.enableLiveSources) connectors.push(hhConnector(config), joobleConnector(config), usajobsConnector(config), remotiveConnector(config), arbeitnowConnector(config));
-  connectors.push(...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config));
+  const connectors = config.enableDemoSource === false ? [] : [demoConnector(config.demoPath)];
+  if (config.enableLiveSources) {
+    connectors.push(
+      hhConnector(config), joobleConnector(config), usajobsConnector(config), remotiveConnector(config), arbeitnowConnector(config),
+      ...restrictedConnectors(), ...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config),
+    );
+  }
   return connectors;
 }

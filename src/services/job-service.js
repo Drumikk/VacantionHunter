@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { parseQuery } from "../core/query-parser.js";
-import { rankJobs } from "../core/ranker.js";
+import { isRelevantMatch, rankJobs } from "../core/ranker.js";
 import { assessJob, liveVerify } from "../core/authenticity.js";
 
 function nextCooldown(error, failureCount, config) {
@@ -62,6 +62,12 @@ export class JobService extends EventEmitter {
 
   parse(raw) { return parseQuery(raw); }
 
+  searchableJobs() {
+    return this.connectors.some((connector) => connector.id === "demo")
+      ? this.store.jobs
+      : this.store.jobs.filter((job) => !String(job.source?.id || "").startsWith("demo"));
+  }
+
   async initialize() {
     await Promise.all([this.store.load(), this.watchStore?.load(), this.notificationService?.initialize(), this.applicationStore?.load()]);
     const demo = this.connectors.find((connector) => connector.id === "demo");
@@ -77,7 +83,7 @@ export class JobService extends EventEmitter {
       const rawJobs = await connector.search(query);
       const jobs = rawJobs.map((job) => ({ ...job, verification: assessJob(job), ingestedAt: new Date().toISOString() }));
       await this.store.merge(jobs);
-      Object.assign(status, { status: "ok", lastSuccessAt: new Date().toISOString(), count: jobs.length, failureCount: 0, cooldownUntil: null });
+      Object.assign(status, { status: "ok", lastSuccessAt: new Date().toISOString(), count: jobs.length, failureCount: 0, cooldownUntil: null, diagnostics: connector.getDiagnostics?.() || null });
       this.emit("jobs", { source: connector.id, count: jobs.length, query: query.raw });
       return jobs;
     } catch (error) {
@@ -89,6 +95,7 @@ export class JobService extends EventEmitter {
         failureCount,
         cooldownReason: cooldown.reason,
         cooldownUntil: new Date(Date.now() + cooldown.delayMs).toISOString(),
+        diagnostics: connector.getDiagnostics?.() || null,
       });
       this.emit("source", status);
       throw error;
@@ -138,7 +145,7 @@ export class JobService extends EventEmitter {
     const query = this.parse(rawQuery);
     let refreshReport = [];
     if (refresh) refreshReport = await this.refresh(query);
-    const results = rankJobs(this.store.jobs, query, { sort }).filter((job) => job.matchPercent > 0).slice(0, Math.min(limit, 250));
+    const results = rankJobs(this.searchableJobs(), query, { sort }).filter((job) => isRelevantMatch(job, query)).slice(0, Math.min(limit, 250));
     return { query, total: results.length, results, refreshReport, sources: this.getSources() };
   }
 
@@ -162,7 +169,7 @@ export class JobService extends EventEmitter {
 
   matchingJobIds(rawQuery) {
     const query = typeof rawQuery === "string" ? this.parse(rawQuery) : rawQuery;
-    return rankJobs(this.store.jobs, query).filter((job) => job.matchPercent > 0).slice(0, 250).map((job) => job.id);
+    return rankJobs(this.searchableJobs(), query).filter((job) => isRelevantMatch(job, query)).slice(0, 250).map((job) => job.id);
   }
 
   async refreshWatch(id) {

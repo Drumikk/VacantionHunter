@@ -1,0 +1,43 @@
+name: Live source smoke test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HH_USER_AGENT: ${{ secrets.HH_USER_AGENT }}
+      JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
+      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
+      USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
+      REQUEST_TIMEOUT_MS: "12000"
+      ATS_REQUEST_TIMEOUT_MS: "45000"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run exact production query against every source
+        shell: bash
+        run: |
+          mkdir -p outputs
+          node scripts/smoke-live.mjs ".NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией" > outputs/live-smoke.json
+      - name: Write source summary
+        run: node scripts/smoke-summary.mjs outputs/live-smoke.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload machine-readable report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-source-smoke-${{ github.run_id }}
+          path: outputs/live-smoke.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Fail on enabled source errors
+        run: node scripts/smoke-summary.mjs outputs/live-smoke.json --fail-on-errors > /dev/null
