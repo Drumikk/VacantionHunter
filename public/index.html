@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="VacationHunter — объяснимый агрегатор вакансий">
   <title>VacationHunter — вакансии без шума</title>
-  <link rel="stylesheet" href="/styles.css?v=20260729-5">
+  <link rel="stylesheet" href="/styles.css?v=20260729-6">
 </head>
 <body>
   <header class="topbar">
@@ -13,7 +13,10 @@
       <span class="brand-mark">VH</span>
       <span>VacationHunter</span>
     </a>
-    <button type="button" class="source-health" id="sourceHealth" aria-expanded="false" aria-controls="sourcesPanel"><span class="pulse"></span><span>Источники готовы</span></button>
+    <div class="topbar-actions">
+      <button type="button" class="pipeline-nav" id="pipelineButton" aria-controls="pipelineSection"><span>Воронка</span><b id="pipelineCount">0</b></button>
+      <button type="button" class="source-health" id="sourceHealth" aria-expanded="false" aria-controls="sourcesPanel"><span class="pulse"></span><span>Источники готовы</span></button>
+    </div>
   </header>
 
   <div class="sources-backdrop hidden" id="sourcesBackdrop"></div>
@@ -31,6 +34,15 @@
   </aside>
 
   <main>
+    <section class="pipeline-section hidden" id="pipelineSection" aria-labelledby="pipelineTitle">
+      <div class="pipeline-head">
+        <div><p class="eyebrow">Поиск → отклик → результат</p><h1 id="pipelineTitle">Воронка вакансий</h1><p class="lede">Сохранённые позиции, следующие действия, заметки и история этапов остаются здесь независимо от источника.</p></div>
+        <button type="button" class="pipeline-back" id="pipelineBack">← К поиску</button>
+      </div>
+      <div class="pipeline-summary" id="pipelineSummary" aria-live="polite"></div>
+      <div class="pipeline-board" id="pipelineBoard"></div>
+    </section>
+
     <section class="hero" id="hero">
       <p class="eyebrow">Поиск по нескольким источникам · без дублей</p>
       <h1>Опишите работу,<br><span>которую хотите найти</span></h1>
@@ -105,11 +117,17 @@
       <aside class="job-facts">
         <div class="salary"></div>
         <dl><div><dt>Локация</dt><dd class="location"></dd></div><div><dt>Источник</dt><dd class="source"></dd></div><div><dt>Проверка</dt><dd class="verification"></dd></div></dl>
+        <div class="job-pipeline-actions">
+          <button type="button" class="save-job">☆ Сохранить</button>
+          <label><span class="sr-only">Этап отклика</span><select class="job-status-select" aria-label="Этап отклика">
+            <option value="">Этап отклика…</option><option value="saved">Сохранено</option><option value="applied">Отклик отправлен</option><option value="screening">Скрининг</option><option value="interview">Интервью</option><option value="offer">Оффер</option><option value="rejected">Отказ</option><option value="withdrawn">Не актуально</option>
+          </select></label>
+        </div>
         <a class="open-job" target="_blank" rel="noopener noreferrer">Открыть вакансию <span>↗</span></a>
       </aside>
     </article>
   </template>
 
-  <script type="module" src="/app.js?v=20260729-5"></script>
+  <script type="module" src="/app.js?v=20260729-6"></script>
 </body>
 </html>

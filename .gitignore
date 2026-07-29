@@ -3,6 +3,7 @@ node_modules/
 data/job-store.json
 data/watch-store.json
 data/notification-outbox.json
+data/application-store.json
 data/*.tmp
 coverage/
 outputs/

@@ -57,5 +57,6 @@ export const config = {
   storePath: path.join(rootDir, "data", "job-store.json"),
   watchStorePath: path.join(rootDir, "data", "watch-store.json"),
   notificationOutboxPath: path.join(rootDir, "data", "notification-outbox.json"),
+  applicationStorePath: path.join(rootDir, "data", "application-store.json"),
   demoPath: path.join(rootDir, "data", "demo-jobs.json"),
 };

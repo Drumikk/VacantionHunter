@@ -1,6 +1,14 @@
 const $ = (selector) => document.querySelector(selector);
-const state = { parsed: null, response: null, searching: false, watches: [], watchBusy: false, sources: [], sourceBusy: new Set(), notification: null, notificationBusy: false, discoveredChats: [] };
+const state = { parsed: null, response: null, searching: false, watches: [], watchBusy: false, sources: [], sourceBusy: new Set(), notification: null, notificationBusy: false, discoveredChats: [], applications: [], applicationSummary: { total: 0, active: 0, counts: {} }, applicationBusy: new Set(), applicationDrafts: new Map(), pipelineOpen: false };
 const formatter = new Intl.NumberFormat("ru-RU");
+const applicationLabels = { saved: "Сохранено", applied: "Отклик отправлен", screening: "Скрининг", interview: "Интервью", offer: "Оффер", rejected: "Отказ", withdrawn: "Не актуально" };
+const pipelineColumns = [
+  { id: "saved", title: "Сохранено", statuses: ["saved"] },
+  { id: "applied", title: "Отклик", statuses: ["applied", "screening"] },
+  { id: "interview", title: "Интервью", statuses: ["interview"] },
+  { id: "offer", title: "Оффер", statuses: ["offer"] },
+  { id: "closed", title: "Завершено", statuses: ["rejected", "withdrawn"] },
+];
 
 function escapeHtml(value = "") { return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char])); }
 function salaryText(job) {
@@ -32,6 +40,7 @@ async function api(path, payload, method = "POST") {
 
 function queryKey(query) { return String(query || "").trim().replace(/\s+/g, " ").toLocaleLowerCase("ru-RU"); }
 function currentWatch(query) { return state.watches.find((watch) => queryKey(watch.query) === queryKey(query)); }
+function applicationFor(jobId) { return state.applications.find((application) => application.jobId === jobId); }
 function renderWatches() {
   const box = $("#savedSearches");
   if (!state.watches.length) { box.classList.add("hidden"); return; }
@@ -86,8 +95,133 @@ async function parseCurrent() {
   }, 180);
 }
 
+function statusOptions(current) {
+  return Object.entries(applicationLabels).map(([value, label]) => `<option value="${value}" ${value === current ? "selected" : ""}>${label}</option>`).join("");
+}
+
+function localDateTimeValue(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
+}
+
+function pipelineGroupItems(column) {
+  return state.applications.filter((item) => column.statuses.includes(item.status)).sort((a, b) => {
+    const aNext = a.nextActionAt ? Date.parse(a.nextActionAt) : Number.POSITIVE_INFINITY;
+    const bNext = b.nextActionAt ? Date.parse(b.nextActionAt) : Number.POSITIVE_INFINITY;
+    return aNext - bNext || Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+  });
+}
+
+function renderPipeline() {
+  const summary = state.applicationSummary;
+  $("#pipelineCount").textContent = summary.total || 0;
+  $("#pipelineSummary").innerHTML = `<span><strong>${summary.total || 0}</strong> всего</span><span><strong>${summary.active || 0}</strong> активных</span><span><strong>${summary.counts?.interview || 0}</strong> интервью</span><span><strong>${summary.counts?.offer || 0}</strong> офферов</span>`;
+  if (!state.applications.length) {
+    $("#pipelineBoard").innerHTML = '<div class="pipeline-empty"><strong>Воронка пока пуста</strong><p>Сохраните подходящую вакансию из выдачи — её карточка, ссылка и заметки останутся здесь.</p><button type="button" data-empty-back>Перейти к поиску</button></div>';
+    return;
+  }
+  $("#pipelineBoard").innerHTML = pipelineColumns.map((column) => {
+    const items = pipelineGroupItems(column);
+    return `<section class="pipeline-column" data-pipeline-column="${column.id}">
+      <header><h2>${column.title}</h2><b>${items.length}</b></header>
+      <div class="pipeline-column-list">${items.map((item) => {
+        const job = item.job;
+        const due = item.nextActionAt && Date.parse(item.nextActionAt) < Date.now();
+        return `<article class="pipeline-card" data-pipeline-job="${escapeHtml(item.jobId)}">
+          <div class="pipeline-card-stage"><span data-stage="${escapeHtml(item.status)}">${escapeHtml(applicationLabels[item.status] || item.status)}</span><small>${escapeHtml(dateTimeText(item.statusChangedAt))}</small></div>
+          <h3>${escapeHtml(job.title)}</h3><p class="pipeline-company">${escapeHtml(job.company)}${job.location ? ` · ${escapeHtml(job.location)}` : ""}</p>
+          <p class="pipeline-salary">${escapeHtml(salaryText(job))}</p>
+          <label>Этап<select data-pipeline-status>${statusOptions(item.status)}</select></label>
+          <label>Следующее действие<input type="datetime-local" data-next-action value="${escapeHtml(localDateTimeValue(item.nextActionAt))}" class="${due ? "overdue" : ""}"></label>
+          <label>Заметка<textarea rows="3" maxlength="4000" data-application-notes placeholder="Контакт, детали интервью, следующий шаг…">${escapeHtml(state.applicationDrafts.has(item.jobId) ? state.applicationDrafts.get(item.jobId) : item.notes || "")}</textarea></label>
+          <div class="pipeline-card-actions"><button type="button" data-save-notes>Сохранить заметку</button><a href="${escapeHtml(job.applyUrl || job.url)}" target="_blank" rel="noopener noreferrer">Открыть ↗</a><button type="button" class="remove-application" data-remove-application aria-label="Удалить ${escapeHtml(job.title)} из воронки">Удалить</button></div>
+        </article>`;
+      }).join("") || '<p class="pipeline-column-empty">Пока пусто</p>'}</div>
+    </section>`;
+  }).join("");
+}
+
+function refreshJobCards() {
+  if (!state.response) return;
+  $("#results").replaceChildren(...state.response.results.map(renderJob));
+}
+
+async function loadApplications() {
+  try {
+    const response = await api("/api/applications", undefined, "GET");
+    state.applications = response.items || [];
+    state.applicationSummary = response.summary || { total: 0, active: 0, counts: {} };
+    renderPipeline();
+    refreshJobCards();
+  } catch (error) {
+    $("#pipelineSummary").textContent = `Не удалось загрузить воронку: ${error.message}`;
+  }
+}
+
+async function saveApplication(jobId, patch = {}) {
+  if (!jobId || state.applicationBusy.has(jobId)) return null;
+  state.applicationBusy.add(jobId);
+  refreshJobCards();
+  try {
+    const existing = applicationFor(jobId);
+    const result = existing
+      ? await api(`/api/applications/${encodeURIComponent(jobId)}`, patch, "PATCH")
+      : await api("/api/applications", { jobId, ...patch });
+    if (Object.hasOwn(patch, "notes")) state.applicationDrafts.delete(jobId);
+    state.applications = [result.application, ...state.applications.filter((item) => item.jobId !== jobId)];
+    await loadApplications();
+    return result.application;
+  } catch (error) {
+    window.alert(`Не удалось обновить воронку: ${error.message}`);
+    return null;
+  } finally {
+    state.applicationBusy.delete(jobId);
+    refreshJobCards();
+  }
+}
+
+async function removeApplication(jobId) {
+  if (!jobId || state.applicationBusy.has(jobId)) return;
+  state.applicationBusy.add(jobId);
+  try {
+    await api(`/api/applications/${encodeURIComponent(jobId)}`, undefined, "DELETE");
+    state.applicationDrafts.delete(jobId);
+    state.applications = state.applications.filter((item) => item.jobId !== jobId);
+    await loadApplications();
+  } catch (error) {
+    window.alert(`Не удалось удалить вакансию: ${error.message}`);
+  } finally {
+    state.applicationBusy.delete(jobId);
+  }
+}
+
+function openPipeline(jobId = null) {
+  state.pipelineOpen = true;
+  $("#hero").classList.add("hidden");
+  $("#resultsSection").classList.add("hidden");
+  $("#processing").classList.add("hidden");
+  $("#pipelineSection").classList.remove("hidden");
+  $("#pipelineButton").setAttribute("aria-current", "page");
+  renderPipeline();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (jobId) requestAnimationFrame(() => document.querySelector(`[data-pipeline-job="${CSS.escape(jobId)}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
+}
+
+function closePipeline() {
+  state.pipelineOpen = false;
+  $("#pipelineSection").classList.add("hidden");
+  $("#hero").classList.remove("hidden");
+  if (state.response) $("#resultsSection").classList.remove("hidden");
+  $("#pipelineButton").removeAttribute("aria-current");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function renderJob(job) {
   const node = $("#jobTemplate").content.firstElementChild.cloneNode(true);
+  node.dataset.jobId = job.id;
   const hue = Math.max(28, Math.min(128, 28 + job.matchPercent));
   node.style.setProperty("--match-hue", hue);
   node.querySelector("h3").textContent = job.title;
@@ -108,6 +242,17 @@ function renderJob(job) {
   verificationNode.textContent = `${statusMap[verification.status] || verification.status} · ${verification.score}/100`;
   verificationNode.classList.add(["suspicious", "stale"].includes(verification.status) ? "risk" : "ok");
   const link = node.querySelector(".open-job"); link.href = job.url; link.setAttribute("aria-label", `Открыть вакансию ${job.title} на ${source.name || "источнике"}`);
+  const application = applicationFor(job.id);
+  const busy = state.applicationBusy.has(job.id);
+  const saveButton = node.querySelector(".save-job");
+  saveButton.dataset.saveJob = job.id;
+  saveButton.disabled = busy;
+  saveButton.textContent = busy ? "Сохраняем…" : application ? `✓ ${applicationLabels[application.status]}` : "☆ Сохранить";
+  saveButton.classList.toggle("tracked", Boolean(application));
+  const statusSelect = node.querySelector(".job-status-select");
+  statusSelect.dataset.jobStatus = job.id;
+  statusSelect.value = application?.status || "";
+  statusSelect.disabled = busy;
   const parts = Object.entries(job.scoreBreakdown || {});
   node.querySelector(".score-bars").innerHTML = parts.map(([key, value]) => `<span title="${escapeHtml(key)}: ${value}" style="--width:${Math.min(100, value * 1.4)}%"></span>`).join("");
   node.querySelector(".missing").textContent = job.missingTags?.length ? `Не совпало: ${job.missingTags.join(", ")}` : "Все обязательные теги совпали.";
@@ -316,6 +461,8 @@ $("#searchForm").addEventListener("submit", (event) => { event.preventDefault();
 $("#primarySort").addEventListener("change", () => runSearch({ refresh: false }));
 $("#secondarySort").addEventListener("change", () => runSearch({ refresh: false }));
 $("#sourceHealth").addEventListener("click", openSources);
+$("#pipelineButton").addEventListener("click", () => openPipeline());
+$("#pipelineBack").addEventListener("click", closePipeline);
 $("#sourcesClose").addEventListener("click", closeSources);
 $("#sourcesBackdrop").addEventListener("click", closeSources);
 $("#sourceList").addEventListener("click", (event) => {
@@ -326,6 +473,43 @@ $("#notificationCenter").addEventListener("click", (event) => {
   if (event.target.closest("[data-test-notification]")) notificationAction("test");
   if (event.target.closest("[data-flush-notifications]")) notificationAction("flush");
   if (event.target.closest("[data-discover-chats]")) notificationAction("discover");
+});
+$("#results").addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-save-job]");
+  if (!button) return;
+  const existing = applicationFor(button.dataset.saveJob);
+  if (existing) return openPipeline(existing.jobId);
+  await saveApplication(button.dataset.saveJob, { status: "saved" });
+});
+$("#results").addEventListener("change", async (event) => {
+  const select = event.target.closest("[data-job-status]");
+  if (!select?.value) return;
+  await saveApplication(select.dataset.jobStatus, { status: select.value });
+});
+$("#pipelineBoard").addEventListener("click", async (event) => {
+  if (event.target.closest("[data-empty-back]")) return closePipeline();
+  const card = event.target.closest("[data-pipeline-job]");
+  if (!card) return;
+  const jobId = card.dataset.pipelineJob;
+  if (event.target.closest("[data-remove-application]")) return removeApplication(jobId);
+  if (event.target.closest("[data-save-notes]")) {
+    const notes = card.querySelector("[data-application-notes]").value;
+    await saveApplication(jobId, { notes });
+  }
+});
+$("#pipelineBoard").addEventListener("change", async (event) => {
+  const card = event.target.closest("[data-pipeline-job]");
+  if (!card) return;
+  if (event.target.matches("[data-pipeline-status]")) await saveApplication(card.dataset.pipelineJob, { status: event.target.value });
+  if (event.target.matches("[data-next-action]")) {
+    const value = event.target.value ? new Date(event.target.value).toISOString() : null;
+    await saveApplication(card.dataset.pipelineJob, { nextActionAt: value });
+  }
+});
+$("#pipelineBoard").addEventListener("input", (event) => {
+  if (!event.target.matches("[data-application-notes]")) return;
+  const card = event.target.closest("[data-pipeline-job]");
+  if (card) state.applicationDrafts.set(card.dataset.pipelineJob, event.target.value);
 });
 document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !$("#sourcesPanel").classList.contains("hidden")) closeSources(); });
 $("#watchSearch").addEventListener("change", async (event) => {
@@ -409,8 +593,10 @@ events.addEventListener("watch-jobs", (event) => {
     loadNotification();
   } catch { /* a later watch snapshot will resynchronize state */ }
 });
+events.addEventListener("application", () => loadApplications());
 
 loadWatches();
 loadSources();
 loadNotification();
+loadApplications();
 parseCurrent();

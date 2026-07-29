@@ -19,13 +19,22 @@ function publicWatch(watch) {
   return { ...details, newCount: unreadJobIds.length, newJobIds: unreadJobIds.slice(0, 100) };
 }
 
+function applicationDetails(details = {}) {
+  const allowed = {};
+  for (const key of ["status", "notes", "nextActionAt"]) {
+    if (Object.hasOwn(details, key)) allowed[key] = details[key];
+  }
+  return allowed;
+}
+
 export class JobService extends EventEmitter {
-  constructor({ connectors, store, watchStore = null, notificationService = null, config }) {
+  constructor({ connectors, store, watchStore = null, notificationService = null, applicationStore = null, config }) {
     super();
     this.connectors = connectors;
     this.store = store;
     this.watchStore = watchStore;
     this.notificationService = notificationService;
+    this.applicationStore = applicationStore;
     this.config = config;
     this.sourceStatus = new Map(connectors.map((source) => [source.id, {
       id: source.id,
@@ -54,7 +63,7 @@ export class JobService extends EventEmitter {
   parse(raw) { return parseQuery(raw); }
 
   async initialize() {
-    await Promise.all([this.store.load(), this.watchStore?.load(), this.notificationService?.initialize()]);
+    await Promise.all([this.store.load(), this.watchStore?.load(), this.notificationService?.initialize(), this.applicationStore?.load()]);
     const demo = this.connectors.find((connector) => connector.id === "demo");
     if (demo) await this.ingestConnector(demo, parseQuery("работа"));
   }
@@ -198,6 +207,37 @@ export class JobService extends EventEmitter {
   async retryNotifications() { return this.notificationService?.retryFailed() || []; }
   async sendTestNotification() { return this.notificationService?.sendTest(); }
   async discoverNotificationChats() { return this.notificationService?.discoverChats(); }
+
+  getApplications({ status = null } = {}) {
+    return {
+      items: this.applicationStore?.list({ status }) || [],
+      summary: this.applicationStore?.summary() || { total: 0, active: 0, counts: {} },
+    };
+  }
+
+  async addApplication(jobId, details = {}) {
+    const job = this.store.jobs.find((item) => item.id === jobId);
+    if (!job) {
+      const error = new Error("Вакансия не найдена");
+      error.statusCode = 404;
+      throw error;
+    }
+    const application = await this.applicationStore.add(job, applicationDetails(details));
+    this.emit("application", { action: "updated", application });
+    return application;
+  }
+
+  async updateApplication(jobId, details = {}) {
+    const application = await this.applicationStore.update(jobId, applicationDetails(details));
+    this.emit("application", { action: "updated", application });
+    return application;
+  }
+
+  async removeApplication(jobId) {
+    const removed = await this.applicationStore.remove(jobId);
+    if (removed) this.emit("application", { action: "removed", jobId });
+    return removed;
+  }
 
   async verify(ids) {
     const wanted = new Set(ids);

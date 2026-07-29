@@ -29,6 +29,8 @@ flowchart LR
 
 Обязательный минимум: `id`, `externalId`, `title`, `company`, `description`, `url`, `source`, `postedAt`. Структурные поля: `skills[]`, `location`, `remote`, `relocation`, `visaSponsorship`, `employmentType`, `experience`, `salary {min,max,currency,period}`. Вычисляемые поля: `salaryMonthlyUsd`, `verification`, `matchPercent`, `andMatch`, `scoreBreakdown`, `duplicateCount`, `sourceUrls[]`.
 
+`ApplicationStore` сохраняет отдельный ограниченный snapshot вакансии: идентификатор, название, компанию, ссылки, локацию, зарплату, навыки, источник и verification. Пользовательские поля — `status`, `notes`, `nextActionAt`, `statusChangedAt`, `history[]`. Snapshot не зависит от дальнейшего присутствия объекта в `JobStore`; через HTTP изменяются только три пользовательских поля.
+
 ## Разбор запроса
 
 MVP использует детерминированные правила и словари: результат быстрый, тестируемый и объяснимый. Каждый тег имеет:
@@ -101,6 +103,8 @@ MVP выполняет изолированные параллельные за�
 Новые вакансии из наблюдений передаются в `NotificationService`. Telegram-адаптер не вызывается напрямую из события UI: сначала `NotificationOutbox` атомарно сохраняет payload и dedupe key, только после этого watch store обновляет `knownJobIds`, затем сериализованный flush выполняет `sendMessage`. Если процесс остановится между двумя записями, следующий refresh повторит постановку, но тот же dedupe key не создаст второе сообщение. Результат доставки переводит запись в `sent`, временная ошибка назначает `nextAttemptAt`, исчерпание попыток — в `failed`.
 
 Операционные маршруты: `GET /api/notifications/status`, `POST /api/notifications/discover`, `POST /api/notifications/test`, `POST /api/notifications/flush`. Статус содержит только булевы признаки конфигурации и счётчики очереди. Bot token существует только в `config`/`TelegramClient` серверного процесса.
+
+Воронка использует `GET/POST /api/applications` и `PATCH/DELETE /api/applications/:jobId`. `ApplicationStore` сериализует atomic rename так же, как остальные локальные хранилища, ограничивает статусы и длину заметки, нормализует дату и записывает историю только при реальной смене этапа. SSE-событие `application` синхронизирует открытые вкладки.
 
 HH — отдельный случай конфигурации: коннектор виден как `disabled`, пока оператор не задаст `HH_USER_AGENT` с реальным контактным email. Это предотвращает циклические запросы с заведомо заблокированным фиктивным заголовком.
 
