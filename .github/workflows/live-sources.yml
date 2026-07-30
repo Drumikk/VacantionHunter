@@ -14,6 +14,9 @@ jobs:
     timeout-minutes: 15
     env:
       HH_USER_AGENT: ${{ secrets.HH_USER_AGENT }}
+      HH_ACCESS_TOKEN: ${{ secrets.HH_ACCESS_TOKEN }}
+      HH_CLIENT_ID: ${{ secrets.HH_CLIENT_ID }}
+      HH_CLIENT_SECRET: ${{ secrets.HH_CLIENT_SECRET }}
       JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
       USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
       USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}

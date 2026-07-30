@@ -54,6 +54,10 @@ ATS_DETAIL_CONCURRENCY=4
 MAX_JOBS_PER_SOURCE=100
 MAX_JOBS_SCANNED_PER_SOURCE=500
 HH_USER_AGENT=VacationHunter/0.1 (contact: ваш_реальный_email)
+HH_ACCESS_TOKEN=токен_приложения
+# Альтернатива HH_ACCESS_TOKEN: HH_CLIENT_ID и HH_CLIENT_SECRET зарегистрированного приложения
+HH_CLIENT_ID=
+HH_CLIENT_SECRET=
 HTTP_USER_AGENT=VacationHunter/0.1
 JOOBLE_API_KEY=полученный_ключ
 USAJOBS_API_KEY=полученный_ключ
@@ -72,7 +76,7 @@ ATS-параметры — это публичные board/site slug конкр�
 
 Те же ATS-источники можно описать объектами в `config/sources.json`: `slug`, отображаемое `name`, карьерный `homepage`, `regions` и `enabled`. Каждая company board становится отдельным коннектором и получает собственные health, error count и cooldown; сбой одной компании не маскируется общим статусом ATS.
 
-`HH_USER_AGENT` намеренно не имеет фиктивного значения по умолчанию: HH требует валидный User-Agent и может блокировать тестовые домены. Укажите название приложения и реальный контактный email; без этого коннектор отображается как `disabled`. Ответы 401/403, Cloudflare challenge и 429 переводят источник в cooldown, чтобы фоновое обновление не создавало лишнюю нагрузку. CAPTCHA, Cloudflare и геоблокировки не обходятся — используется официальный API/RSS, партнёрский доступ либо источник отключается.
+Для стабильной работы HH зарегистрируйте приложение на <https://dev.hh.ru/> и задайте `HH_USER_AGENT` вместе с готовым `HH_ACCESS_TOKEN`. Альтернативно приложение умеет один раз за процесс получить и затем кэшировать токен по паре `HH_CLIENT_ID` + `HH_CLIENT_SECRET`. Значения токенов и секретов не попадают в диагностический API. Ответы 401/403, Cloudflare challenge и 429 переводят источник в cooldown, чтобы фоновое обновление не создавало лишнюю нагрузку. CAPTCHA, Cloudflare и геоблокировки не обходятся.
 
 Для максимально широкого автоматического поиска сначала получите `JOOBLE_API_KEY` на <https://jooble.org/api/about>. Jooble агрегирует вакансии с множества job boards и карьерных страниц, поэтому этот коннектор расширяет покрытие без поддержки отдельного HTML-парсера для каждого сайта. `USAJOBS_API_KEY` и `USAJOBS_EMAIL` подключают официальный поиск федеральных вакансий США. Подробная архитектура, ограничения LinkedIn/Indeed и регистрация: [автоматический сбор](docs/INGESTION.md).
 

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchJson, HttpError } from "../src/connectors/http.js";
-import { hhConnector } from "../src/connectors/hh.js";
+import { hhConnector, hhUserAgentDiagnostics } from "../src/connectors/hh.js";
 import { joobleConnector } from "../src/connectors/jooble.js";
 import { createConnectors } from "../src/connectors/index.js";
 import { JobService } from "../src/services/job-service.js";
@@ -23,10 +23,68 @@ test("classifies a Cloudflare challenge without retrying a forbidden response", 
   assert.equal(calls, 1);
 });
 
-test("HH is explicitly disabled until a real API User-Agent is configured", () => {
+test("HH is explicitly disabled until a User-Agent and application authorization are configured", () => {
   const connector = hhConnector({ hhUserAgent: "" });
   assert.equal(connector.enabled, false);
   assert.match(connector.disabledReason, /HH_USER_AGENT/);
+
+  const missingAuth = hhConnector({ hhUserAgent: "VacationHunter/0.1 (developer@example.com)" });
+  assert.equal(missingAuth.enabled, false);
+  assert.match(missingAuth.disabledReason, /HH_ACCESS_TOKEN/);
+});
+
+test("HH validates its identifying User-Agent without exposing the email", async () => {
+  assert.deepEqual(hhUserAgentDiagnostics("VacationHunter/0.1 (developer@example.com)"), { configured: true, formatValid: true });
+  assert.deepEqual(hhUserAgentDiagnostics("VacationHunter/0.1 (contact: developer@example.com)"), { configured: true, formatValid: true });
+  const connector = hhConnector({ hhUserAgent: "developer@example.com", hhAccessToken: "secret" });
+  await assert.rejects(connector.search({ role: ".NET developer", skills: [".net"] }), (error) => error.code === "invalid_config");
+  assert.deepEqual(connector.getDiagnostics(), {
+    userAgentConfigured: true,
+    userAgentFormatValid: false,
+    authConfigured: true,
+    authMode: "access_token",
+    clientCredentialsComplete: false,
+  });
+});
+
+test("HH sends a configured application access token without exposing it in diagnostics", async () => {
+  const secret = "hh-access-secret";
+  let authorization;
+  const connector = hhConnector({
+    hhUserAgent: "VacationHunter/0.1 (developer@example.com)",
+    hhAccessToken: secret,
+    maxJobsPerSource: 10,
+    fetchImpl: async (_url, options) => {
+      authorization = options.headers.Authorization;
+      return Response.json({ items: [] });
+    },
+  });
+  assert.equal(connector.enabled, true);
+  await connector.search({ role: ".NET developer", skills: [".net"] });
+  assert.equal(authorization, `Bearer ${secret}`);
+  assert.equal(JSON.stringify(connector.getDiagnostics()).includes(secret), false);
+});
+
+test("HH obtains and caches an application token from client credentials", async () => {
+  const calls = [];
+  const connector = hhConnector({
+    hhUserAgent: "VacationHunter/0.1 (developer@example.com)",
+    hhClientId: "client-id",
+    hhClientSecret: "client-secret",
+    maxJobsPerSource: 10,
+    fetchImpl: async (url, options) => {
+      calls.push({ url: String(url), options });
+      if (String(url) === "https://api.hh.ru/token") return Response.json({ access_token: "issued-token" });
+      return Response.json({ items: [] });
+    },
+  });
+  await connector.search({ role: ".NET developer", skills: [".net"] });
+  await connector.search({ role: ".NET developer", skills: [".net"] });
+  const tokenCalls = calls.filter(({ url }) => url === "https://api.hh.ru/token");
+  assert.equal(tokenCalls.length, 1);
+  assert.equal(tokenCalls[0].options.method, "POST");
+  assert.match(tokenCalls[0].options.body, /grant_type=client_credentials/);
+  assert.equal(calls.at(-1).options.headers.Authorization, "Bearer issued-token");
 });
 
 test("source circuit breaker skips repeated calls during cooldown", async () => {

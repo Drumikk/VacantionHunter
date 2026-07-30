@@ -40,7 +40,7 @@
 
 | Группа | Источник | Статус | Результат / действие |
 |---|---|---|---|
-| Direct API | HeadHunter | disabled | Указать `HH_USER_AGENT` с реальным контактным email |
+| Direct API | HeadHunter | disabled | Зарегистрировать приложение; указать `HH_USER_AGENT` и `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET` |
 | Aggregator API | Jooble | disabled | Получить и указать `JOOBLE_API_KEY` |
 | Government API | USAJOBS | disabled | Получить `USAJOBS_API_KEY` и указать регистрационный `USAJOBS_EMAIL` |
 | Remote API | Remotive | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
@@ -73,4 +73,4 @@ npm run smoke:live -- --source=ashby:sola
 npm run smoke:live -- --source=lever
 ```
 
-Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления `HH_USER_AGENT`, `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода.
+Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода.

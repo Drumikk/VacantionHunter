@@ -1,5 +1,5 @@
 export class HttpError extends Error {
-  constructor(message, { status, code, retryAfterMs = null, host, requestId = null } = {}) {
+  constructor(message, { status, code, retryAfterMs = null, host, requestId = null, description = null } = {}) {
     super(message);
     this.name = "HttpError";
     this.status = status;
@@ -7,6 +7,7 @@ export class HttpError extends Error {
     this.retryAfterMs = retryAfterMs;
     this.host = host;
     this.requestId = requestId;
+    this.description = description;
   }
 }
 
@@ -26,18 +27,21 @@ async function responseError(response, url) {
   const server = response.headers.get("server") || "";
   const challenged = response.headers.get("cf-mitigated") === "challenge" || /cloudflare/i.test(server) && contentType.includes("text/html");
   let code = challenged ? "cloudflare_challenge" : `http_${response.status}`;
+  let description = null;
   if (contentType.includes("json")) {
     try {
       const payload = await response.json();
       code = payload?.errors?.[0]?.type || payload?.errors?.[0]?.value || code;
+      description = payload?.description || payload?.errors?.[0]?.reason || null;
     } catch { /* an invalid error body should not hide the HTTP status */ }
   }
-  return new HttpError(`HTTP ${response.status} (${code}) from ${host}`, {
+  return new HttpError(`HTTP ${response.status} (${code}) from ${host}${description ? `: ${description}` : ""}`, {
     status: response.status,
     code,
     retryAfterMs: retryAfterMs(response),
     host,
     requestId,
+    description,
   });
 }
 

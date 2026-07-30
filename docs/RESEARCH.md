@@ -4,7 +4,7 @@
 
 | Решение | Первичный источник | Что подтверждает | Реализация |
 |---|---|---|---|
-| HH через JSON API | <https://api.hh.ru/openapi/redoc> | HTTPS/JSON, обязательный User-Agent, поиск по тексту, зарплате, валюте, дате; employer `trusted`, `archived`, `closed_for_applicants` | `src/connectors/hh.js` |
+| HH через JSON API | <https://api.hh.ru/openapi/redoc> | HTTPS/JSON, обязательный User-Agent, OAuth-токен зарегистрированного приложения, поиск по тексту, зарплате, валюте, дате; employer `trusted`, `archived`, `closed_for_applicants` | `src/connectors/hh.js` |
 | Greenhouse public Job Board API | <https://developer.greenhouse.io/job-board.html> | Публичное получение опубликованных jobs; application POST требует auth | `src/connectors/greenhouse.js` |
 | Lever public Postings API | <https://hire.lever.co/developer/support> | Postings API публично отдаёт опубликованные вакансии | `src/connectors/lever.js` |
 | Ashby public Job Postings API | <https://developers.ashbyhq.com/docs/public-job-posting-api> | Список опубликованных вакансий и `includeCompensation=true` | `src/connectors/ashby.js` |
@@ -24,7 +24,7 @@
 
 ## Операционная проверка API 2026-07-29
 
-- HH вернул `bad_user_agent` для фиктивного домена в контактном адресе и `forbidden` для User-Agent без контакта. Поэтому в приложении нет небезопасного значения по умолчанию: оператор обязан задать реальный `HH_USER_AGENT`.
+- HH вернул `bad_user_agent` для фиктивного домена в контактном адресе, а credentialed CI с одним `HH_USER_AGENT` получил `403 forbidden`. Поэтому production-коннектор требует реальный `HH_USER_AGENT` и OAuth-авторизацию приложения; анонимный CAPTCHA/403 не обходится.
 - Remotive JSON API и документированный RSS (`https://remotive.com/feed`) с текущего тестового IP вернули Cloudflare 403. Это инфраструктурная блокировка, а не доказательство закрытия API; коннектор переводится в cooldown, атрибуция и обратная ссылка остаются обязательными.
 - Arbeitnow по-прежнему документирует no-key API и обновил страницу 9 марта 2026 г., но текущий тестовый IP получает managed Cloudflare challenge. Обход не применяется; используются cooldown, другой разрешённый deployment egress или договорной API.
 

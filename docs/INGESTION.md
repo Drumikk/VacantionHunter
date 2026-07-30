@@ -21,7 +21,7 @@ Cookies, пароль и пользовательская сессия не яв
 | Слой | Покрытие | Авторизация | Статус |
 |---|---|---|---|
 | Jooble REST API | Агрегатор вакансий из job boards, карьерных страниц и рекрутеров в десятках стран | `JOOBLE_API_KEY` | Реализовано; основной широкий слой |
-| HeadHunter API | РФ/СНГ | идентифицирующий `HH_USER_AGENT` | Реализовано |
+| HeadHunter API | РФ/СНГ | `HH_USER_AGENT` + OAuth-токен приложения | Реализовано |
 | Greenhouse, Ashby, Lever | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 16 стартовых boards |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
@@ -74,6 +74,7 @@ npm start
 
 ```powershell
 $env:HH_USER_AGENT='VacationHunter/0.2 (contact: ваш-email@example.com)'
+$env:HH_ACCESS_TOKEN='токен зарегистрированного приложения'
 ```
 
 ## Эксплуатационные ограничения
