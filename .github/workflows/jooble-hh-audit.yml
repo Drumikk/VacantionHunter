@@ -1,0 +1,34 @@
+name: Jooble HeadHunter coverage audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
+      REQUEST_TIMEOUT_MS: "15000"
+      MAX_JOBS_PER_SOURCE: "100"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Query Jooble and identify HeadHunter sources
+        shell: bash
+        run: |
+          mkdir -p outputs
+          node scripts/audit-jooble-hh.mjs > outputs/jooble-hh-audit.json
+      - name: Upload sanitized audit
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jooble-hh-audit-${{ github.run_id }}
+          path: outputs/jooble-hh-audit.json
+          if-no-files-found: error
+          retention-days: 14
