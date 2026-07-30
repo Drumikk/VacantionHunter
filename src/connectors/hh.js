@@ -59,7 +59,7 @@ export function hhConnector(config) {
   if (!userAgent.configured) disabledReason = "Требуется HH_USER_AGENT с реальным контактным email";
   else if (!userAgent.formatValid) disabledReason = "HH_USER_AGENT должен иметь формат AppName/Version (real-email@example.com)";
   else if (!hasAccessToken && (hasClientId !== hasClientSecret)) disabledReason = "HH_CLIENT_ID и HH_CLIENT_SECRET должны быть указаны вместе";
-  else if (!hasAccessToken && !hasClientCredentials) disabledReason = "Требуется HH_ACCESS_TOKEN или HH_CLIENT_ID + HH_CLIENT_SECRET";
+  else if (!hasAccessToken && !hasClientCredentials) disabledReason = "Для новых приложений соискателей доступ HH закрыт; нужен ранее одобренный HH_ACCESS_TOKEN или HH_CLIENT_ID + HH_CLIENT_SECRET";
   const source = {
     id: "hh",
     name: "HeadHunter",
@@ -68,6 +68,7 @@ export function hhConnector(config) {
     setupUrl: "https://dev.hh.ru/",
     authType: "oauth2_application",
     credentialFields: ["HH_USER_AGENT", "HH_ACCESS_TOKEN", "HH_CLIENT_ID", "HH_CLIENT_SECRET"],
+    note: "Поддерживается только ранее одобренный доступ приложения; новые приложения для соискателей HH не регистрирует.",
   };
   return {
     ...source,

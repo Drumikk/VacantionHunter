@@ -10,7 +10,7 @@
 | Ashby public Job Postings API | <https://developers.ashbyhq.com/docs/public-job-posting-api> | Список опубликованных вакансий и `includeCompensation=true` | `src/connectors/ashby.js` |
 | Remotive public API | <https://remotive.com/remote-jobs/api> | Разрешена републикация с атрибуцией; public jobs задержаны на 24 часа | `src/connectors/remotive.js` |
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
-| Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination; вакансии из множества интернет-источников | `src/connectors/jooble.js` |
+| Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination и поле исходного `source`; международное покрытие без РФ | `src/connectors/jooble.js` |
 | USAJOBS Search API | <https://developer.usajobs.gov/api-reference/get-api-search> | API key + email headers, keyword/location/remote/date filters, salary и application close date | `src/connectors/usajobs.js` |
 | Telegram Bot API | <https://core.telegram.org/bots/api> | HTTPS JSON, `sendMessage` до 4096 символов, `getUpdates`, flood-control `retry_after` | `src/services/notification-service.js` |
 | Telegram BotFather | <https://core.telegram.org/bots/features#botfather> | `/newbot` создаёт бота и выдаёт секретный authentication token | `.env` + центр уведомлений |
@@ -25,6 +25,8 @@
 ## Операционная проверка API 2026-07-29
 
 - HH вернул `bad_user_agent` для фиктивного домена в контактном адресе, а credentialed CI с одним `HH_USER_AGENT` получил `403 forbidden`. Поэтому production-коннектор требует реальный `HH_USER_AGENT` и OAuth-авторизацию приложения; анонимный CAPTCHA/403 не обходится.
+- 30 июля 2026 года форма HH показала только сценарии для сотрудников одного или нескольких работодателей и уведомление о прекращении поддержки API для соискателей с 15 декабря 2025 года. Прямой коннектор сохраняется только для ранее одобренных токенов.
+- Jooble-аудит просканировал глобальный endpoint и `ru.jooble.org`: глобальная русская выдача вернула 0, региональный endpoint отклонил глобальный ключ с 401, а сам российский сайт сообщает о прекращении работы в РФ. Вакансии hh.ru через Jooble не заявляются.
 - Remotive JSON API и документированный RSS (`https://remotive.com/feed`) с текущего тестового IP вернули Cloudflare 403. Это инфраструктурная блокировка, а не доказательство закрытия API; коннектор переводится в cooldown, атрибуция и обратная ссылка остаются обязательными.
 - Arbeitnow по-прежнему документирует no-key API и обновил страницу 9 марта 2026 г., но текущий тестовый IP получает managed Cloudflare challenge. Обход не применяется; используются cooldown, другой разрешённый deployment egress или договорной API.
 

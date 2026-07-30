@@ -28,8 +28,8 @@ export function joobleConnector(config) {
     authType: "api_key",
     credentialFields: ["JOOBLE_API_KEY"],
     adapter: "aggregator-api",
-    regions: ["russia-cis", "europe", "north-america", "latin-america", "oceania", "global-remote"],
-    note: "Официальный агрегаторный API; ключ выдаётся после регистрации Jooble REST API.",
+    regions: ["europe", "north-america", "latin-america", "oceania", "global-remote"],
+    note: "Официальный агрегаторный API для международного поиска. Jooble прекратил работу в РФ; вакансии hh.ru через этот коннектор не заявляются.",
   };
   const enabled = Boolean(config.joobleApiKey);
   const execute = async (query) => {

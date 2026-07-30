@@ -40,8 +40,8 @@
 
 | Группа | Источник | Статус | Результат / действие |
 |---|---|---|---|
-| Direct API | HeadHunter | disabled | Зарегистрировать приложение; указать `HH_USER_AGENT` и `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET` |
-| Aggregator API | Jooble | disabled | Получить и указать `JOOBLE_API_KEY` |
+| Direct API | HeadHunter | restricted | Новые приложения соискателей не принимаются; работает только ранее одобренный токен |
+| Aggregator API | Jooble | ok outside РФ | API работает для международной выдачи; РФ и hh.ru не покрываются |
 | Government API | USAJOBS | disabled | Получить `USAJOBS_API_KEY` и указать регистрационный `USAJOBS_EMAIL` |
 | Remote API | Remotive | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
 | Remote API | Arbeitnow | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |

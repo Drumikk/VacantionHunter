@@ -19,7 +19,10 @@ function config(overrides = {}) {
 }
 
 test("Jooble is disabled without a key and maps its authenticated aggregator response", async () => {
-  assert.equal(joobleConnector(config()).enabled, false);
+  const disabled = joobleConnector(config());
+  assert.equal(disabled.enabled, false);
+  assert.equal(disabled.regions.includes("russia-cis"), false);
+  assert.match(disabled.note, /прекратил работу в РФ/);
   let calls = 0;
   let request = null;
   const connector = joobleConnector(config({

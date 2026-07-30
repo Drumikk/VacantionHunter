@@ -70,12 +70,12 @@ for (const probe of probes) {
   }
 }
 
-const hhSamples = reports.flatMap((report) => report.hhSamples);
+const hhSamples = reports.flatMap((report) => report.hhSamples || []);
 console.log(JSON.stringify({
   checkedAt: new Date().toISOString(),
   apiKeyExposed: false,
   hhDetected: hhSamples.length > 0,
-  hhVacanciesReturned: reports.reduce((sum, report) => sum + report.hhCount, 0),
+  hhVacanciesReturned: reports.reduce((sum, report) => sum + (report.hhCount || 0), 0),
   reports,
 }, null, 2));
 
