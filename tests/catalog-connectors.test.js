@@ -8,6 +8,10 @@ import { hnWhoIsHiringConnector } from "../src/connectors/hn-who-is-hiring.js";
 import { reliefWebConnector } from "../src/connectors/reliefweb.js";
 import { recruiteeConnectors } from "../src/connectors/recruitee.js";
 import { adzunaConnectors } from "../src/connectors/adzuna.js";
+import { himalayasConnector } from "../src/connectors/himalayas.js";
+import { jobicyConnector } from "../src/connectors/jobicy.js";
+import { reedConnector } from "../src/connectors/reed.js";
+import { superJobConnector } from "../src/connectors/superjob.js";
 
 const query = { raw: ".NET developer remote relocation", role: ".NET developer", skills: [".net"], remote: true, relocation: true, locations: [] };
 
@@ -185,4 +189,98 @@ test("Adzuna creates country sources, requires credentials and preserves redirec
   assert.equal(JSON.stringify(connector).includes(secretKey), false);
   assert.equal(job.url, "https://www.adzuna.co.uk/jobs/land/ad/ad-1");
   assert.deepEqual(job.salary, { min: 80_000, max: 100_000, currency: "GBP", period: "year", predicted: false });
+});
+
+test("Himalayas maps its public remote search response", async () => {
+  const connector = himalayasConnector(config({
+    fetchImpl: async (url) => {
+      const requested = new URL(url);
+      assert.equal(requested.pathname, "/jobs/api/search");
+      assert.match(requested.searchParams.get("q"), /\.net/i);
+      return Response.json({ jobs: [{
+        guid: "him-1", title: "Senior .NET Developer", companyName: "Himalaya Co", description: "ASP.NET remote with relocation support",
+        applicationLink: "https://himalayas.app/jobs/him-1", locationRestrictions: ["Europe"], employmentType: "Full Time", seniority: "Senior",
+        category: ["Engineering"], parentCategories: ["Software"], minSalary: 90_000, maxSalary: 120_000, currency: "USD", salaryPeriod: "annual",
+        pubDate: "2026-07-30T00:00:00Z", expiryDate: "2026-09-01T00:00:00Z",
+      }] });
+    },
+  }));
+  const [job] = await connector.search(query);
+  assert.equal(job.id, "himalayas:him-1");
+  assert.equal(job.remote, true);
+  assert.equal(job.relocation, true);
+  assert.deepEqual(job.salary, { min: 90_000, max: 120_000, currency: "USD", period: "year" });
+});
+
+test("Jobicy maps public API jobs and attribution URL", async () => {
+  let calls = 0;
+  const connector = jobicyConnector(config({
+    fetchImpl: async (url) => {
+      calls += 1;
+      const requested = new URL(url);
+      assert.equal(requested.searchParams.get("count"), "100");
+      assert.equal(requested.searchParams.has("tag"), false);
+      return Response.json({ jobs: [{
+      id: 146259, url: "https://jobicy.com/jobs/146259-net-developer", jobTitle: ".NET Developer", companyName: "INNOCV",
+      jobDescription: "ASP.NET 100% remote work with relocation support", jobGeo: "Spain", jobType: ["Full-Time"], jobLevel: "Midweight",
+      jobIndustry: ["Software Engineering"], pubDate: "2026-07-14T12:10:06Z", salaryMin: 60_000, salaryMax: 80_000,
+      salaryCurrency: "EUR", salaryPeriod: "yearly",
+      }] });
+    },
+  }));
+  const [job] = await connector.search(query);
+  await connector.search({ ...query, raw: `${query.raw} second saved search` });
+  assert.equal(calls, 1, "the public feed must not be polled more than once per hour");
+  assert.equal(job.url, "https://jobicy.com/jobs/146259-net-developer");
+  assert.equal(job.remote, true);
+  assert.equal(job.relocation, true);
+  assert.deepEqual(job.salary, { min: 60_000, max: 80_000, currency: "EUR", period: "year" });
+});
+
+test("Reed uses API key as Basic username and maps UK search results", async () => {
+  assert.equal(reedConnector(config()).enabled, false);
+  const secret = "reed-secret";
+  let authorization;
+  const connector = reedConnector(config({
+    reedApiKey: secret,
+    fetchImpl: async (_url, options) => {
+      authorization = options.headers.Authorization;
+      return Response.json({ results: [{
+        jobId: 42, jobTitle: "Senior .NET Developer", employerName: "Example Ltd", jobDescription: "ASP.NET remote with relocation support",
+        locationName: "London", minimumSalary: 70_000, maximumSalary: 90_000, currency: "GBP", jobType: "Full Time",
+        contractType: "Permanent", date: "2026-07-30T00:00:00Z", expirationDate: "2026-09-01T00:00:00Z",
+        jobUrl: "https://www.reed.co.uk/jobs/senior-net-developer/42", externalUrl: "https://example.test/apply",
+      }] });
+    },
+  }));
+  const [job] = await connector.search(query);
+  assert.equal(authorization, `Basic ${Buffer.from(`${secret}:`).toString("base64")}`);
+  assert.equal(JSON.stringify(connector).includes(secret), false);
+  assert.equal(job.applyUrl, "https://example.test/apply");
+  assert.equal(job.remote, true);
+});
+
+test("SuperJob requires only app secret for public vacancy search", async () => {
+  assert.equal(superJobConnector(config()).enabled, false);
+  const secret = "superjob-secret";
+  let appHeader;
+  const connector = superJobConnector(config({
+    superjobSecretKey: secret,
+    fetchImpl: async (_url, options) => {
+      appHeader = options.headers["X-Api-App-Id"];
+      return Response.json({ objects: [{
+        id: 77, profession: "Разработчик .NET", firm_name: "ООО Пример", vacancyRichText: "ASP.NET. Удалённая работа, поддержка релокации.",
+        town: { title: "Москва" }, place_of_work: { title: "Удалённая работа" }, link: "https://www.superjob.ru/vakansii/77.html",
+        payment_from: 200_000, payment_to: 260_000, currency: "rub", date_published: 1_785_427_200, date_pub_to: 1_790_611_200,
+        moveable: true, is_archive: false,
+      }] });
+    },
+  }));
+  const [job] = await connector.search(query);
+  assert.equal(appHeader, secret);
+  assert.equal(JSON.stringify(connector).includes(secret), false);
+  assert.equal(job.id, "superjob:77");
+  assert.equal(job.remote, true);
+  assert.equal(job.relocation, true);
+  assert.deepEqual(job.salary, { min: 200_000, max: 260_000, currency: "RUB", period: "month" });
 });

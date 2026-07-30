@@ -17,6 +17,10 @@ import { hnWhoIsHiringConnector } from "./hn-who-is-hiring.js";
 import { reliefWebConnector } from "./reliefweb.js";
 import { recruiteeConnectors } from "./recruitee.js";
 import { adzunaConnectors } from "./adzuna.js";
+import { himalayasConnector } from "./himalayas.js";
+import { jobicyConnector } from "./jobicy.js";
+import { reedConnector } from "./reed.js";
+import { superJobConnector } from "./superjob.js";
 
 export function createConnectors(config) {
   const connectors = config.enableDemoSource === false ? [] : [demoConnector(config.demoPath)];
@@ -24,6 +28,7 @@ export function createConnectors(config) {
     connectors.push(
       hhEmailConnector(config), hhConnector(config), joobleConnector(config), usajobsConnector(config), remotiveConnector(config), arbeitnowConnector(config),
       trudvsemConnector(config), jobtechConnector(config), remoteOkConnector(config), weWorkRemotelyConnector(config), hnWhoIsHiringConnector(config), reliefWebConnector(config),
+      himalayasConnector(config), jobicyConnector(config), reedConnector(config), superJobConnector(config),
       ...restrictedConnectors(), ...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config), ...recruiteeConnectors(config), ...adzunaConnectors(config),
     );
   }

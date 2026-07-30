@@ -26,7 +26,10 @@ Cookies, пароль и пользовательская сессия не яв
 | Greenhouse, Ashby, Lever, Recruitee | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 22 стартовых boards |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
+| Himalayas, Jobicy | Международные remote-вакансии | публичные API без ключей | Реализовано; обязательны атрибуция и оригинальные ссылки, Jobicy кэшируется на час |
 | Adzuna API | 16 национальных рынков текущего географического scope | `app_id` + `app_key` | Реализовано; 8 стран включаются по умолчанию после настройки ключей |
+| Reed Jobseeker API | Великобритания | `REED_API_KEY` через Basic Auth | Реализовано; включается после регистрации ключа |
+| SuperJob API | РФ/СНГ | `SUPERJOB_SECRET_KEY` в `X-Api-App-Id` | Реализовано; OAuth пользователя для публичного поиска не нужен |
 | LinkedIn / Indeed | Крупные закрытые площадки | партнёрский договор | Не скрейпятся; открытого search API для этого сценария нет |
 
 Jooble выбран широким международным слоем: официальный API принимает `keywords`, `location`, radius, salary и pagination и возвращает источник, компанию, ссылку, тип, зарплату и время обновления. Он не используется как замена HH: российский сайт Jooble прекратил работу, глобальный API с российской локацией не возвращает российскую выдачу, а региональный endpoint не принимает глобальный ключ.
@@ -35,7 +38,7 @@ USAJOBS добавлен как пример прямого tokenized API: он 
 
 ## Получение ключей
 
-Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Remotive, Arbeitnow и настроенные публичные ATS-доски. Их не нужно авторизовывать в браузере. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
+Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, Remotive, Arbeitnow и настроенные публичные ATS-доски. Их не нужно авторизовывать в браузере. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
 
 ```powershell
 $env:RELIEFWEB_APPNAME='ваше-одобренное-имя'
@@ -47,6 +50,14 @@ Adzuna подключается парой `app_id`/`app_key`. По умолча
 $env:ADZUNA_APP_ID='ваш-app-id'
 $env:ADZUNA_API_KEY='ваш-app-key'
 $env:ADZUNA_COUNTRIES='gb,us,ca,au,de,fr,nl,pl'
+```
+
+Reed выдаёт Jobseeker API key после регистрации разработчика; ключ передаётся как Basic username с пустым паролем. SuperJob требует Secret key зарегистрированного приложения в заголовке `X-Api-App-Id`; пользовательский OAuth для чтения публичных вакансий не используется:
+
+```powershell
+$env:REED_API_KEY='ваш-api-key'
+$env:SUPERJOB_SECRET_KEY='ваш-secret-key'
+npm start
 ```
 
 Текущая карта реализованных и следующих источников: [аудит каталога](SOURCE_CATALOG_AUDIT.md).
@@ -146,6 +157,10 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - HN Algolia API: <https://hn.algolia.com/api>
 - ReliefWeb API v2 и appname: <https://apidoc.reliefweb.int/>, <https://apidoc.reliefweb.int/parameters>
 - Recruitee Careers Site API: <https://docs.recruitee.com/reference/intro-to-careers-site-api>, <https://docs.recruitee.com/reference/offers>
+- Himalayas public API: <https://himalayas.app/api>
+- Jobicy Remote Jobs API: <https://github.com/Jobicy/remote-jobs-api>
+- Reed Jobseeker API: <https://www.reed.co.uk/developers/jobseeker>
+- SuperJob API: <https://api.superjob.ru/>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>
 - Indeed Partner API guides: <https://docs.indeed.com/api-guides/>

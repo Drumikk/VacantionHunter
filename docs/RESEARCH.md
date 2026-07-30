@@ -21,6 +21,10 @@
 | HN Algolia Search API | <https://hn.algolia.com/api> | Публичный поиск по HN; позволяет получать комментарии ежемесячной темы Who Is Hiring | `src/connectors/hn-who-is-hiring.js` |
 | ReliefWeb API v2 | <https://apidoc.reliefweb.int/> | Официальный API OCHA; `appname` обязателен и с 2025-11-01 требует предварительного одобрения | `src/connectors/reliefweb.js` |
 | Adzuna Search API | <https://developer.adzuna.com/docs/search> | Country endpoint, keyword/location filters, зарплата, компания и обязательный `redirect_url`; нужны `app_id` + `app_key` | `src/connectors/adzuna.js` |
+| Himalayas public API | <https://himalayas.app/api> | Публичный JSON search без авторизации, фильтры remote/географии/стажа и обязательная обратная ссылка | `src/connectors/himalayas.js` |
+| Jobicy Remote Jobs API | <https://github.com/Jobicy/remote-jobs-api> | Публичный JSON API без ключа; до 100 записей, шестичасовая задержка, атрибуция и опрос не чаще раза в час | `src/connectors/jobicy.js` |
+| Reed Jobseeker API | <https://www.reed.co.uk/developers/jobseeker> | Search endpoint, до 100 результатов и Basic Auth с API key как username | `src/connectors/reed.js` |
+| SuperJob API | <https://api.superjob.ru/> | Публичный поиск вакансий через `/2.0/vacancies/`; Secret key приложения в `X-Api-App-Id`, пользовательский OAuth не обязателен | `src/connectors/superjob.js` |
 | Telegram Bot API | <https://core.telegram.org/bots/api> | HTTPS JSON, `sendMessage` до 4096 символов, `getUpdates`, flood-control `retry_after` | `src/services/notification-service.js` |
 | Telegram BotFather | <https://core.telegram.org/bots/features#botfather> | `/newbot` создаёт бота и выдаёт секретный authentication token | `.env` + центр уведомлений |
 | LinkedIn automation limits | <https://www.linkedin.com/legal/user-agreement> | scraping, bots и копирование cookies запрещены без отдельного разрешения | policy: connector disabled without partnership |
@@ -41,7 +45,7 @@
 
 Такая проверка намеренно различает «API существует по документации» и «API доступен из конкретного окружения сейчас».
 
-Точечная проверка новых коннекторов 2026-07-31: «Работа России» вернула 16 .NET-вакансий, JobTech — 20 записей и 9 релевантных частичных совпадений, HN Who Is Hiring — 3 полных совпадения. Все 6 Recruitee boards ответили успешно за 93–232 мс. Remote OK и We Work Remotely не завершили TLS/HTTP-запрос из локального Windows egress за отведённый таймаут; их схемы проверены unit-тестами, а сбой изолируется системой health/cooldown. ReliefWeb штатно остаётся `disabled` до одобрения `RELIEFWEB_APPNAME`; Adzuna — до `ADZUNA_APP_ID` и `ADZUNA_API_KEY`.
+Точечная проверка новых коннекторов 2026-07-31: «Работа России» вернула 16 .NET-вакансий, JobTech — 20 записей и 9 релевантных частичных совпадений, HN Who Is Hiring — 3 полных совпадения. Все 6 Recruitee boards ответили успешно за 93–232 мс. Remote OK, We Work Remotely, Himalayas и Jobicy не завершили TLS/HTTP-запрос из локального Windows egress за отведённый таймаут; их схемы проверены unit-тестами, а сбой изолируется системой health/cooldown. ReliefWeb штатно остаётся `disabled` до одобрения `RELIEFWEB_APPNAME`; Adzuna — до `ADZUNA_APP_ID` и `ADZUNA_API_KEY`; Reed и SuperJob — до своих серверных ключей.
 
 Стартовый пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
 

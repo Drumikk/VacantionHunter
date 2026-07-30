@@ -61,6 +61,8 @@ export const config = {
   adzunaAppId: process.env.ADZUNA_APP_ID || "",
   adzunaApiKey: process.env.ADZUNA_API_KEY || "",
   adzunaCountries: adzunaCountries.length ? adzunaCountries : ["gb", "us", "ca", "au", "de", "fr", "nl", "pl"],
+  reedApiKey: process.env.REED_API_KEY || "",
+  superjobSecretKey: process.env.SUPERJOB_SECRET_KEY || "",
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || "",
   telegramChatId: process.env.TELEGRAM_CHAT_ID || "",
   telegramSilent: process.env.TELEGRAM_SILENT === "true",
