@@ -41,6 +41,7 @@
 | Группа | Источник | Статус | Результат / действие |
 |---|---|---|---|
 | Direct API | HeadHunter | restricted | Новые приложения соискателей не принимаются; работает только ранее одобренный токен |
+| Email alerts | HeadHunter email alerts | ready, credentials required | Рабочий путь для соискателя: отдельный IMAP-ящик получает официальные уведомления сохранённого поиска HH |
 | Aggregator API | Jooble | ok outside РФ | API работает для международной выдачи; РФ и hh.ru не покрываются |
 | Government API | USAJOBS | disabled | Получить `USAJOBS_API_KEY` и указать регистрационный `USAJOBS_EMAIL` |
 | Remote API | Remotive | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
@@ -73,4 +74,4 @@ npm run smoke:live -- --source=ashby:sola
 npm run smoke:live -- --source=lever
 ```
 
-Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода.
+Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же API-коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода. IMAP-доступ к личной почте безопаснее держать локально либо в отдельном секрет-хранилище развёрнутого сервера, а не в CI общего репозитория.

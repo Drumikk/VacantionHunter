@@ -1,9 +1,11 @@
 node_modules/
+.pnpm-store/
 .env
 data/job-store.json
 data/watch-store.json
 data/notification-outbox.json
 data/application-store.json
+data/hh-email-state.json
 data/*.tmp
 coverage/
 outputs/

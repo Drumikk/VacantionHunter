@@ -21,6 +21,7 @@ Cookies, пароль и пользовательская сессия не яв
 | Слой | Покрытие | Авторизация | Статус |
 |---|---|---|---|
 | Jooble REST API | Международный агрегатор вакансий из job boards, карьерных страниц и рекрутеров | `JOOBLE_API_KEY` | Реализовано; РФ и hh.ru не покрывает |
+| HH email alerts | РФ/СНГ, выдача сохранённых поисков HH | отдельный IMAP-ящик + пароль приложения | Реализовано; импортирует официальные уведомления без скрейпинга сайта |
 | HeadHunter API | РФ/СНГ | ранее одобренный OAuth-токен приложения | Реализован адаптер; новый доступ для соискателей закрыт |
 | Greenhouse, Ashby, Lever | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 16 стартовых boards |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
@@ -70,7 +71,27 @@ $env:USAJOBS_EMAIL='ваш-email@example.com'
 npm start
 ```
 
-### HeadHunter
+### HeadHunter через email-уведомления — рабочий вариант для соискателя
+
+1. На HH создайте нужный поиск, сохраните его как автопоиск и включите email-уведомления.
+2. Рекомендуется завести отдельный почтовый ящик только для вакансий либо настроить пересылку писем HH в такой ящик.
+3. Для Gmail включите двухэтапную аутентификацию и создайте отдельный пароль приложения. Основной пароль аккаунта использовать нельзя.
+4. Заполните локальный `.env` (значения не нужно отправлять в чат):
+
+```dotenv
+HH_EMAIL_IMAP_HOST=imap.gmail.com
+HH_EMAIL_IMAP_PORT=993
+HH_EMAIL_IMAP_SECURE=true
+HH_EMAIL_IMAP_USER=vacancies@example.com
+HH_EMAIL_IMAP_PASSWORD=пароль-приложения
+HH_EMAIL_IMAP_FOLDER=INBOX
+HH_EMAIL_SENDER_DOMAINS=hh.ru,headhunter.ru
+HH_EMAIL_LOOKBACK_DAYS=30
+```
+
+После запуска откройте центр «Источники» и нажмите «Проверить сейчас» у `HeadHunter email alerts`. Коннектор принимает только отправителей с точным доменом `hh.ru`, `headhunter.ru` или их поддоменами, извлекает ID и канонические ссылки на вакансии, не исполняет HTML/JavaScript и не вызывает IMAP-команды изменения писем. Последний обработанный UID хранится в `data/hh-email-state.json`, поэтому письмо не импортируется повторно. Планировщик опрашивает источник каждые 15 минут при наличии сохранённого наблюдения или недавнего запроса.
+
+### HeadHunter через ранее одобренный API
 
 ```powershell
 $env:HH_USER_AGENT='VacationHunter/0.2 (contact: ваш-email@example.com)'
@@ -97,6 +118,8 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 
 - Jooble REST API: <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation>
 - Jooble API registration: <https://jooble.org/api/about>
+- HH: автопоиски и уведомления: <https://feedback.hh.ru/knowledge-base/article/3711>
+- Gmail IMAP и пароли приложений: <https://support.google.com/mail/answer/7126229>, <https://support.google.com/accounts/answer/185833>
 - Adzuna overview/search/terms: <https://developer.adzuna.com/overview>, <https://developer.adzuna.com/docs/search>, <https://developer.adzuna.com/docs/terms_of_service>
 - USAJOBS authentication/search: <https://developer.usajobs.gov/guides/authentication>, <https://developer.usajobs.gov/api-reference/get-api-search>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>

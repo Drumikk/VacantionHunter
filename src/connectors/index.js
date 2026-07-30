@@ -1,5 +1,6 @@
 import { demoConnector } from "./demo.js";
 import { hhConnector } from "./hh.js";
+import { hhEmailConnector } from "./hh-email.js";
 import { remotiveConnector } from "./remotive.js";
 import { arbeitnowConnector } from "./arbeitnow.js";
 import { joobleConnector } from "./jooble.js";
@@ -13,7 +14,7 @@ export function createConnectors(config) {
   const connectors = config.enableDemoSource === false ? [] : [demoConnector(config.demoPath)];
   if (config.enableLiveSources) {
     connectors.push(
-      hhConnector(config), joobleConnector(config), usajobsConnector(config), remotiveConnector(config), arbeitnowConnector(config),
+      hhEmailConnector(config), hhConnector(config), joobleConnector(config), usajobsConnector(config), remotiveConnector(config), arbeitnowConnector(config),
       ...restrictedConnectors(), ...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config),
     );
   }
