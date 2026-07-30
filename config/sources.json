@@ -104,5 +104,43 @@
       "homepage": "https://mtch.com/careers",
       "regions": ["europe", "north-america"]
     }
+  ],
+  "recruiteeBoards": [
+    {
+      "slug": "upside",
+      "name": "Upside",
+      "homepage": "https://upside.recruitee.com/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "aihr",
+      "name": "AIHR",
+      "homepage": "https://aihr.recruitee.com/",
+      "regions": ["europe"]
+    },
+    {
+      "slug": "sequra",
+      "name": "SeQura",
+      "homepage": "https://sequra.recruitee.com/",
+      "regions": ["europe", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "constellr",
+      "name": "constellr",
+      "homepage": "https://constellr.recruitee.com/",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "jumpseller",
+      "name": "Jumpseller",
+      "homepage": "https://jumpseller.recruitee.com/",
+      "regions": ["europe", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "ecconsultants",
+      "name": "E&C Consultants",
+      "homepage": "https://ecconsultants.recruitee.com/",
+      "regions": ["europe", "global-remote"]
+    }
   ]
 }

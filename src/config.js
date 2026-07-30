@@ -24,6 +24,7 @@ function registryEntries(registry, key, envName) {
 }
 
 const registry = readRegistry();
+const adzunaCountries = csv("ADZUNA_COUNTRIES");
 
 export const config = {
   rootDir,
@@ -56,6 +57,10 @@ export const config = {
   joobleApiKey: process.env.JOOBLE_API_KEY || "",
   usajobsApiKey: process.env.USAJOBS_API_KEY || "",
   usajobsEmail: process.env.USAJOBS_EMAIL || "",
+  reliefwebAppName: process.env.RELIEFWEB_APPNAME || "",
+  adzunaAppId: process.env.ADZUNA_APP_ID || "",
+  adzunaApiKey: process.env.ADZUNA_API_KEY || "",
+  adzunaCountries: adzunaCountries.length ? adzunaCountries : ["gb", "us", "ca", "au", "de", "fr", "nl", "pl"],
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || "",
   telegramChatId: process.env.TELEGRAM_CHAT_ID || "",
   telegramSilent: process.env.TELEGRAM_SILENT === "true",
@@ -72,6 +77,7 @@ export const config = {
   greenhouseBoards: registryEntries(registry.data, "greenhouseBoards", "GREENHOUSE_BOARDS"),
   ashbyBoards: registryEntries(registry.data, "ashbyBoards", "ASHBY_BOARDS"),
   leverSites: registryEntries(registry.data, "leverSites", "LEVER_SITES"),
+  recruiteeBoards: registryEntries(registry.data, "recruiteeBoards", "RECRUITEE_BOARDS"),
   storePath: path.join(rootDir, "data", "job-store.json"),
   watchStorePath: path.join(rootDir, "data", "watch-store.json"),
   notificationOutboxPath: path.join(rootDir, "data", "notification-outbox.json"),

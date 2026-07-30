@@ -12,7 +12,7 @@
 - ранжирование: полные обязательные совпадения → взвешенная релевантность → зарплата → свежесть → надёжность;
 - дедупликация по ID источника, canonical URL, fingerprint и fuzzy title/company/location;
 - проверка вакансии по происхождению, компании, сроку, HTTP/JobPosting и риск-фразам;
-- коннекторы HH, Remotive, Arbeitnow, tokenized multi-site API Jooble, USAJOBS и настраиваемые публичные ATS-фиды Greenhouse, Ashby, Lever;
+- коннекторы «Работа России», шведского JobTech/Platsbanken, Remote OK, We Work Remotely RSS, Hacker News Who Is Hiring, ReliefWeb, Remotive, Arbeitnow, Jooble, USAJOBS и настраиваемые публичные ATS-фиды Greenhouse, Ashby, Lever, Recruitee; HH оставлен как необязательный резервный канал;
 - явные policy-статусы для LinkedIn и Indeed: они не скрейпятся без официального партнёрского доступа;
 - локальный демонстрационный набор для офлайн-режима; при включённых live-источниках он по умолчанию не смешивается с реальной выдачей;
 - сохраняемые наблюдения за поиском: отдельное JSON-хранилище, фоновые обновления и SSE-уведомления для опции «следить за новыми»;
@@ -22,7 +22,7 @@
 
 ## Запуск
 
-Требуется Node.js 20+; внешние npm-зависимости не нужны.
+Требуется Node.js 20+. Зависимости устанавливаются через `pnpm install`; XML/RSS разбирается локально без браузерной автоматизации.
 
 ```powershell
 corepack enable
@@ -64,17 +64,22 @@ HTTP_USER_AGENT=VacationHunter/0.1
 JOOBLE_API_KEY=полученный_ключ
 USAJOBS_API_KEY=полученный_ключ
 USAJOBS_EMAIL=реальный_email_регистрации
+RELIEFWEB_APPNAME=предварительно_одобренное_имя_приложения
+ADZUNA_APP_ID=идентификатор_приложения
+ADZUNA_API_KEY=полученный_ключ
+ADZUNA_COUNTRIES=gb,us,ca,au,de,fr,nl,pl
 TELEGRAM_BOT_TOKEN=токен_из_BotFather
 TELEGRAM_CHAT_ID=id_личного_чата_или_канала
 AGGREGATOR_CACHE_MS=900000
 GREENHOUSE_BOARDS=company-one,company-two
 ASHBY_BOARDS=CompanyOne,CompanyTwo
 LEVER_SITES=company-one,company-two
+RECRUITEE_BOARDS=company-one,company-two
 ```
 
 Наблюдаемые поиски сохраняются локально в `data/watch-store.json` и после перезапуска снова попадают в фоновое обновление. Это однопользовательский режим MVP; для многопользовательского развёртывания потребуются аккаунты и серверная база данных.
 
-ATS-параметры — это публичные board/site slug конкретных компаний. Обход авторизации не реализуется: для закрытых данных нужен OAuth, API-ключ или партнёрский фид.
+ATS-параметры — это публичные board/site slug конкретных компаний. Поддерживаются Greenhouse, Ashby, Lever и Recruitee Careers Site API. Обход авторизации не реализуется: для закрытых данных нужен OAuth, API-ключ или партнёрский фид.
 
 Те же ATS-источники можно описать объектами в `config/sources.json`: `slug`, отображаемое `name`, карьерный `homepage`, `regions` и `enabled`. Каждая company board становится отдельным коннектором и получает собственные health, error count и cooldown; сбой одной компании не маскируется общим статусом ATS.
 

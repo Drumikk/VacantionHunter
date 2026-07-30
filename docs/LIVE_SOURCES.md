@@ -1,6 +1,6 @@
 # Статус живых источников
 
-Дата снимка: 2026-07-29 22:53 UTC. Окружение: локальный Windows egress. Запрос:
+Основной снимок: 2026-07-29 22:53 UTC. Новые источники точечно проверены 2026-07-31. Окружение: локальный Windows egress. Запрос:
 
 ```text
 .NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией
@@ -48,6 +48,14 @@
 | Remote API | Arbeitnow | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
 | Partner-only | LinkedIn | disabled | Нужен официальный Talent Solutions partner access; login cookies не используются |
 | Partner-only | Indeed | disabled | Нужен официальный партнёрский доступ; login scraping не используется |
+| Government API | Работа России | ok | 16 .NET-вакансий в live-проверке; 16 релевантных частичных совпадений |
+| Government API | Arbetsförmedlingen JobTech | ok | 20 записей обработано; 9 релевантных частичных совпадений |
+| Remote API | Remote OK | egress timeout | Unit mapping прошёл; официальный endpoint не ответил из локального Windows egress |
+| RSS | We Work Remotely | egress timeout | Unit XML/RSS mapping прошёл; официальный feed не ответил из локального Windows egress |
+| Community API | Hacker News Who Is Hiring | ok | 3 полных совпадения через HN Algolia API |
+| International API | ReliefWeb | disabled | Нужен предварительно одобренный `RELIEFWEB_APPNAME` |
+| Recruitee | 6 company boards | ok | Upside, AIHR, SeQura, constellr, Jumpseller и E&C Consultants ответили без ошибок |
+| Aggregator API | Adzuna (8 стран по умолчанию) | disabled | Нужны `ADZUNA_APP_ID` и `ADZUNA_API_KEY`; список стран задаётся `ADZUNA_COUNTRIES` |
 | Greenhouse | Canonical | error | Большой public index не завершил body download за 3 × 30 s из локального egress |
 | Greenhouse | Grafana Labs | ok | Ответ обработан, точных кандидатов нет |
 | Greenhouse | Elastic | error | Большой public index не завершил body download за 3 × 30 s из локального egress |
@@ -72,6 +80,10 @@ npm test
 npm run smoke:live -- ".NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией"
 npm run smoke:live -- --source=ashby:sola
 npm run smoke:live -- --source=lever
+npm run smoke:live -- --source=trudvsem ".NET developer remote"
+npm run smoke:live -- --source=jobtech-sweden ".NET developer remote"
+npm run smoke:live -- --source=hn-who-is-hiring ".NET developer remote"
+npm run smoke:live -- --source=recruitee ".NET developer remote"
 ```
 
 Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же API-коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода. IMAP-доступ к личной почте безопаснее держать локально либо в отдельном секрет-хранилище развёрнутого сервера, а не в CI общего репозитория.

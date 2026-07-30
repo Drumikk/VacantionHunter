@@ -1,6 +1,6 @@
 # Доказательная база решений
 
-Дата проверки: 2026-07-29. Для технических решений использованы первичные документы владельцев API и стандартов.
+Дата первоначальной проверки: 2026-07-29. Каталог и новые источники повторно проверены 2026-07-31. Для технических решений использованы первичные документы владельцев API и стандартов.
 
 | Решение | Первичный источник | Что подтверждает | Реализация |
 |---|---|---|---|
@@ -9,10 +9,18 @@
 | Greenhouse public Job Board API | <https://developer.greenhouse.io/job-board.html> | Публичное получение опубликованных jobs; application POST требует auth | `src/connectors/greenhouse.js` |
 | Lever public Postings API | <https://hire.lever.co/developer/support> | Postings API публично отдаёт опубликованные вакансии | `src/connectors/lever.js` |
 | Ashby public Job Postings API | <https://developers.ashbyhq.com/docs/public-job-posting-api> | Список опубликованных вакансий и `includeCompensation=true` | `src/connectors/ashby.js` |
+| Recruitee Careers Site API | <https://docs.recruitee.com/reference/intro-to-careers-site-api> | Публичный список опубликованных offers не требует авторизации и использует subdomain компании | `src/connectors/recruitee.js` |
 | Remotive public API | <https://remotive.com/remote-jobs/api> | Разрешена републикация с атрибуцией; public jobs задержаны на 24 часа | `src/connectors/remotive.js` |
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
 | Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination и поле исходного `source`; международное покрытие без РФ | `src/connectors/jooble.js` |
 | USAJOBS Search API | <https://developer.usajobs.gov/api-reference/get-api-search> | API key + email headers, keyword/location/remote/date filters, salary и application close date | `src/connectors/usajobs.js` |
+| «Работа России» | <https://trudvsem.ru/opendata/api> | Официальный открытый JSON API Роструда: текстовый поиск, пагинация и инкрементальные изменения | `src/connectors/trudvsem.js` |
+| Arbetsförmedlingen JobSearch | <https://jobsearch.api.jobtechdev.se/> | Открытый API государственной службы занятости Швеции с поиском и структурированными полями вакансии | `src/connectors/jobtech.js` |
+| Remote OK API | <https://remoteok.com/api> | Публичный JSON feed; при показе данных обязательны атрибуция и ссылка на оригинал | `src/connectors/remoteok.js` |
+| We Work Remotely RSS | <https://weworkremotely.com/remote-job-rss-feed> | Официальный публичный RSS; требуется атрибуция и ссылка на оригинальную вакансию | `src/connectors/weworkremotely.js` |
+| HN Algolia Search API | <https://hn.algolia.com/api> | Публичный поиск по HN; позволяет получать комментарии ежемесячной темы Who Is Hiring | `src/connectors/hn-who-is-hiring.js` |
+| ReliefWeb API v2 | <https://apidoc.reliefweb.int/> | Официальный API OCHA; `appname` обязателен и с 2025-11-01 требует предварительного одобрения | `src/connectors/reliefweb.js` |
+| Adzuna Search API | <https://developer.adzuna.com/docs/search> | Country endpoint, keyword/location filters, зарплата, компания и обязательный `redirect_url`; нужны `app_id` + `app_key` | `src/connectors/adzuna.js` |
 | Telegram Bot API | <https://core.telegram.org/bots/api> | HTTPS JSON, `sendMessage` до 4096 символов, `getUpdates`, flood-control `retry_after` | `src/services/notification-service.js` |
 | Telegram BotFather | <https://core.telegram.org/bots/features#botfather> | `/newbot` создаёт бота и выдаёт секретный authentication token | `.env` + центр уведомлений |
 | LinkedIn automation limits | <https://www.linkedin.com/legal/user-agreement> | scraping, bots и копирование cookies запрещены без отдельного разрешения | policy: connector disabled without partnership |
@@ -32,6 +40,8 @@
 - Arbeitnow по-прежнему документирует no-key API и обновил страницу 9 марта 2026 г., но текущий тестовый IP получает managed Cloudflare challenge. Обход не применяется; используются cooldown, другой разрешённый deployment egress или договорной API.
 
 Такая проверка намеренно различает «API существует по документации» и «API доступен из конкретного окружения сейчас».
+
+Точечная проверка новых коннекторов 2026-07-31: «Работа России» вернула 16 .NET-вакансий, JobTech — 20 записей и 9 релевантных частичных совпадений, HN Who Is Hiring — 3 полных совпадения. Все 6 Recruitee boards ответили успешно за 93–232 мс. Remote OK и We Work Remotely не завершили TLS/HTTP-запрос из локального Windows egress за отведённый таймаут; их схемы проверены unit-тестами, а сбой изолируется системой health/cooldown. ReliefWeb штатно остаётся `disabled` до одобрения `RELIEFWEB_APPNAME`; Adzuna — до `ADZUNA_APP_ID` и `ADZUNA_API_KEY`.
 
 Стартовый пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
 

@@ -23,10 +23,10 @@ Cookies, пароль и пользовательская сессия не яв
 | Jooble REST API | Международный агрегатор вакансий из job boards, карьерных страниц и рекрутеров | `JOOBLE_API_KEY` | Реализовано; РФ и hh.ru не покрывает |
 | HH email alerts | РФ/СНГ, выдача сохранённых поисков HH | отдельный IMAP-ящик + пароль приложения | Реализовано; импортирует официальные уведомления без скрейпинга сайта |
 | HeadHunter API | РФ/СНГ | ранее одобренный OAuth-токен приложения | Реализован адаптер; новый доступ для соискателей закрыт |
-| Greenhouse, Ashby, Lever | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 16 стартовых boards |
+| Greenhouse, Ashby, Lever, Recruitee | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 22 стартовых boards |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
-| Adzuna API | Западные национальные рынки | `app_id` + `app_key` | Исследовано; отложено до согласования лицензии и обязательной бренд-атрибуции |
+| Adzuna API | 16 национальных рынков текущего географического scope | `app_id` + `app_key` | Реализовано; 8 стран включаются по умолчанию после настройки ключей |
 | LinkedIn / Indeed | Крупные закрытые площадки | партнёрский договор | Не скрейпятся; открытого search API для этого сценария нет |
 
 Jooble выбран широким международным слоем: официальный API принимает `keywords`, `location`, radius, salary и pagination и возвращает источник, компанию, ссылку, тип, зарплату и время обновления. Он не используется как замена HH: российский сайт Jooble прекратил работу, глобальный API с российской локацией не возвращает российскую выдачу, а региональный endpoint не принимает глобальный ключ.
@@ -34,6 +34,22 @@ Jooble выбран широким международным слоем: офи
 USAJOBS добавлен как пример прямого tokenized API: он требует `Authorization-Key` и email в `User-Agent`, поддерживает keyword/location/remote/date filters и возвращает нормализуемую зарплату, срок приёма заявок и прямую apply-ссылку.
 
 ## Получение ключей
+
+Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Remotive, Arbeitnow и настроенные публичные ATS-доски. Их не нужно авторизовывать в браузере. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
+
+```powershell
+$env:RELIEFWEB_APPNAME='ваше-одобренное-имя'
+```
+
+Adzuna подключается парой `app_id`/`app_key`. По умолчанию создаются отдельные источники для `gb,us,ca,au,de,fr,nl,pl`; можно выбрать любые страны из `gb,us,at,au,be,br,ca,ch,de,es,fr,it,mx,nl,nz,pl`, но базовая квота невелика, поэтому расширять список следует осознанно:
+
+```powershell
+$env:ADZUNA_APP_ID='ваш-app-id'
+$env:ADZUNA_API_KEY='ваш-app-key'
+$env:ADZUNA_COUNTRIES='gb,us,ca,au,de,fr,nl,pl'
+```
+
+Текущая карта реализованных и следующих источников: [аудит каталога](SOURCE_CATALOG_AUDIT.md).
 
 ### Jooble — рекомендуется первым
 
@@ -104,6 +120,7 @@ $env:HH_ACCESS_TOKEN='токен зарегистрированного прил
 - Одинаковый запрос к tokenized API кэшируется на `AGGREGATOR_CACHE_MS` (по умолчанию 15 минут).
 - 401/403 дают длительный cooldown, 429 учитывает `Retry-After`, временные ошибки получают exponential backoff.
 - Система не обходит CAPTCHA, Cloudflare, paywall, login wall или ограничения выдачи.
+- Для RSS/API всегда сохраняется оригинальная ссылка и требуемая владельцем атрибуция; пользовательские cookies и пароли job boards не собираются.
 
 ## Автоматическая доставка результатов
 
@@ -122,6 +139,13 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Gmail IMAP и пароли приложений: <https://support.google.com/mail/answer/7126229>, <https://support.google.com/accounts/answer/185833>
 - Adzuna overview/search/terms: <https://developer.adzuna.com/overview>, <https://developer.adzuna.com/docs/search>, <https://developer.adzuna.com/docs/terms_of_service>
 - USAJOBS authentication/search: <https://developer.usajobs.gov/guides/authentication>, <https://developer.usajobs.gov/api-reference/get-api-search>
+- «Работа России» Open Data API: <https://trudvsem.ru/opendata/api>
+- Arbetsförmedlingen JobSearch API: <https://jobsearch.api.jobtechdev.se/>
+- Remote OK API: <https://remoteok.com/api>
+- We Work Remotely RSS: <https://weworkremotely.com/remote-job-rss-feed>
+- HN Algolia API: <https://hn.algolia.com/api>
+- ReliefWeb API v2 и appname: <https://apidoc.reliefweb.int/>, <https://apidoc.reliefweb.int/parameters>
+- Recruitee Careers Site API: <https://docs.recruitee.com/reference/intro-to-careers-site-api>, <https://docs.recruitee.com/reference/offers>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>
 - Indeed Partner API guides: <https://docs.indeed.com/api-guides/>
