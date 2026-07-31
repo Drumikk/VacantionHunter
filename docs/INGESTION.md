@@ -23,7 +23,7 @@ Cookies, пароль и пользовательская сессия не яв
 | Jooble REST API | Международный агрегатор вакансий из job boards, карьерных страниц и рекрутеров | `JOOBLE_API_KEY` | Реализовано; РФ и hh.ru не покрывает |
 | HH email alerts | РФ/СНГ, выдача сохранённых поисков HH | отдельный IMAP-ящик + пароль приложения | Реализовано; импортирует официальные уведомления без скрейпинга сайта |
 | HeadHunter API | РФ/СНГ | ранее одобренный OAuth-токен приложения | Реализован адаптер; новый доступ для соискателей закрыт |
-| Greenhouse, Ashby, Lever, Recruitee, Workable | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 41 стартовая board, включая 19 live-проверенных Workable accounts |
+| Greenhouse, Ashby, Lever, Recruitee, Workable, Personio, SmartRecruiters | Публичные вакансии конкретных работодателей | пользовательский логин не требуется; SmartRecruiters key необязателен | Реализована 61 стартовая board |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
 | Himalayas, Jobicy | Международные remote-вакансии | публичные API без ключей | Реализовано; обязательны атрибуция и оригинальные ссылки, Jobicy кэшируется на час |
@@ -40,7 +40,7 @@ USAJOBS добавлен как пример прямого tokenized API: он 
 
 ## Получение ключей
 
-Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, The Muse, Remotive, Arbeitnow и настроенные публичные ATS-доски, включая 19 Workable accounts. Их не нужно авторизовывать в браузере. Для The Muse можно необязательно указать `THE_MUSE_API_KEY`, чтобы поднять квоту; без ключа страницы кэшируются минимум на час. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
+Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, The Muse, Remotive, Arbeitnow и настроенные публичные ATS-доски, включая Workable и Personio. Их не нужно авторизовывать в браузере. Для The Muse можно необязательно указать `THE_MUSE_API_KEY`, чтобы поднять квоту; без ключа страницы кэшируются минимум на час. SmartRecruiters Posting API также поддерживает необязательный серверный `SMARTRECRUITERS_API_KEY`; локальный Cloudflare challenge не обходится. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
 
 ```powershell
 $env:RELIEFWEB_APPNAME='ваше-одобренное-имя'
@@ -172,6 +172,8 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Reed Jobseeker API: <https://www.reed.co.uk/developers/jobseeker>
 - SuperJob API: <https://api.superjob.ru/>
 - Workable public careers API: <https://help.workable.com/hc/en-us/articles/115012771647-Using-the-Workable-API-to-create-a-careers-page>
+- Personio open positions XML feed: <https://developer.personio.de/docs/retrieving-open-job-positions>
+- SmartRecruiters Posting API: <https://developers.smartrecruiters.com/docs/posting-api>
 - France Travail API Offres d'emploi: <https://www.data.gouv.fr/dataservices/api-offres-demploi>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>

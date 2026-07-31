@@ -10,7 +10,7 @@
 
 ## Реальное состояние приложения
 
-После текущего расширения оркестратор знает 69 независимо наблюдаемых источников при стандартной конфигурации: 28 API/RSS/policy-источников плюс 41 конкретную карьерную доску Greenhouse/Ashby/Lever/Recruitee/Workable. Каждый источник имеет отдельные health, timeout, retry и cooldown; падение одного не останавливает остальные.
+После текущего расширения оркестратор знает 89 независимо наблюдаемых источников при стандартной конфигурации: 28 API/RSS/policy-источников плюс 61 конкретную карьерную доску Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters. Каждый источник имеет отдельные health, timeout, retry и cooldown; падение одного не останавливает остальные.
 
 | Слой | Подключено | Доступ | Примечание |
 |---|---:|---|---|
@@ -18,7 +18,7 @@
 | Глобальные/remote API и RSS | 7 | Remotive, Arbeitnow, Remote OK, WWR, HN, Himalayas, Jobicy без пользовательского логина | Атрибуция сохраняется, Jobicy опрашивается не чаще раза в час, HTML login scraping не используется |
 | Агрегаторы и региональные API | 12 | Jooble + 8 стран Adzuna + Reed + SuperJob + The Muse | Adzuna, Reed и SuperJob включаются после добавления ключей; The Muse работает анонимно, а необязательный ключ повышает квоту |
 | Международные организации | 1 | ReliefWeb с одобренным `appname` | Подключается одной переменной окружения |
-| Публичные ATS работодателей | 41 board | Без ключей | Greenhouse 5, Ashby 6, Lever 5, Recruitee 6, Workable 19 |
+| Публичные ATS работодателей | 61 board | Без пользовательского логина | Greenhouse 5, Ashby 6, Lever 5, Recruitee 6, Workable 19, Personio 10, SmartRecruiters 10 |
 | Ограниченные платформы | 4 | HH API/email, LinkedIn, Indeed | HH необязателен; LinkedIn/Indeed отключены без партнёрства |
 
 ## Что добавлено в этой итерации
@@ -40,12 +40,14 @@
 | France Travail | официальный API активных вакансий | OAuth client credentials | реализован; до настройки пары `FRANCE_TRAVAIL_CLIENT_ID`/`FRANCE_TRAVAIL_CLIENT_SECRET` виден как disabled |
 | Workable | официальный публичный careers endpoint | нет | generic-адаптер + 19 company boards, каждая live-проверена структурированным JSON |
 | The Muse | официальный публичный Jobs API | необязательный API key | реализован: категоризация запроса, 2 страницы на категорию, локальная точная фильтрация и часовой кэш |
+| Personio | официальный XML feed карьерной страницы | нет | generic-адаптер + 10 европейских company boards; iits live-проверен через полный pipeline |
+| SmartRecruiters | официальный Posting API | без логина, необязательный server API key | generic-адаптер + 10 компаний; локальный API egress получает Cloudflare 403 и изолируется cooldown |
 
 ## Как действительно получить максимум
 
 Количество покрываемых сайтов следует увеличивать слоями, а не писать сотни хрупких HTML-парсеров.
 
-1. Один адаптер на ATS-платформу. Greenhouse/Ashby/Lever/Recruitee/Workable уже дают 41 отдельный источник. Следующие высокоэффективные семейства: SmartRecruiters и публичные career endpoints BambooHR/Personio после проверки условий и схемы доступа. Для каждой компании хранится только slug и метаданные.
+1. Один адаптер на ATS-платформу. Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters уже дают 61 отдельный источник. Следующие высокоэффективные семейства: публичные career endpoints BambooHR и дополнительные проверенные slugs существующих адаптеров. Для каждой компании хранится только slug и метаданные.
 2. Официальные государственные API. France Travail уже реализован. EURES требует одобренного партнёрского канала, а открытая выгрузка Canada Job Bank — это аналитический CSV без ID работодателя и прямых apply URL, поэтому оба источника не маскируются под полноценный live search API.
 3. API-ключи агрегаторов. Adzuna, Reed и SuperJob уже имеют готовые адаптеры и подключаются после регистрации; для следующих сервисов сначала проверяются лицензия, квоты и требования к атрибуции.
 4. RSS/Atom/JSON feeds. Подключаются общим feed-адаптером с allowlist, лимитом размера, XML-защитой, условными запросами и обязательной ссылкой на источник.

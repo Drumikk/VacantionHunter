@@ -1,6 +1,6 @@
 # Статус живых источников
 
-Основной снимок: 2026-07-29 22:53 UTC. Новые источники точечно проверены 2026-07-31. Текущая стандартная конфигурация содержит 69 независимо наблюдаемых коннекторов; таблица итогов ниже сохраняет базовый снимок 23 источников для воспроизводимости. Окружение: локальный Windows egress. Запрос:
+Основной снимок: 2026-07-29 22:53 UTC. Новые источники точечно проверены 2026-07-31. Текущая стандартная конфигурация содержит 89 независимо наблюдаемых коннекторов; таблица итогов ниже сохраняет базовый снимок 23 источников для воспроизводимости. Окружение: локальный Windows egress. Запрос:
 
 ```text
 .NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией
@@ -13,7 +13,7 @@
 | Метрика | Значение |
 |---|---:|
 | Источников в базовом снимке | 23 |
-| Источников в текущей стандартной конфигурации | 69 |
+| Источников в текущей стандартной конфигурации | 89 |
 | Успешно ответили | 13 |
 | Отключены до настройки доступа | 5 |
 | Ошибка из текущего egress | 5 |
@@ -64,6 +64,8 @@
 | Government API | France Travail | disabled | Запросить доступ к API Offres d'emploi и задать `FRANCE_TRAVAIL_CLIENT_ID` + `FRANCE_TRAVAIL_CLIENT_SECRET` |
 | Workable | 19 company boards | ok | Все выбранные accounts вернули HTTP 200 и структурированные опубликованные jobs при прямой проверке 2026-07-31 |
 | Job board API | The Muse | egress timeout | Endpoint вернул HTTP 200 и начало валидного JSON со схемой вакансий; полный body не завершился из локального Windows egress за 90 s, unit mapping прошёл, страницы кэшируются на час |
+| Personio | 10 company boards | ok / partial egress timeout | Три XML feeds ответили HTTP 200; `personio:iits` прошёл штатный smoke за 238 ms, остальные доски изолированы независимо |
+| SmartRecruiters | 10 company boards | local Cloudflare 403 | Career pages актуальны, Posting API корректно классифицирован как challenge; обход не применяется, нужен CI/deployment egress или допустимый server key |
 | Greenhouse | Canonical | error | Большой public index не завершил body download за 3 × 30 s из локального egress |
 | Greenhouse | Grafana Labs | ok | Ответ обработан, точных кандидатов нет |
 | Greenhouse | Elastic | error | Большой public index не завершил body download за 3 × 30 s из локального egress |
@@ -97,6 +99,8 @@ npm run smoke:live -- --source=jobicy ".NET developer remote"
 npm run smoke:live -- --source=workable ".NET developer remote"
 npm run smoke:live -- --source=france-travail ".NET developer remote"
 npm run smoke:live -- --source=the-muse ".NET developer remote"
+npm run smoke:live -- --source=personio:iits ".NET developer remote"
+npm run smoke:live -- --source=smartrecruiters:AristaNetworks "software engineer remote"
 ```
 
 Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же API-коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода. IMAP-доступ к личной почте безопаснее держать локально либо в отдельном секрет-хранилище развёрнутого сервера, а не в CI общего репозитория.

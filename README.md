@@ -12,7 +12,7 @@
 - ранжирование: полные обязательные совпадения → взвешенная релевантность → зарплата → свежесть → надёжность;
 - дедупликация по ID источника, canonical URL, fingerprint и fuzzy title/company/location;
 - проверка вакансии по происхождению, компании, сроку, HTTP/JobPosting и риск-фразам;
-- 69 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, агрегаторы, публичный API The Muse, 19 live-проверенных Workable boards и 22 доски Greenhouse/Ashby/Lever/Recruitee; HH оставлен как необязательный резервный канал;
+- 89 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, агрегаторы, публичный API The Muse и 61 карьерная доска Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters; HH оставлен как необязательный резервный канал;
 - явные policy-статусы для LinkedIn и Indeed: они не скрейпятся без официального партнёрского доступа;
 - локальный демонстрационный набор для офлайн-режима; при включённых live-источниках он по умолчанию не смешивается с реальной выдачей;
 - сохраняемые наблюдения за поиском: отдельное JSON-хранилище, фоновые обновления и SSE-уведомления для опции «следить за новыми»;
@@ -74,6 +74,7 @@ FRANCE_TRAVAIL_CLIENT_ID=идентификатор_приложения
 FRANCE_TRAVAIL_CLIENT_SECRET=секрет_приложения
 THE_MUSE_API_KEY=необязательный_ключ_для_повышенной_квоты
 THE_MUSE_PAGES=2
+SMARTRECRUITERS_API_KEY=необязательный_серверный_ключ
 TELEGRAM_BOT_TOKEN=токен_из_BotFather
 TELEGRAM_CHAT_ID=id_личного_чата_или_канала
 AGGREGATOR_CACHE_MS=900000
@@ -82,11 +83,13 @@ ASHBY_BOARDS=CompanyOne,CompanyTwo
 LEVER_SITES=company-one,company-two
 RECRUITEE_BOARDS=company-one,company-two
 WORKABLE_BOARDS=company-one,company-two
+PERSONIO_BOARDS=company-one,company-two
+SMARTRECRUITERS_COMPANIES=company-one,company-two
 ```
 
 Наблюдаемые поиски сохраняются локально в `data/watch-store.json` и после перезапуска снова попадают в фоновое обновление. Это однопользовательский режим MVP; для многопользовательского развёртывания потребуются аккаунты и серверная база данных.
 
-ATS-параметры — это публичные board/site slug конкретных компаний. Поддерживаются Greenhouse, Ashby, Lever, Recruitee Careers Site API и официальный публичный Workable endpoint. Обход авторизации не реализуется: для закрытых данных нужен OAuth, API-ключ или партнёрский фид.
+ATS-параметры — это публичные board/site slug конкретных компаний. Поддерживаются Greenhouse, Ashby, Lever, Recruitee, Workable, Personio XML feeds и SmartRecruiters Posting API. Обход авторизации не реализуется: для закрытых данных нужен OAuth, API-ключ или партнёрский фид.
 
 Те же ATS-источники можно описать объектами в `config/sources.json`: `slug`, отображаемое `name`, карьерный `homepage`, `regions` и `enabled`. Каждая company board становится отдельным коннектором и получает собственные health, error count и cooldown; сбой одной компании не маскируется общим статусом ATS.
 

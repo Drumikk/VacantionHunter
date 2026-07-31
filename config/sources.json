@@ -258,5 +258,29 @@
       "homepage": "https://apply.workable.com/basetwo/",
       "regions": ["north-america", "global-remote"]
     }
+  ],
+  "personioBoards": [
+    { "slug": "iits", "name": "iits", "homepage": "https://iits.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "l21s-gmbh", "name": "L21s", "homepage": "https://l21s-gmbh.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "casavi", "name": "casavi", "homepage": "https://casavi.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "pacemaker", "name": "pacemaker.ai", "homepage": "https://pacemaker.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "pitch", "name": "Pitch", "homepage": "https://pitch.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "bikeleasing", "name": "Bikeleasing Group", "homepage": "https://bikeleasing.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "consileon", "name": "Consileon", "homepage": "https://consileon.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "wire-1", "name": "Wire", "homepage": "https://wire-1.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "stp-one", "name": "Septeo CNEE", "homepage": "https://stp-one.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "gokarla-gmbh", "name": "Karla", "homepage": "https://gokarla-gmbh.jobs.personio.de/", "regions": ["europe", "global-remote"] }
+  ],
+  "smartRecruitersCompanies": [
+    { "slug": "voyagepriv", "name": "Voyage Privé", "homepage": "https://careers.smartrecruiters.com/voyagepriv", "regions": ["europe", "global-remote"] },
+    { "slug": "AristaNetworks", "name": "Arista Networks", "homepage": "https://careers.smartrecruiters.com/AristaNetworks", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "Upwork", "name": "Upwork", "homepage": "https://careers.smartrecruiters.com/Upwork", "regions": ["europe", "americas", "global-remote"] },
+    { "slug": "sigmasoftware2", "name": "Sigma Software", "homepage": "https://careers.smartrecruiters.com/sigmasoftware2", "regions": ["europe", "latin-america", "global-remote"] },
+    { "slug": "Mirantis", "name": "Mirantis", "homepage": "https://careers.smartrecruiters.com/Mirantis", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "Dynatrace1", "name": "Dynatrace", "homepage": "https://careers.smartrecruiters.com/Dynatrace1", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "docplanner", "name": "Docplanner", "homepage": "https://careers.smartrecruiters.com/docplanner", "regions": ["europe", "latin-america", "global-remote"] },
+    { "slug": "riseup", "name": "Rise Up", "homepage": "https://careers.smartrecruiters.com/riseup", "regions": ["europe", "global-remote"] },
+    { "slug": "Canva", "name": "Canva", "homepage": "https://careers.smartrecruiters.com/Canva", "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"] },
+    { "slug": "Playtech", "name": "Playtech", "homepage": "https://careers.smartrecruiters.com/Playtech", "regions": ["europe", "north-america", "global-remote"] }
   ]
 }
