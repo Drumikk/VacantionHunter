@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { parseQuery } from "../src/core/query-parser.js";
+import { parseSalaryText } from "../src/core/salary.js";
 
 test("parses .NET role and monthly USD threshold", () => {
   const query = parseQuery("Ищу .Net разработчика с заработной платой от 4000$ удаленно");
@@ -34,4 +35,14 @@ test("normalizes Russian and English locations to the same international value",
   assert.deepEqual(english.locations, ["germany"]);
   assert.equal(russian.role, "python developer");
   assert.ok(russian.tags.some((tag) => tag.id === "location:germany" && tag.required));
+});
+
+test("parses comma and dot thousands separators in salary text", () => {
+  assert.deepEqual(parseSalaryText("Salary $150,000 - $160,000 annually"), {
+    min: 150_000, max: 160_000, currency: "USD", period: "year", explicit: true,
+  });
+  assert.deepEqual(parseSalaryText("EUR 50.000 - 70.000 per annum"), {
+    min: 50_000, max: 70_000, currency: "EUR", period: "year", explicit: true,
+  });
+  assert.equal(parseSalaryText("$10.5k monthly").min, 10_500);
 });

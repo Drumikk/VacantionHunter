@@ -13,9 +13,24 @@ export const DEFAULT_USD_RATES = {
 };
 
 function parseNumber(value) {
-  const cleaned = String(value).toLowerCase().replace(/\s/g, "").replace(/,/g, ".");
+  const cleaned = String(value).toLowerCase().replace(/\s/g, "");
   const multiplier = /k|тыс/.test(cleaned) ? 1_000 : 1;
-  const number = Number.parseFloat(cleaned.replace(/[^\d.]/g, ""));
+  let numeric = cleaned.replace(/[^\d.,]/g, "");
+  const separators = [...numeric.matchAll(/[.,]/g)].map((match) => match.index);
+  if (separators.length) {
+    const last = separators.at(-1);
+    const digitsAfter = numeric.length - last - 1;
+    const thousands = digitsAfter === 3 && multiplier === 1 && separators.every((index, position) =>
+      position === separators.length - 1 || separators[position + 1] - index === 4,
+    );
+    if (thousands) numeric = numeric.replace(/[.,]/g, "");
+    else {
+      const decimalSeparator = numeric[last];
+      numeric = numeric.slice(0, last).replace(/[.,]/g, "") + "." + numeric.slice(last + 1);
+      if (decimalSeparator !== ".") numeric = numeric.replace(/,/g, "");
+    }
+  }
+  const number = Number.parseFloat(numeric);
   return Number.isFinite(number) ? number * multiplier : null;
 }
 

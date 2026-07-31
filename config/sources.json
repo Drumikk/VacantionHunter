@@ -142,5 +142,121 @@
       "homepage": "https://ecconsultants.recruitee.com/",
       "regions": ["europe", "global-remote"]
     }
+  ],
+  "workableBoards": [
+    {
+      "slug": "worknomads",
+      "name": "WorkNomads",
+      "homepage": "https://apply.workable.com/worknomads/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "freelance-latin-america",
+      "name": "Freelance Latin America",
+      "homepage": "https://apply.workable.com/freelance-latin-america/",
+      "regions": ["latin-america", "global-remote"]
+    },
+    {
+      "slug": "azumo",
+      "name": "Azumo",
+      "homepage": "https://apply.workable.com/azumo/",
+      "regions": ["latin-america", "north-america", "global-remote"]
+    },
+    {
+      "slug": "climax-studios",
+      "name": "Climax Studios / MPG",
+      "homepage": "https://apply.workable.com/climax-studios/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "exerizon",
+      "name": "Exerizon",
+      "homepage": "https://apply.workable.com/exerizon/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "portless",
+      "name": "Portless",
+      "homepage": "https://apply.workable.com/portless/",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "c-serv",
+      "name": "C-Serv",
+      "homepage": "https://apply.workable.com/c-serv/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "oversee-1",
+      "name": "Oversee",
+      "homepage": "https://apply.workable.com/oversee-1/",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "runware",
+      "name": "Runware",
+      "homepage": "https://apply.workable.com/runware/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "tekenable",
+      "name": "TEKenable",
+      "homepage": "https://apply.workable.com/tekenable/",
+      "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "workstate",
+      "name": "Workstate",
+      "homepage": "https://apply.workable.com/workstate/",
+      "regions": ["latin-america", "north-america", "global-remote"]
+    },
+    {
+      "slug": "surglobal",
+      "name": "Sur",
+      "homepage": "https://apply.workable.com/surglobal/",
+      "regions": ["latin-america", "global-remote"]
+    },
+    {
+      "slug": "fiscal-ai",
+      "name": "Fiscal.ai",
+      "homepage": "https://apply.workable.com/fiscal-ai/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "calabrio",
+      "name": "Calabrio",
+      "homepage": "https://apply.workable.com/calabrio/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "perch-3",
+      "name": "Perch",
+      "homepage": "https://apply.workable.com/perch-3/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "derq",
+      "name": "Derq",
+      "homepage": "https://apply.workable.com/derq/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "datavisor-jobs",
+      "name": "DataVisor",
+      "homepage": "https://apply.workable.com/datavisor-jobs/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "swtch-energy",
+      "name": "SWTCH Energy",
+      "homepage": "https://apply.workable.com/swtch-energy/",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "basetwo",
+      "name": "Basetwo",
+      "homepage": "https://apply.workable.com/basetwo/",
+      "regions": ["north-america", "global-remote"]
+    }
   ]
 }

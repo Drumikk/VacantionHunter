@@ -293,6 +293,7 @@ function sourceAuthText(source) {
   return {
     none: "Без токена",
     api_key: "API-ключ",
+    optional_api_key: "API-ключ необязателен",
     api_key_headers: "API-ключ + email",
     identified_user_agent: "Контактный User-Agent",
   }[source.authType] || source.authType;

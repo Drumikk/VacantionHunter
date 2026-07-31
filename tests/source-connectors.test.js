@@ -34,6 +34,8 @@ test("infers mobility promises but respects explicit negative statements", () =>
   assert.equal(inferRemote("This is not a remote position"), false);
   assert.equal(inferRelocation("We cover relocation and provide visa sponsorship"), true);
   assert.equal(inferRelocation("We do not provide relocation or visa sponsorship"), false);
+  assert.equal(inferRemote("Télétravail possible en France"), true);
+  assert.equal(inferRelocation("Aide à la mobilité et au déménagement"), true);
 });
 
 test("Ashby mapping produces a complete match for remote paid .NET relocation", async () => {

@@ -10,6 +10,7 @@
 | Lever public Postings API | <https://hire.lever.co/developer/support> | Postings API публично отдаёт опубликованные вакансии | `src/connectors/lever.js` |
 | Ashby public Job Postings API | <https://developers.ashbyhq.com/docs/public-job-posting-api> | Список опубликованных вакансий и `includeCompensation=true` | `src/connectors/ashby.js` |
 | Recruitee Careers Site API | <https://docs.recruitee.com/reference/intro-to-careers-site-api> | Публичный список опубликованных offers не требует авторизации и использует subdomain компании | `src/connectors/recruitee.js` |
+| Workable public careers API | <https://help.workable.com/hc/en-us/articles/115012771647-Using-the-Workable-API-to-create-a-careers-page> | Workable документирует публичный account endpoint для опубликованных jobs с `details=true`; API-токен нужен только для private SPI | `src/connectors/workable.js` |
 | Remotive public API | <https://remotive.com/remote-jobs/api> | Разрешена републикация с атрибуцией; public jobs задержаны на 24 часа | `src/connectors/remotive.js` |
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
 | Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination и поле исходного `source`; международное покрытие без РФ | `src/connectors/jooble.js` |
@@ -25,6 +26,8 @@
 | Jobicy Remote Jobs API | <https://github.com/Jobicy/remote-jobs-api> | Публичный JSON API без ключа; до 100 записей, шестичасовая задержка, атрибуция и опрос не чаще раза в час | `src/connectors/jobicy.js` |
 | Reed Jobseeker API | <https://www.reed.co.uk/developers/jobseeker> | Search endpoint, до 100 результатов и Basic Auth с API key как username | `src/connectors/reed.js` |
 | SuperJob API | <https://api.superjob.ru/> | Публичный поиск вакансий через `/2.0/vacancies/`; Secret key приложения в `X-Api-App-Id`, пользовательский OAuth не обязателен | `src/connectors/superjob.js` |
+| France Travail API Offres d'emploi | <https://www.data.gouv.fr/dataservices/api-offres-demploi> | Официальные активные вакансии France Travail и согласившихся партнёров, search/detail/references, OAuth-приложение и лимит 10 запросов/с | `src/connectors/france-travail.js` |
+| The Muse Jobs API | <https://www.themuse.com/developers/api/v2> | Публичный JSON endpoint вакансий, фильтры по категории/уровню/локации; анонимная квота 500 запросов/ч и 3600 запросов/ч с API key | `src/connectors/the-muse.js` |
 | Telegram Bot API | <https://core.telegram.org/bots/api> | HTTPS JSON, `sendMessage` до 4096 символов, `getUpdates`, flood-control `retry_after` | `src/services/notification-service.js` |
 | Telegram BotFather | <https://core.telegram.org/bots/features#botfather> | `/newbot` создаёт бота и выдаёт секретный authentication token | `.env` + центр уведомлений |
 | LinkedIn automation limits | <https://www.linkedin.com/legal/user-agreement> | scraping, bots и копирование cookies запрещены без отдельного разрешения | policy: connector disabled without partnership |
@@ -46,6 +49,8 @@
 Такая проверка намеренно различает «API существует по документации» и «API доступен из конкретного окружения сейчас».
 
 Точечная проверка новых коннекторов 2026-07-31: «Работа России» вернула 16 .NET-вакансий, JobTech — 20 записей и 9 релевантных частичных совпадений, HN Who Is Hiring — 3 полных совпадения. Все 6 Recruitee boards ответили успешно за 93–232 мс. Remote OK, We Work Remotely, Himalayas и Jobicy не завершили TLS/HTTP-запрос из локального Windows egress за отведённый таймаут; их схемы проверены unit-тестами, а сбой изолируется системой health/cooldown. ReliefWeb штатно остаётся `disabled` до одобрения `RELIEFWEB_APPNAME`; Adzuna — до `ADZUNA_APP_ID` и `ADZUNA_API_KEY`; Reed и SuperJob — до своих серверных ключей.
+
+31 июля 2026 года официальный публичный endpoint Workable проверен на 19 company accounts из Европы, Северной и Латинской Америки: каждый выбранный account вернул HTTP 200 и структурированный массив опубликованных jobs. France Travail подтверждён официальным каталогом data.gouv.fr как API активных вакансий для частных разработчиков, компаний, стартапов и территориальных организаций; коннектор остаётся `disabled` до выдачи OAuth client credentials. The Muse подтвердил HTTP 200 и текущую JSON-схему с описанием, компанией, локациями, категорией, уровнем и первичной ссылкой; реализован часовой кэш и необязательный API key. EURES подтверждён как общеевропейский портал, но открытого search API для произвольного приложения в первичной документации не найдено; внутренние endpoints не используются. Canada Job Bank публикует официальные ежемесячные CSV через Open Government Portal, но набор не содержит работодателя, текста вакансии, posting ID и прямого URL отклика, поэтому не подключается как live-коннектор вакансий.
 
 Стартовый пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
 

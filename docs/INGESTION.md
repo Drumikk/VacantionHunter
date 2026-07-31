@@ -23,13 +23,15 @@ Cookies, пароль и пользовательская сессия не яв
 | Jooble REST API | Международный агрегатор вакансий из job boards, карьерных страниц и рекрутеров | `JOOBLE_API_KEY` | Реализовано; РФ и hh.ru не покрывает |
 | HH email alerts | РФ/СНГ, выдача сохранённых поисков HH | отдельный IMAP-ящик + пароль приложения | Реализовано; импортирует официальные уведомления без скрейпинга сайта |
 | HeadHunter API | РФ/СНГ | ранее одобренный OAuth-токен приложения | Реализован адаптер; новый доступ для соискателей закрыт |
-| Greenhouse, Ashby, Lever, Recruitee | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 22 стартовых boards |
+| Greenhouse, Ashby, Lever, Recruitee, Workable | Публичные вакансии конкретных работодателей | не требуется для чтения | Реализовано, 41 стартовая board, включая 19 live-проверенных Workable accounts |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
 | Himalayas, Jobicy | Международные remote-вакансии | публичные API без ключей | Реализовано; обязательны атрибуция и оригинальные ссылки, Jobicy кэшируется на час |
 | Adzuna API | 16 национальных рынков текущего географического scope | `app_id` + `app_key` | Реализовано; 8 стран включаются по умолчанию после настройки ключей |
 | Reed Jobseeker API | Великобритания | `REED_API_KEY` через Basic Auth | Реализовано; включается после регистрации ключа |
 | SuperJob API | РФ/СНГ | `SUPERJOB_SECRET_KEY` в `X-Api-App-Id` | Реализовано; OAuth пользователя для публичного поиска не нужен |
+| France Travail API Offres d'emploi | Франция и вакансии партнёров | OAuth client credentials приложения | Реализовано; включается после выдачи доступа к API |
+| The Muse Jobs API | Международные вакансии, особенно Северная Америка и global remote | без ключа; API key необязателен | Реализовано; категории выбираются из запроса, страницы кэшируются на час |
 | LinkedIn / Indeed | Крупные закрытые площадки | партнёрский договор | Не скрейпятся; открытого search API для этого сценария нет |
 
 Jooble выбран широким международным слоем: официальный API принимает `keywords`, `location`, radius, salary и pagination и возвращает источник, компанию, ссылку, тип, зарплату и время обновления. Он не используется как замена HH: российский сайт Jooble прекратил работу, глобальный API с российской локацией не возвращает российскую выдачу, а региональный endpoint не принимает глобальный ключ.
@@ -38,7 +40,7 @@ USAJOBS добавлен как пример прямого tokenized API: он 
 
 ## Получение ключей
 
-Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, Remotive, Arbeitnow и настроенные публичные ATS-доски. Их не нужно авторизовывать в браузере. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
+Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, The Muse, Remotive, Arbeitnow и настроенные публичные ATS-доски, включая 19 Workable accounts. Их не нужно авторизовывать в браузере. Для The Muse можно необязательно указать `THE_MUSE_API_KEY`, чтобы поднять квоту; без ключа страницы кэшируются минимум на час. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
 
 ```powershell
 $env:RELIEFWEB_APPNAME='ваше-одобренное-имя'
@@ -57,6 +59,14 @@ Reed выдаёт Jobseeker API key после регистрации разра
 ```powershell
 $env:REED_API_KEY='ваш-api-key'
 $env:SUPERJOB_SECRET_KEY='ваш-secret-key'
+npm start
+```
+
+France Travail требует создать приложение, запросить доступ к продукту «API Offres d'emploi» и сохранить OAuth client credentials только на сервере:
+
+```powershell
+$env:FRANCE_TRAVAIL_CLIENT_ID='ваш-client-id'
+$env:FRANCE_TRAVAIL_CLIENT_SECRET='ваш-client-secret'
 npm start
 ```
 
@@ -161,6 +171,8 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Jobicy Remote Jobs API: <https://github.com/Jobicy/remote-jobs-api>
 - Reed Jobseeker API: <https://www.reed.co.uk/developers/jobseeker>
 - SuperJob API: <https://api.superjob.ru/>
+- Workable public careers API: <https://help.workable.com/hc/en-us/articles/115012771647-Using-the-Workable-API-to-create-a-careers-page>
+- France Travail API Offres d'emploi: <https://www.data.gouv.fr/dataservices/api-offres-demploi>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>
 - Indeed Partner API guides: <https://docs.indeed.com/api-guides/>
