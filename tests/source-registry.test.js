@@ -4,18 +4,18 @@ import test from "node:test";
 
 const registry = JSON.parse(readFileSync(new URL("../config/sources.json", import.meta.url), "utf8"));
 const families = {
-  greenhouseBoards: 22,
-  ashbyBoards: 18,
-  leverSites: 7,
+  greenhouseBoards: 67,
+  ashbyBoards: 39,
+  leverSites: 12,
   recruiteeBoards: 7,
   workableBoards: 19,
-  personioBoards: 14,
+  personioBoards: 16,
   smartRecruitersCompanies: 10,
 };
 
-test("the default ATS registry exposes 97 distinct observable company boards", () => {
+test("the default ATS registry exposes 170 distinct observable company boards", () => {
   assert.deepEqual(Object.fromEntries(Object.keys(families).map((key) => [key, registry[key].length])), families);
-  assert.equal(Object.keys(families).reduce((total, key) => total + registry[key].length, 0), 97);
+  assert.equal(Object.keys(families).reduce((total, key) => total + registry[key].length, 0), 170);
 
   for (const [family, expected] of Object.entries(families)) {
     const boards = registry[family];

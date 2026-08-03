@@ -27,6 +27,21 @@ function applicationDetails(details = {}) {
   return allowed;
 }
 
+export async function mapConcurrent(items, concurrency, mapper) {
+  if (!items.length) return [];
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workerCount = Math.min(items.length, Math.max(1, Number(concurrency) || 1));
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(items[index], index);
+    }
+  }));
+  return results;
+}
+
 export class JobService extends EventEmitter {
   constructor({ connectors, store, watchStore = null, notificationService = null, applicationStore = null, config }) {
     super();
@@ -108,7 +123,7 @@ export class JobService extends EventEmitter {
     const query = typeof rawQuery === "string" ? this.parse(rawQuery) : rawQuery;
     if (query.raw && !this.lastQueries.includes(query.raw)) this.lastQueries = [query.raw, ...this.lastQueries].slice(0, 10);
     const selected = this.connectors.filter((connector) => connector.id !== "demo" && (!sourceIds || sourceIds.includes(connector.id)));
-    return Promise.all(selected.map(async (connector) => {
+    return mapConcurrent(selected, this.config.sourceConcurrency || 16, async (connector) => {
       const status = this.sourceStatus.get(connector.id);
       if (connector.enabled === false) {
         return { source: connector.id, status: "disabled", count: 0, error: connector.disabledReason };
@@ -122,7 +137,7 @@ export class JobService extends EventEmitter {
       } catch (error) {
         return { source: connector.id, status: "rejected", count: 0, error: error.message, cooldownUntil: status.cooldownUntil };
       }
-    }));
+    });
   }
 
   async checkSource(id, rawQuery) {

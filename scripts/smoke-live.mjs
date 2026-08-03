@@ -3,6 +3,7 @@ import { createConnectors } from "../src/connectors/index.js";
 import { assessJob } from "../src/core/authenticity.js";
 import { parseQuery } from "../src/core/query-parser.js";
 import { isRelevantMatch, rankJobs } from "../src/core/ranker.js";
+import { mapConcurrent } from "../src/services/job-service.js";
 
 const strict = process.argv.includes("--strict");
 const sourceFilter = process.argv.find((argument) => argument.startsWith("--source="))?.slice("--source=".length) || null;
@@ -14,7 +15,7 @@ const connectors = createConnectors({ ...config, enableLiveSources: true, maxJob
 const startedAt = new Date().toISOString();
 const started = Date.now();
 
-const results = await Promise.all(connectors.map(async (connector) => {
+const results = await mapConcurrent(connectors, config.sourceConcurrency || 16, async (connector) => {
   const sourceStarted = Date.now();
   if (connector.enabled === false) {
     return {
@@ -44,7 +45,7 @@ const results = await Promise.all(connectors.map(async (connector) => {
       setupUrl: connector.setupUrl || null, credentialFields: connector.credentialFields || [], diagnostics: connector.getDiagnostics?.() || null, sample: null,
     };
   }
-}));
+});
 
 const summary = {
   totalSources: results.length,

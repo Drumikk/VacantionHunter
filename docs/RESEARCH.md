@@ -57,6 +57,8 @@
 
 4 августа 2026 года прямыми запросами к официальным публичным ATS endpoint проверено ещё 36 непустых карьерных досок: Greenhouse 17, Ashby 12, Lever 2, Recruitee 1 и Personio 4. На момент проверки они суммарно публиковали тысячи вакансий; пустые аккаунты и slug с 404 в allowlist не добавлены. В Greenhouse detail-запросы дополнительно ограничены `ATS_DETAIL_CONCURRENCY`, чтобы рост числа компаний не превращался в всплеск параллельных запросов. Стандартный ATS-реестр вырос с 61 до 97 независимо наблюдаемых board.
 
+Во второй массовой проверке в тот же день запрошено 309 дополнительных candidate slug. Непустыми оказались 74 endpoint; повторный ClickHouse feed во второй ATS исключён как зеркальный дубль, а 73 новые доски добавлены в реестр: Greenhouse 45, Ashby 21, Lever 5 и Personio 2. Итоговый ATS-реестр содержит 170 independently observable board. Оркестратор теперь запускает не более 16 источников одновременно (`SOURCE_CONCURRENCY`), сохраняя исходный порядок отчёта; отдельно ограничены detail-запросы внутри ATS.
+
 В ту же волну реализован CareerOneStop Jobs V2. Официальная документация подтверждает обязательный `Authorization: Bearer`, выданный при регистрации User ID, US-wide location `0`, список с description snippet и отдельный detail endpoint. Коннектор остаётся `disabled` до настройки двух credentials, фильтрует index до detail-запросов и кэширует одинаковый поиск.
 
 Исходный пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
@@ -66,6 +68,8 @@
 - Lever: SwissBorg, Zartis, Aircall, PayU GPO, Match Group — от 4 до 83 опубликованных вакансий на момент проверки.
 
 Дополнительный пакет 2026-08-04: Greenhouse — Databricks, Stripe, Datadog, MongoDB, Okta, Remote, Reddit, Figma, Twilio, Coinbase, Klaviyo, Intercom, Discord, Webflow, Cockroach Labs, commercetools и CircleCI; Ashby — PostHog, Linear, Supabase, Neon, n8n, Modal, Render, Resend, Infisical, ElevenLabs, Temporal и OpenAI; Lever — Spotify и Palantir; Recruitee — bunq; Personio — EGYM, Everphone, TWAICE и Personio.
+
+Вторая волна 2026-08-04 добавляет 73 непустые доски компаний из Европы, Северной и Латинской Америки, Австралии/Новой Зеландии и global remote. В неё вошли, среди прочих, Airbnb, Adyen, SumUp, Wolt, Vercel, Monzo, N26, Culture Amp, Buildkite, EBANX, VTEX, ClickHouse, Docker, Notion, Cohere, Zapier, dLocal и Ledger. Полный воспроизводимый allowlist находится в `config/sources.json`; локальные доски Азии, Ближнего Востока и Африки в него не добавлялись.
 
 Точный запрос `.NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией` проверен через общий parser → connector → normalization → ranking контур. Ashby/Sola вернул действующую вакансию `Software Engineer, Windows AI Automation`: remote, relocation support, USD 160–300k/year, 100% обязательных условий. Пять Lever boards завершили полный индексный проход; частичные таймауты отдельных detail pages записываются в diagnostics и не маскируются как падение всей доски. Полная воспроизводимая матрица находится в `docs/LIVE_SOURCES.md`.
 

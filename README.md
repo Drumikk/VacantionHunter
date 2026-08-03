@@ -12,7 +12,7 @@
 - ранжирование: полные обязательные совпадения → взвешенная релевантность → зарплата → свежесть → надёжность;
 - дедупликация по ID источника, canonical URL, fingerprint и fuzzy title/company/location;
 - проверка вакансии по происхождению, компании, сроку, HTTP/JobPosting и риск-фразам;
-- 126 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, агрегаторы, публичные API The Muse и CareerOneStop и 97 карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters; HH оставлен как необязательный резервный канал;
+- 207 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, 16 рынков Adzuna, публичные API The Muse и CareerOneStop и 170 live-проверенных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters; HH оставлен как необязательный резервный канал;
 - явные policy-статусы для LinkedIn и Indeed: они не скрейпятся без официального партнёрского доступа;
 - локальный демонстрационный набор для офлайн-режима; при включённых live-источниках он по умолчанию не смешивается с реальной выдачей;
 - сохраняемые наблюдения за поиском: отдельное JSON-хранилище, фоновые обновления и SSE-уведомления для опции «следить за новыми»;
@@ -53,6 +53,7 @@ REQUEST_TIMEOUT_MS=8000
 ATS_REQUEST_TIMEOUT_MS=30000
 ATS_INDEX_PAGE_SIZE=20
 ATS_DETAIL_CONCURRENCY=4
+SOURCE_CONCURRENCY=16
 MAX_JOBS_PER_SOURCE=100
 MAX_JOBS_SCANNED_PER_SOURCE=500
 HH_USER_AGENT=VacationHunter/0.1 (contact: ваш_реальный_email)
@@ -69,7 +70,7 @@ CAREERONESTOP_API_TOKEN=выданный_bearer_token
 RELIEFWEB_APPNAME=предварительно_одобренное_имя_приложения
 ADZUNA_APP_ID=идентификатор_приложения
 ADZUNA_API_KEY=полученный_ключ
-ADZUNA_COUNTRIES=gb,us,ca,au,de,fr,nl,pl
+ADZUNA_COUNTRIES=gb,us,at,au,be,br,ca,ch,de,es,fr,it,mx,nl,nz,pl
 REED_API_KEY=полученный_ключ
 SUPERJOB_SECRET_KEY=secret_key_приложения
 FRANCE_TRAVAIL_CLIENT_ID=идентификатор_приложения
@@ -93,7 +94,7 @@ SMARTRECRUITERS_COMPANIES=company-one,company-two
 
 ATS-параметры — это публичные board/site slug конкретных компаний. Поддерживаются Greenhouse, Ashby, Lever, Recruitee, Workable, Personio XML feeds и SmartRecruiters Posting API. Обход авторизации не реализуется: для закрытых данных нужен OAuth, API-ключ или партнёрский фид.
 
-Те же ATS-источники можно описать объектами в `config/sources.json`: `slug`, отображаемое `name`, карьерный `homepage`, `regions` и `enabled`. Каждая company board становится отдельным коннектором и получает собственные health, error count и cooldown; сбой одной компании не маскируется общим статусом ATS.
+Те же ATS-источники можно описать объектами в `config/sources.json`: `slug`, отображаемое `name`, карьерный `homepage`, `regions` и `enabled`. Каждая company board становится отдельным коннектором и получает собственные health, error count и cooldown; сбой одной компании не маскируется общим статусом ATS. `SOURCE_CONCURRENCY` ограничивает общее число одновременно опрашиваемых источников, поэтому рост реестра не превращается в сетевой шторм.
 
 HH прекратил поддержку API для соискателей 15 декабря 2025 года: текущая форма регистрации принимает только приложения для сотрудников работодателей. Поэтому прямой HH-коннектор доступен лишь при наличии ранее одобренного `HH_ACCESS_TOKEN` или пары `HH_CLIENT_ID` + `HH_CLIENT_SECRET`; приложение не выдаёт себя за работодателя и не обходит CAPTCHA.
 

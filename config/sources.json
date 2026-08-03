@@ -135,7 +135,52 @@
       "name": "CircleCI",
       "homepage": "https://job-boards.greenhouse.io/circleci",
       "regions": ["north-america", "global-remote"]
-    }
+    },
+    { "slug": "andurilindustries", "name": "Anduril Industries", "homepage": "https://job-boards.greenhouse.io/andurilindustries", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "rocketlab", "name": "Rocket Lab", "homepage": "https://job-boards.greenhouse.io/rocketlab", "regions": ["north-america", "oceania"] },
+    { "slug": "sumup", "name": "SumUp", "homepage": "https://job-boards.greenhouse.io/sumup", "regions": ["europe", "north-america", "latin-america"] },
+    { "slug": "samsara", "name": "Samsara", "homepage": "https://job-boards.greenhouse.io/samsara", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "brex", "name": "Brex", "homepage": "https://job-boards.greenhouse.io/brex", "regions": ["north-america", "global-remote"] },
+    { "slug": "toast", "name": "Toast", "homepage": "https://job-boards.greenhouse.io/toast", "regions": ["europe", "north-america"] },
+    { "slug": "wolt", "name": "Wolt", "homepage": "https://job-boards.greenhouse.io/wolt", "regions": ["europe"] },
+    { "slug": "roblox", "name": "Roblox", "homepage": "https://job-boards.greenhouse.io/roblox", "regions": ["north-america"] },
+    { "slug": "adyen", "name": "Adyen", "homepage": "https://job-boards.greenhouse.io/adyen", "regions": ["europe", "north-america", "latin-america", "oceania"] },
+    { "slug": "scaleai", "name": "Scale AI", "homepage": "https://job-boards.greenhouse.io/scaleai", "regions": ["europe", "north-america"] },
+    { "slug": "airbnb", "name": "Airbnb", "homepage": "https://job-boards.greenhouse.io/airbnb", "regions": ["europe", "north-america", "latin-america", "oceania"] },
+    { "slug": "lyft", "name": "Lyft", "homepage": "https://job-boards.greenhouse.io/lyft", "regions": ["north-america"] },
+    { "slug": "digitalocean98", "name": "DigitalOcean", "homepage": "https://job-boards.greenhouse.io/digitalocean98", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "asana", "name": "Asana", "homepage": "https://job-boards.greenhouse.io/asana", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "robinhood", "name": "Robinhood", "homepage": "https://job-boards.greenhouse.io/robinhood", "regions": ["north-america"] },
+    { "slug": "instacart", "name": "Instacart", "homepage": "https://job-boards.greenhouse.io/instacart", "regions": ["north-america"] },
+    { "slug": "quintoandar", "name": "QuintoAndar", "homepage": "https://job-boards.greenhouse.io/quintoandar", "regions": ["latin-america"] },
+    { "slug": "clara", "name": "Clara", "homepage": "https://job-boards.greenhouse.io/clara", "regions": ["latin-america"] },
+    { "slug": "vercel", "name": "Vercel", "homepage": "https://job-boards.greenhouse.io/vercel", "regions": ["europe", "north-america", "latin-america", "global-remote"] },
+    { "slug": "monzo", "name": "Monzo", "homepage": "https://job-boards.greenhouse.io/monzo", "regions": ["europe"] },
+    { "slug": "n26", "name": "N26", "homepage": "https://job-boards.greenhouse.io/n26", "regions": ["europe"] },
+    { "slug": "chime", "name": "Chime", "homepage": "https://job-boards.greenhouse.io/chime", "regions": ["north-america"] },
+    { "slug": "duolingo", "name": "Duolingo", "homepage": "https://job-boards.greenhouse.io/duolingo", "regions": ["europe", "north-america"] },
+    { "slug": "tailscale", "name": "Tailscale", "homepage": "https://job-boards.greenhouse.io/tailscale", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "fastly", "name": "Fastly", "homepage": "https://job-boards.greenhouse.io/fastly", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "trustpilot", "name": "Trustpilot", "homepage": "https://job-boards.greenhouse.io/trustpilot", "regions": ["europe", "north-america"] },
+    { "slug": "bitpanda", "name": "Bitpanda", "homepage": "https://job-boards.greenhouse.io/bitpanda", "regions": ["europe"] },
+    { "slug": "airtable", "name": "Airtable", "homepage": "https://job-boards.greenhouse.io/airtable", "regions": ["europe", "north-america"] },
+    { "slug": "algolia", "name": "Algolia", "homepage": "https://job-boards.greenhouse.io/algolia", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "ebanx", "name": "EBANX", "homepage": "https://job-boards.greenhouse.io/ebanx", "regions": ["north-america", "latin-america"] },
+    { "slug": "dropbox", "name": "Dropbox", "homepage": "https://job-boards.greenhouse.io/dropbox", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "blockchain", "name": "Blockchain.com", "homepage": "https://job-boards.greenhouse.io/blockchain", "regions": ["europe", "north-america", "latin-america", "global-remote"] },
+    { "slug": "vtex", "name": "VTEX", "homepage": "https://job-boards.greenhouse.io/vtex", "regions": ["europe", "north-america", "latin-america"] },
+    { "slug": "gocardless", "name": "GoCardless", "homepage": "https://job-boards.greenhouse.io/gocardless", "regions": ["europe", "north-america"] },
+    { "slug": "cultureamp", "name": "Culture Amp", "homepage": "https://job-boards.greenhouse.io/cultureamp", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "contentful", "name": "Contentful", "homepage": "https://job-boards.greenhouse.io/contentful", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "wildlifestudios", "name": "Wildlife Studios", "homepage": "https://job-boards.greenhouse.io/wildlifestudios", "regions": ["north-america", "latin-america"] },
+    { "slug": "wikimedia", "name": "Wikimedia Foundation", "homepage": "https://job-boards.greenhouse.io/wikimedia", "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"] },
+    { "slug": "bitwarden", "name": "Bitwarden", "homepage": "https://job-boards.greenhouse.io/bitwarden", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "typeform", "name": "Typeform", "homepage": "https://job-boards.greenhouse.io/typeform", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "bitso", "name": "Bitso", "homepage": "https://job-boards.greenhouse.io/bitso", "regions": ["latin-america", "global-remote"] },
+    { "slug": "buildkite", "name": "Buildkite", "homepage": "https://job-boards.greenhouse.io/buildkite", "regions": ["north-america", "oceania", "global-remote"] },
+    { "slug": "skyscanner", "name": "Skyscanner", "homepage": "https://job-boards.greenhouse.io/skyscanner", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "netlify", "name": "Netlify", "homepage": "https://job-boards.greenhouse.io/netlify", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "bungie", "name": "Bungie", "homepage": "https://job-boards.greenhouse.io/bungie", "regions": ["north-america"] }
   ],
   "ashbyBoards": [
     {
@@ -245,7 +290,28 @@
       "name": "OpenAI",
       "homepage": "https://jobs.ashbyhq.com/openai",
       "regions": ["europe", "north-america", "latin-america", "oceania"]
-    }
+    },
+    { "slug": "harvey", "name": "Harvey", "homepage": "https://jobs.ashbyhq.com/harvey", "regions": ["europe", "north-america"] },
+    { "slug": "clickhouse", "name": "ClickHouse", "homepage": "https://jobs.ashbyhq.com/clickhouse", "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"] },
+    { "slug": "cohere", "name": "Cohere", "homepage": "https://jobs.ashbyhq.com/cohere", "regions": ["europe", "north-america"] },
+    { "slug": "ramp", "name": "Ramp", "homepage": "https://jobs.ashbyhq.com/ramp", "regions": ["north-america"] },
+    { "slug": "plaid", "name": "Plaid", "homepage": "https://jobs.ashbyhq.com/plaid", "regions": ["europe", "north-america"] },
+    { "slug": "notion", "name": "Notion", "homepage": "https://jobs.ashbyhq.com/notion", "regions": ["europe", "north-america"] },
+    { "slug": "vanta", "name": "Vanta", "homepage": "https://jobs.ashbyhq.com/vanta", "regions": ["europe", "north-america"] },
+    { "slug": "langchain", "name": "LangChain", "homepage": "https://jobs.ashbyhq.com/langchain", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "perplexity", "name": "Perplexity", "homepage": "https://jobs.ashbyhq.com/perplexity", "regions": ["north-america"] },
+    { "slug": "docker", "name": "Docker", "homepage": "https://jobs.ashbyhq.com/docker", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "sentry", "name": "Sentry", "homepage": "https://jobs.ashbyhq.com/sentry", "regions": ["europe", "north-america"] },
+    { "slug": "oyster", "name": "Oyster", "homepage": "https://jobs.ashbyhq.com/oyster", "regions": ["europe", "north-america", "latin-america", "global-remote"] },
+    { "slug": "zapier", "name": "Zapier", "homepage": "https://jobs.ashbyhq.com/zapier", "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"] },
+    { "slug": "airbyte", "name": "Airbyte", "homepage": "https://jobs.ashbyhq.com/airbyte", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "railway", "name": "Railway", "homepage": "https://jobs.ashbyhq.com/railway", "regions": ["north-america"] },
+    { "slug": "browserbase", "name": "Browserbase", "homepage": "https://jobs.ashbyhq.com/browserbase", "regions": ["north-america"] },
+    { "slug": "motherduck", "name": "MotherDuck", "homepage": "https://jobs.ashbyhq.com/motherduck", "regions": ["europe", "north-america"] },
+    { "slug": "prefect", "name": "Prefect", "homepage": "https://jobs.ashbyhq.com/prefect", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "runway", "name": "Runway", "homepage": "https://jobs.ashbyhq.com/runway", "regions": ["north-america"] },
+    { "slug": "checkly", "name": "Checkly", "homepage": "https://jobs.ashbyhq.com/checkly", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "gitbook", "name": "GitBook", "homepage": "https://jobs.ashbyhq.com/gitbook", "regions": ["europe", "north-america", "global-remote"] }
   ],
   "leverSites": [
     {
@@ -289,7 +355,12 @@
       "name": "Palantir",
       "homepage": "https://jobs.lever.co/palantir",
       "regions": ["europe", "north-america"]
-    }
+    },
+    { "slug": "benchsci", "name": "BenchSci", "homepage": "https://jobs.lever.co/benchsci", "regions": ["europe", "north-america"] },
+    { "slug": "deputy", "name": "Deputy", "homepage": "https://jobs.lever.co/deputy", "regions": ["europe", "north-america", "oceania"] },
+    { "slug": "dlocal", "name": "dLocal", "homepage": "https://jobs.lever.co/dlocal", "regions": ["europe", "north-america", "latin-america", "global-remote"] },
+    { "slug": "ledger", "name": "Ledger", "homepage": "https://jobs.lever.co/ledger", "regions": ["europe", "north-america", "global-remote"] },
+    { "slug": "pointclickcare", "name": "PointClickCare", "homepage": "https://jobs.lever.co/pointclickcare", "regions": ["north-america"] }
   ],
   "recruiteeBoards": [
     {
@@ -465,7 +536,9 @@
     { "slug": "egym", "name": "EGYM", "homepage": "https://egym.jobs.personio.de/", "regions": ["europe", "north-america"] },
     { "slug": "everphone", "name": "Everphone", "homepage": "https://everphone.jobs.personio.de/", "regions": ["europe"] },
     { "slug": "twaice", "name": "TWAICE", "homepage": "https://twaice.jobs.personio.de/", "regions": ["europe", "north-america"] },
-    { "slug": "personio", "name": "Personio", "homepage": "https://personio.jobs.personio.de/", "regions": ["europe"] }
+    { "slug": "personio", "name": "Personio", "homepage": "https://personio.jobs.personio.de/", "regions": ["europe"] },
+    { "slug": "getquin", "name": "getquin", "homepage": "https://getquin.jobs.personio.de/", "regions": ["europe"] },
+    { "slug": "meister", "name": "Meister", "homepage": "https://meister.jobs.personio.de/", "regions": ["europe", "global-remote"] }
   ],
   "smartRecruitersCompanies": [
     { "slug": "voyagepriv", "name": "Voyage Privé", "homepage": "https://careers.smartrecruiters.com/voyagepriv", "regions": ["europe", "global-remote"] },

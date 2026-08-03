@@ -122,6 +122,32 @@ test("source circuit breaker skips repeated calls during cooldown", async () => 
   assert.equal(service.getSources()[0].cooldownReason, "cloudflare_challenge");
 });
 
+test("refresh limits total source concurrency while preserving report order", async () => {
+  let inFlight = 0;
+  let maxInFlight = 0;
+  const connectors = Array.from({ length: 7 }, (_, index) => ({
+    id: `source-${index}`,
+    name: `Source ${index}`,
+    async search() {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      inFlight -= 1;
+      return [];
+    },
+  }));
+  const service = new JobService({
+    connectors,
+    store: { jobs: [], async load() {}, async merge() {} },
+    config: { sourceConcurrency: 3, sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+
+  const report = await service.refresh("backend developer");
+
+  assert.equal(maxInFlight, 3);
+  assert.deepEqual(report.map((item) => item.source), connectors.map((item) => item.id));
+});
+
 test("creates an independently observable connector for every ATS board", () => {
   const connectors = createConnectors({
     enableLiveSources: true,
