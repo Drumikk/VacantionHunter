@@ -295,6 +295,7 @@ function sourceAuthText(source) {
     api_key: "API-ключ",
     optional_api_key: "API-ключ необязателен",
     api_key_headers: "API-ключ + email",
+    bearer_token_user_id: "Bearer-токен + User ID",
     identified_user_agent: "Контактный User-Agent",
   }[source.authType] || source.authType;
 }

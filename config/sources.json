@@ -33,6 +33,108 @@
       "name": "Cloudflare",
       "homepage": "https://www.cloudflare.com/careers/jobs/",
       "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "databricks",
+      "name": "Databricks",
+      "homepage": "https://job-boards.greenhouse.io/databricks",
+      "regions": ["europe", "north-america", "latin-america", "oceania"]
+    },
+    {
+      "slug": "stripe",
+      "name": "Stripe",
+      "homepage": "https://job-boards.greenhouse.io/stripe",
+      "regions": ["europe", "north-america", "latin-america", "oceania"]
+    },
+    {
+      "slug": "datadog",
+      "name": "Datadog",
+      "homepage": "https://job-boards.greenhouse.io/datadog",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "mongodb",
+      "name": "MongoDB",
+      "homepage": "https://job-boards.greenhouse.io/mongodb",
+      "regions": ["europe", "north-america", "latin-america", "oceania"]
+    },
+    {
+      "slug": "okta",
+      "name": "Okta",
+      "homepage": "https://job-boards.greenhouse.io/okta",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "remotecom",
+      "name": "Remote",
+      "homepage": "https://job-boards.greenhouse.io/remotecom",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "reddit",
+      "name": "Reddit",
+      "homepage": "https://job-boards.greenhouse.io/reddit",
+      "regions": ["europe", "north-america"]
+    },
+    {
+      "slug": "figma",
+      "name": "Figma",
+      "homepage": "https://job-boards.greenhouse.io/figma",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "twilio",
+      "name": "Twilio",
+      "homepage": "https://job-boards.greenhouse.io/twilio",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "coinbase",
+      "name": "Coinbase",
+      "homepage": "https://job-boards.greenhouse.io/coinbase",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "klaviyo",
+      "name": "Klaviyo",
+      "homepage": "https://job-boards.greenhouse.io/klaviyo",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "intercom",
+      "name": "Intercom",
+      "homepage": "https://job-boards.greenhouse.io/intercom",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "discord",
+      "name": "Discord",
+      "homepage": "https://job-boards.greenhouse.io/discord",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "webflow",
+      "name": "Webflow",
+      "homepage": "https://job-boards.greenhouse.io/webflow",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "cockroachlabs",
+      "name": "Cockroach Labs",
+      "homepage": "https://job-boards.greenhouse.io/cockroachlabs",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "commercetools",
+      "name": "commercetools",
+      "homepage": "https://job-boards.greenhouse.io/commercetools",
+      "regions": ["europe", "north-america", "oceania"]
+    },
+    {
+      "slug": "circleci",
+      "name": "CircleCI",
+      "homepage": "https://job-boards.greenhouse.io/circleci",
+      "regions": ["north-america", "global-remote"]
     }
   ],
   "ashbyBoards": [
@@ -71,6 +173,78 @@
       "name": "Granular Energy",
       "homepage": "https://www.granular-energy.com/careers",
       "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "posthog",
+      "name": "PostHog",
+      "homepage": "https://jobs.ashbyhq.com/posthog",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "linear",
+      "name": "Linear",
+      "homepage": "https://jobs.ashbyhq.com/linear",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "supabase",
+      "name": "Supabase",
+      "homepage": "https://jobs.ashbyhq.com/supabase",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "neon",
+      "name": "Neon",
+      "homepage": "https://jobs.ashbyhq.com/neon",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "n8n",
+      "name": "n8n",
+      "homepage": "https://jobs.ashbyhq.com/n8n",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "modal",
+      "name": "Modal",
+      "homepage": "https://jobs.ashbyhq.com/modal",
+      "regions": ["north-america"]
+    },
+    {
+      "slug": "render",
+      "name": "Render",
+      "homepage": "https://jobs.ashbyhq.com/render",
+      "regions": ["north-america", "global-remote"]
+    },
+    {
+      "slug": "resend",
+      "name": "Resend",
+      "homepage": "https://jobs.ashbyhq.com/resend",
+      "regions": ["europe", "north-america", "latin-america", "global-remote"]
+    },
+    {
+      "slug": "infisical",
+      "name": "Infisical",
+      "homepage": "https://jobs.ashbyhq.com/infisical",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "elevenlabs",
+      "name": "ElevenLabs",
+      "homepage": "https://jobs.ashbyhq.com/elevenlabs",
+      "regions": ["europe", "north-america", "latin-america", "oceania", "global-remote"]
+    },
+    {
+      "slug": "temporal",
+      "name": "Temporal",
+      "homepage": "https://jobs.ashbyhq.com/temporal",
+      "regions": ["europe", "north-america", "global-remote"]
+    },
+    {
+      "slug": "openai",
+      "name": "OpenAI",
+      "homepage": "https://jobs.ashbyhq.com/openai",
+      "regions": ["europe", "north-america", "latin-america", "oceania"]
     }
   ],
   "leverSites": [
@@ -102,6 +276,18 @@
       "slug": "matchgroup",
       "name": "Match Group",
       "homepage": "https://mtch.com/careers",
+      "regions": ["europe", "north-america"]
+    },
+    {
+      "slug": "spotify",
+      "name": "Spotify",
+      "homepage": "https://jobs.lever.co/spotify",
+      "regions": ["europe", "north-america", "latin-america", "oceania"]
+    },
+    {
+      "slug": "palantir",
+      "name": "Palantir",
+      "homepage": "https://jobs.lever.co/palantir",
       "regions": ["europe", "north-america"]
     }
   ],
@@ -141,6 +327,12 @@
       "name": "E&C Consultants",
       "homepage": "https://ecconsultants.recruitee.com/",
       "regions": ["europe", "global-remote"]
+    },
+    {
+      "slug": "bunq",
+      "name": "bunq",
+      "homepage": "https://bunq.recruitee.com/",
+      "regions": ["europe"]
     }
   ],
   "workableBoards": [
@@ -269,12 +461,16 @@
     { "slug": "consileon", "name": "Consileon", "homepage": "https://consileon.jobs.personio.de/", "regions": ["europe", "global-remote"] },
     { "slug": "wire-1", "name": "Wire", "homepage": "https://wire-1.jobs.personio.de/", "regions": ["europe", "global-remote"] },
     { "slug": "stp-one", "name": "Septeo CNEE", "homepage": "https://stp-one.jobs.personio.de/", "regions": ["europe", "global-remote"] },
-    { "slug": "gokarla-gmbh", "name": "Karla", "homepage": "https://gokarla-gmbh.jobs.personio.de/", "regions": ["europe", "global-remote"] }
+    { "slug": "gokarla-gmbh", "name": "Karla", "homepage": "https://gokarla-gmbh.jobs.personio.de/", "regions": ["europe", "global-remote"] },
+    { "slug": "egym", "name": "EGYM", "homepage": "https://egym.jobs.personio.de/", "regions": ["europe", "north-america"] },
+    { "slug": "everphone", "name": "Everphone", "homepage": "https://everphone.jobs.personio.de/", "regions": ["europe"] },
+    { "slug": "twaice", "name": "TWAICE", "homepage": "https://twaice.jobs.personio.de/", "regions": ["europe", "north-america"] },
+    { "slug": "personio", "name": "Personio", "homepage": "https://personio.jobs.personio.de/", "regions": ["europe"] }
   ],
   "smartRecruitersCompanies": [
     { "slug": "voyagepriv", "name": "Voyage Privé", "homepage": "https://careers.smartrecruiters.com/voyagepriv", "regions": ["europe", "global-remote"] },
     { "slug": "AristaNetworks", "name": "Arista Networks", "homepage": "https://careers.smartrecruiters.com/AristaNetworks", "regions": ["europe", "north-america", "global-remote"] },
-    { "slug": "Upwork", "name": "Upwork", "homepage": "https://careers.smartrecruiters.com/Upwork", "regions": ["europe", "americas", "global-remote"] },
+    { "slug": "Upwork", "name": "Upwork", "homepage": "https://careers.smartrecruiters.com/Upwork", "regions": ["europe", "north-america", "latin-america", "global-remote"] },
     { "slug": "sigmasoftware2", "name": "Sigma Software", "homepage": "https://careers.smartrecruiters.com/sigmasoftware2", "regions": ["europe", "latin-america", "global-remote"] },
     { "slug": "Mirantis", "name": "Mirantis", "homepage": "https://careers.smartrecruiters.com/Mirantis", "regions": ["europe", "north-america", "global-remote"] },
     { "slug": "Dynatrace1", "name": "Dynatrace", "homepage": "https://careers.smartrecruiters.com/Dynatrace1", "regions": ["europe", "north-america", "global-remote"] },

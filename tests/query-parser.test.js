@@ -46,3 +46,14 @@ test("parses comma and dot thousands separators in salary text", () => {
   });
   assert.equal(parseSalaryText("$10.5k monthly").min, 10_500);
 });
+
+test("does not treat locations, experience, or unrelated numeric ranges as salary", () => {
+  const query = parseQuery("Fullstack Engineer remote Europe");
+  assert.equal(query.salary, null);
+  assert.equal(query.clarifications.some((item) => item.field === "salaryPeriod"), false);
+  assert.equal(parseSalaryText("Minimum 5 years of experience", { fallbackCurrency: "USD", fallbackPeriod: "year" }), null);
+  assert.equal(parseSalaryText("Platform scaled from 6,000,000 - 10,000,000 users", { fallbackCurrency: "USD", fallbackPeriod: "year" }), null);
+  assert.deepEqual(parseSalaryText("Salary range 100,000 - 120,000 annually", { fallbackCurrency: "USD", fallbackPeriod: "year" }), {
+    min: 100_000, max: 120_000, currency: "USD", period: "year", explicit: true,
+  });
+});

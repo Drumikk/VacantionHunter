@@ -6,6 +6,12 @@ const CURRENCY_ALIASES = {
   rub: "RUB", rur: "RUB", руб: "RUB", рублей: "RUB",
   cad: "CAD", aud: "AUD", chf: "CHF", pln: "PLN", sek: "SEK", nok: "NOK",
 };
+const NUMBER_PATTERN = String.raw`\d(?:[\d\s.,]*\d)?\s*(?:k|тыс)?`;
+const CURRENCY_PATTERN = `(?:[$€£₽]|(?<![\\p{L}])(?:${Object.keys(CURRENCY_ALIASES)
+  .sort((left, right) => right.length - left.length)
+  .map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+  .join("|")})(?![\\p{L}]))`;
+const SALARY_CONTEXT = /(?:salary|salaries|compensation|base\s+pay|pay\s+range|wage|remuneration|earnings?|зарплат|оклад|вознагражден)/iu;
 
 export const DEFAULT_USD_RATES = {
   USD: 1, EUR: 1.09, GBP: 1.29, RUB: 0.0108, CAD: 0.73, AUD: 0.66,
@@ -54,23 +60,31 @@ function detectPeriod(text, fallback = "month") {
 
 export function parseSalaryText(text, { fallbackPeriod = "month", fallbackCurrency = null } = {}) {
   const value = String(text || "");
-  const currency = detectCurrency(value) || fallbackCurrency;
-  const period = detectPeriod(value, fallbackPeriod);
-  const targetPattern = /(?:от|from|min(?:imum)?|не\s+менее)\s*([$€£₽]?)\s*([\d\s.,]+\s*(?:k|тыс)?)(?:\s*([a-zа-я]{2,10}))?/iu;
-  const rangePattern = /([$€£₽]?)\s*([\d\s.,]+\s*(?:k|тыс)?)\s*(?:-|–|—|to|до)\s*([$€£₽]?)\s*([\d\s.,]+\s*(?:k|тыс)?)/iu;
-  const simplePattern = /([$€£₽])\s*([\d\s.,]+\s*(?:k|тыс)?)|([\d\s.,]+\s*(?:k|тыс)?)\s*(usd|eur|gbp|rub|rur|cad|aud|chf|pln|sek|nok|доллар(?:ов)?|евро|руб(?:лей)?)/iu;
+  const contextFor = (match) => value.slice(Math.max(0, match.index - 80), Math.min(value.length, match.index + match[0].length + 80));
+  const acceptedCurrency = (match) => {
+    const direct = detectCurrency(match[0]);
+    if (direct) return direct;
+    const context = contextFor(match);
+    return SALARY_CONTEXT.test(context) ? detectCurrency(context) || fallbackCurrency : null;
+  };
+  const rangePattern = new RegExp(`(${CURRENCY_PATTERN})?\\s*(${NUMBER_PATTERN})\\s*(?:-|–|—|to|до)\\s*(${CURRENCY_PATTERN})?\\s*(${NUMBER_PATTERN})(?:\\s*(${CURRENCY_PATTERN}))?`, "giu");
+  const targetPattern = new RegExp(`(?:от|from|min(?:imum)?|не\\s+менее)\\s*(${CURRENCY_PATTERN})?\\s*(${NUMBER_PATTERN})(?:\\s*(${CURRENCY_PATTERN}))?`, "giu");
+  const simplePattern = new RegExp(`(${CURRENCY_PATTERN})\\s*(${NUMBER_PATTERN})|(${NUMBER_PATTERN})\\s*(${CURRENCY_PATTERN})`, "giu");
 
-  const range = value.match(rangePattern);
-  if (range) {
-    return { min: parseNumber(range[2]), max: parseNumber(range[4]), currency: SYMBOLS[range[1]] || SYMBOLS[range[3]] || currency, period, explicit: true };
+  for (const range of value.matchAll(rangePattern)) {
+    const currency = acceptedCurrency(range);
+    if (!currency) continue;
+    return { min: parseNumber(range[2]), max: parseNumber(range[4]), currency, period: detectPeriod(contextFor(range), fallbackPeriod), explicit: true };
   }
-  const target = value.match(targetPattern);
-  if (target && (target[1] || target[3] || currency)) {
-    return { min: parseNumber(target[2]), max: null, currency: SYMBOLS[target[1]] || CURRENCY_ALIASES[String(target[3] || "").toLowerCase()] || currency, period, explicit: true };
+  for (const target of value.matchAll(targetPattern)) {
+    const currency = acceptedCurrency(target);
+    if (!currency) continue;
+    return { min: parseNumber(target[2]), max: null, currency, period: detectPeriod(contextFor(target), fallbackPeriod), explicit: true };
   }
-  const simple = value.match(simplePattern);
-  if (simple) {
-    return { min: parseNumber(simple[2] || simple[3]), max: null, currency: SYMBOLS[simple[1]] || CURRENCY_ALIASES[String(simple[4] || "").toLowerCase()] || currency, period, explicit: true };
+  for (const simple of value.matchAll(simplePattern)) {
+    const currency = detectCurrency(simple[0]);
+    if (!currency) continue;
+    return { min: parseNumber(simple[2] || simple[3]), max: null, currency, period: detectPeriod(contextFor(simple), fallbackPeriod), explicit: true };
   }
   return null;
 }

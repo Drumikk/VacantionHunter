@@ -1,6 +1,6 @@
 # Аудит каталога источников и план максимального покрытия
 
-Дата аудита: 2026-07-31. Исходный каталог: `Ресурсы_поиска_работы_РФ_Европа_Америка_Океания_2026-07-29.xlsx`.
+Дата аудита: 2026-08-04. Исходный каталог: `Ресурсы_поиска_работы_РФ_Европа_Америка_Океания_2026-07-29.xlsx`.
 
 ## Что находится в каталоге
 
@@ -10,15 +10,15 @@
 
 ## Реальное состояние приложения
 
-После текущего расширения оркестратор знает 89 независимо наблюдаемых источников при стандартной конфигурации: 28 API/RSS/policy-источников плюс 61 конкретную карьерную доску Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters. Каждый источник имеет отдельные health, timeout, retry и cooldown; падение одного не останавливает остальные.
+После текущего расширения оркестратор знает 126 независимо наблюдаемых источников при стандартной конфигурации: 29 API/RSS/policy-источников плюс 97 конкретных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters. Каждый источник имеет отдельные health, timeout, retry и cooldown; падение одного не останавливает остальные.
 
 | Слой | Подключено | Доступ | Примечание |
 |---|---:|---|---|
-| Государственные API | 4 | «Работа России» и JobTech без ключа; USAJOBS и France Travail с credentials | Самые устойчивые и юридически прозрачные данные |
+| Государственные API | 5 | «Работа России» и JobTech без ключа; USAJOBS, CareerOneStop и France Travail с credentials | Самые устойчивые и юридически прозрачные данные |
 | Глобальные/remote API и RSS | 7 | Remotive, Arbeitnow, Remote OK, WWR, HN, Himalayas, Jobicy без пользовательского логина | Атрибуция сохраняется, Jobicy опрашивается не чаще раза в час, HTML login scraping не используется |
 | Агрегаторы и региональные API | 12 | Jooble + 8 стран Adzuna + Reed + SuperJob + The Muse | Adzuna, Reed и SuperJob включаются после добавления ключей; The Muse работает анонимно, а необязательный ключ повышает квоту |
 | Международные организации | 1 | ReliefWeb с одобренным `appname` | Подключается одной переменной окружения |
-| Публичные ATS работодателей | 61 board | Без пользовательского логина | Greenhouse 5, Ashby 6, Lever 5, Recruitee 6, Workable 19, Personio 10, SmartRecruiters 10 |
+| Публичные ATS работодателей | 97 board | Без пользовательского логина | Greenhouse 22, Ashby 18, Lever 7, Recruitee 7, Workable 19, Personio 14, SmartRecruiters 10 |
 | Ограниченные платформы | 4 | HH API/email, LinkedIn, Indeed | HH необязателен; LinkedIn/Indeed отключены без партнёрства |
 
 ## Что добавлено в этой итерации
@@ -38,16 +38,18 @@
 | Reed.co.uk | официальный Jobseeker API | API key через Basic Auth | реализован; до настройки `REED_API_KEY` виден как disabled |
 | SuperJob | официальный API вакансий | Secret key приложения | реализован; до настройки `SUPERJOB_SECRET_KEY` виден как disabled, OAuth пользователя не нужен |
 | France Travail | официальный API активных вакансий | OAuth client credentials | реализован; до настройки пары `FRANCE_TRAVAIL_CLIENT_ID`/`FRANCE_TRAVAIL_CLIENT_SECRET` виден как disabled |
+| CareerOneStop | официальный Jobs V2 API Министерства труда США | User ID + Bearer API token | реализован; list → локальный prefilter → ограниченный detail, одинаковые запросы кэшируются |
 | Workable | официальный публичный careers endpoint | нет | generic-адаптер + 19 company boards, каждая live-проверена структурированным JSON |
 | The Muse | официальный публичный Jobs API | необязательный API key | реализован: категоризация запроса, 2 страницы на категорию, локальная точная фильтрация и часовой кэш |
-| Personio | официальный XML feed карьерной страницы | нет | generic-адаптер + 10 европейских company boards; iits live-проверен через полный pipeline |
+| Personio | официальный XML feed карьерной страницы | нет | generic-адаптер + 14 европейских и трансатлантических company boards |
 | SmartRecruiters | официальный Posting API | без логина, необязательный server API key | generic-адаптер + 10 компаний; локальный API egress получает Cloudflare 403 и изолируется cooldown |
+| ATS expansion 2026-08-04 | публичные endpoints пяти уже поддержанных ATS | нет | +36 непустых live-проверенных boards: Greenhouse 17, Ashby 12, Lever 2, Recruitee 1, Personio 4 |
 
 ## Как действительно получить максимум
 
 Количество покрываемых сайтов следует увеличивать слоями, а не писать сотни хрупких HTML-парсеров.
 
-1. Один адаптер на ATS-платформу. Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters уже дают 61 отдельный источник. Следующие высокоэффективные семейства: публичные career endpoints BambooHR и дополнительные проверенные slugs существующих адаптеров. Для каждой компании хранится только slug и метаданные.
+1. Один адаптер на ATS-платформу. Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters уже дают 97 отдельных источников. Следующие высокоэффективные семейства: публичные career endpoints BambooHR и дополнительные проверенные slugs существующих адаптеров. Для каждой компании хранится только slug и метаданные.
 2. Официальные государственные API. France Travail уже реализован. EURES требует одобренного партнёрского канала, а открытая выгрузка Canada Job Bank — это аналитический CSV без ID работодателя и прямых apply URL, поэтому оба источника не маскируются под полноценный live search API.
 3. API-ключи агрегаторов. Adzuna, Reed и SuperJob уже имеют готовые адаптеры и подключаются после регистрации; для следующих сервисов сначала проверяются лицензия, квоты и требования к атрибуции.
 4. RSS/Atom/JSON feeds. Подключаются общим feed-адаптером с allowlist, лимитом размера, XML-защитой, условными запросами и обязательной ссылкой на источник.

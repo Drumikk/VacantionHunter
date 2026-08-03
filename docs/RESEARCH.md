@@ -1,6 +1,6 @@
 # Доказательная база решений
 
-Дата первоначальной проверки: 2026-07-29. Каталог и новые источники повторно проверены 2026-07-31. Для технических решений использованы первичные документы владельцев API и стандартов.
+Дата первоначальной проверки: 2026-07-29. Каталог и новые источники повторно проверены 2026-08-04. Для технических решений использованы первичные документы владельцев API и стандартов.
 
 | Решение | Первичный источник | Что подтверждает | Реализация |
 |---|---|---|---|
@@ -17,6 +17,7 @@
 | Arbeitnow API | <https://www.arbeitnow.com/blog/job-board-api> | No-key API, ATS-derived jobs, remote и visa sponsorship поля | `src/connectors/arbeitnow.js` |
 | Jooble REST API | <https://help.jooble.org/en/support/solutions/articles/60001448238-rest-api-documentation> | API key, POST search, keywords/location/pagination и поле исходного `source`; международное покрытие без РФ | `src/connectors/jooble.js` |
 | USAJOBS Search API | <https://developer.usajobs.gov/api-reference/get-api-search> | API key + email headers, keyword/location/remote/date filters, salary и application close date | `src/connectors/usajobs.js` |
+| CareerOneStop Jobs V2 | <https://api.careeronestop.org/api-explorer/home/index/JobSearchV2_GetJobsByKeywordAndOnetCode> | Официальный REST API Министерства труда США; User ID в path, Bearer token в заголовке, keyword/location/radius/date filters, список и detail вакансии | `src/connectors/careeronestop.js` |
 | «Работа России» | <https://trudvsem.ru/opendata/api> | Официальный открытый JSON API Роструда: текстовый поиск, пагинация и инкрементальные изменения | `src/connectors/trudvsem.js` |
 | Arbetsförmedlingen JobSearch | <https://jobsearch.api.jobtechdev.se/> | Открытый API государственной службы занятости Швеции с поиском и структурированными полями вакансии | `src/connectors/jobtech.js` |
 | Remote OK API | <https://remoteok.com/api> | Публичный JSON feed; при показе данных обязательны атрибуция и ссылка на оригинал | `src/connectors/remoteok.js` |
@@ -54,11 +55,17 @@
 
 31 июля 2026 года официальный публичный endpoint Workable проверен на 19 company accounts из Европы, Северной и Латинской Америки: каждый выбранный account вернул HTTP 200 и структурированный массив опубликованных jobs. Personio XML feed подтверждён на 10 актуальных career subdomains; три полностью загрузились из локального egress, а `personio:iits` прошёл штатный smoke за 238 мс. SmartRecruiters career pages десяти компаний доступны, но API с локального IP вернул классифицированный Cloudflare 403; обход не применяется, коннекторы уходят в cooldown и могут быть независимо перепроверены из CI/deployment egress. France Travail подтверждён официальным каталогом data.gouv.fr как API активных вакансий для частных разработчиков, компаний, стартапов и территориальных организаций; коннектор остаётся `disabled` до выдачи OAuth client credentials. The Muse подтвердил HTTP 200 и текущую JSON-схему с описанием, компанией, локациями, категорией, уровнем и первичной ссылкой; реализован часовой кэш и необязательный API key. EURES подтверждён как общеевропейский портал, но открытого search API для произвольного приложения в первичной документации не найдено; внутренние endpoints не используются. Canada Job Bank публикует официальные ежемесячные CSV через Open Government Portal, но набор не содержит работодателя, текста вакансии, posting ID и прямого URL отклика, поэтому не подключается как live-коннектор вакансий.
 
-Стартовый пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
+4 августа 2026 года прямыми запросами к официальным публичным ATS endpoint проверено ещё 36 непустых карьерных досок: Greenhouse 17, Ashby 12, Lever 2, Recruitee 1 и Personio 4. На момент проверки они суммарно публиковали тысячи вакансий; пустые аккаунты и slug с 404 в allowlist не добавлены. В Greenhouse detail-запросы дополнительно ограничены `ATS_DETAIL_CONCURRENCY`, чтобы рост числа компаний не превращался в всплеск параллельных запросов. Стандартный ATS-реестр вырос с 61 до 97 независимо наблюдаемых board.
+
+В ту же волну реализован CareerOneStop Jobs V2. Официальная документация подтверждает обязательный `Authorization: Bearer`, выданный при регистрации User ID, US-wide location `0`, список с description snippet и отдельный detail endpoint. Коннектор остаётся `disabled` до настройки двух credentials, фильтрует index до detail-запросов и кэширует одинаковый поиск.
+
+Исходный пакет из 16 company boards проверен прямыми запросами к публичным API 2026-07-29 и хранится в `config/sources.json`; каждая доска обновляется и наблюдается независимо:
 
 - Ashby: Sola, Qdrant, Enode, Percona, Reedsy, Granular Energy — все вернули `apiVersion=1`, опубликованные вакансии и прямые `jobUrl`;
 - Greenhouse: Canonical, Grafana Labs, Elastic, GitLab, Cloudflare — от 131 до 302 опубликованных вакансий на момент проверки;
 - Lever: SwissBorg, Zartis, Aircall, PayU GPO, Match Group — от 4 до 83 опубликованных вакансий на момент проверки.
+
+Дополнительный пакет 2026-08-04: Greenhouse — Databricks, Stripe, Datadog, MongoDB, Okta, Remote, Reddit, Figma, Twilio, Coinbase, Klaviyo, Intercom, Discord, Webflow, Cockroach Labs, commercetools и CircleCI; Ashby — PostHog, Linear, Supabase, Neon, n8n, Modal, Render, Resend, Infisical, ElevenLabs, Temporal и OpenAI; Lever — Spotify и Palantir; Recruitee — bunq; Personio — EGYM, Everphone, TWAICE и Personio.
 
 Точный запрос `.NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией` проверен через общий parser → connector → normalization → ranking контур. Ashby/Sola вернул действующую вакансию `Software Engineer, Windows AI Automation`: remote, relocation support, USD 160–300k/year, 100% обязательных условий. Пять Lever boards завершили полный индексный проход; частичные таймауты отдельных detail pages записываются в diagnostics и не маскируются как падение всей доски. Полная воспроизводимая матрица находится в `docs/LIVE_SOURCES.md`.
 

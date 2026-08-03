@@ -1,6 +1,6 @@
 # Автоматический сбор вакансий
 
-Дата проверки: 2026-07-29.
+Дата проверки: 2026-08-04.
 
 ## Как обычно устроены агрегаторы вакансий
 
@@ -23,8 +23,9 @@ Cookies, пароль и пользовательская сессия не яв
 | Jooble REST API | Международный агрегатор вакансий из job boards, карьерных страниц и рекрутеров | `JOOBLE_API_KEY` | Реализовано; РФ и hh.ru не покрывает |
 | HH email alerts | РФ/СНГ, выдача сохранённых поисков HH | отдельный IMAP-ящик + пароль приложения | Реализовано; импортирует официальные уведомления без скрейпинга сайта |
 | HeadHunter API | РФ/СНГ | ранее одобренный OAuth-токен приложения | Реализован адаптер; новый доступ для соискателей закрыт |
-| Greenhouse, Ashby, Lever, Recruitee, Workable, Personio, SmartRecruiters | Публичные вакансии конкретных работодателей | пользовательский логин не требуется; SmartRecruiters key необязателен | Реализована 61 стартовая board |
+| Greenhouse, Ashby, Lever, Recruitee, Workable, Personio, SmartRecruiters | Публичные вакансии конкретных работодателей | пользовательский логин не требуется; SmartRecruiters key необязателен | Реализованы 97 live-проверенных board |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
+| CareerOneStop Jobs V2 | Агрегированный официальный поиск вакансий по США | User ID + Bearer API token | Реализовано; включается после регистрации доступа |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
 | Himalayas, Jobicy | Международные remote-вакансии | публичные API без ключей | Реализовано; обязательны атрибуция и оригинальные ссылки, Jobicy кэшируется на час |
 | Adzuna API | 16 национальных рынков текущего географического scope | `app_id` + `app_key` | Реализовано; 8 стран включаются по умолчанию после настройки ключей |
@@ -37,6 +38,8 @@ Cookies, пароль и пользовательская сессия не яв
 Jooble выбран широким международным слоем: официальный API принимает `keywords`, `location`, radius, salary и pagination и возвращает источник, компанию, ссылку, тип, зарплату и время обновления. Он не используется как замена HH: российский сайт Jooble прекратил работу, глобальный API с российской локацией не возвращает российскую выдачу, а региональный endpoint не принимает глобальный ключ.
 
 USAJOBS добавлен как пример прямого tokenized API: он требует `Authorization-Key` и email в `User-Agent`, поддерживает keyword/location/remote/date filters и возвращает нормализуемую зарплату, срок приёма заявок и прямую apply-ссылку.
+
+CareerOneStop добавляет второй независимый официальный слой США. List Jobs V2 получает до 100 свежих кандидатов, локально оставляет релевантные и только для них загружает detail; запросы к detail ограничены по параллелизму, одинаковый поиск кэшируется, а Bearer token не сериализуется в UI или логах. Явный запрос по неамериканской стране не вызывает этот US-only API.
 
 ## Получение ключей
 
@@ -108,6 +111,17 @@ $env:USAJOBS_EMAIL='ваш-email@example.com'
 npm start
 ```
 
+### CareerOneStop — широкий поиск по США
+
+1. Запросить доступ к Web APIs на <https://www.careeronestop.org/Developers/WebAPI/web-api.aspx>.
+2. Сохранить выданные User ID и API token только в серверном `.env`.
+
+```powershell
+$env:CAREERONESTOP_USER_ID='выданный-user-id'
+$env:CAREERONESTOP_API_TOKEN='выданный-api-token'
+npm start
+```
+
 ### HeadHunter через email-уведомления — рабочий вариант для соискателя
 
 1. На HH создайте нужный поиск, сохраните его как автопоиск и включите email-уведомления.
@@ -160,6 +174,7 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Gmail IMAP и пароли приложений: <https://support.google.com/mail/answer/7126229>, <https://support.google.com/accounts/answer/185833>
 - Adzuna overview/search/terms: <https://developer.adzuna.com/overview>, <https://developer.adzuna.com/docs/search>, <https://developer.adzuna.com/docs/terms_of_service>
 - USAJOBS authentication/search: <https://developer.usajobs.gov/guides/authentication>, <https://developer.usajobs.gov/api-reference/get-api-search>
+- CareerOneStop Web APIs / Jobs V2: <https://www.careeronestop.org/Developers/WebAPI/web-api.aspx>, <https://api.careeronestop.org/api-explorer/home/index/JobSearchV2_GetJobsByKeywordAndOnetCode>, <https://api.careeronestop.org/api-explorer/home/index/JobSearchV2_GetJobDetailsbyID>
 - «Работа России» Open Data API: <https://trudvsem.ru/opendata/api>
 - Arbetsförmedlingen JobSearch API: <https://jobsearch.api.jobtechdev.se/>
 - Remote OK API: <https://remoteok.com/api>

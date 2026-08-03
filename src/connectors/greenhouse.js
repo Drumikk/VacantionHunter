@@ -35,12 +35,20 @@ export function greenhouseConnectors(config) {
           id: item.id, title: item.title, description: (item.metadata || []).map((field) => Array.isArray(field.value) ? field.value.join(" ") : field.value).filter(Boolean).join(" "),
           location: item.location?.name || "", url: item.absolute_url, updatedAt: item.updated_at,
         })).filter((job) => retrievalMatches(job, query)).slice(0, config.maxJobsPerSource);
-        const details = await Promise.all(candidates.map(async (candidate) => {
-          try {
-            const item = await fetchJson(`${baseUrl}/jobs/${encodeURIComponent(candidate.id)}`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 2, fetchImpl: config.fetchImpl || fetch });
-            return { item, warning: null };
-          } catch (error) {
-            return { item: candidate, warning: { postingId: candidate.id, title: candidate.title, error: error.message, code: typeof error.code === "string" ? error.code : error.name || "source_error" } };
+        const details = new Array(candidates.length);
+        let nextCandidate = 0;
+        const workerCount = Math.min(candidates.length, Math.max(1, config.atsDetailConcurrency || 4));
+        await Promise.all(Array.from({ length: workerCount }, async () => {
+          while (nextCandidate < candidates.length) {
+            const index = nextCandidate;
+            nextCandidate += 1;
+            const candidate = candidates[index];
+            try {
+              const item = await fetchJson(`${baseUrl}/jobs/${encodeURIComponent(candidate.id)}`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 2, fetchImpl: config.fetchImpl || fetch });
+              details[index] = { item, warning: null };
+            } catch (error) {
+              details[index] = { item: candidate, warning: { postingId: candidate.id, title: candidate.title, error: error.message, code: typeof error.code === "string" ? error.code : error.name || "source_error" } };
+            }
           }
         }));
         const warnings = details.map((detail) => detail.warning).filter(Boolean);

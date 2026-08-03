@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { joobleConnector } from "../src/connectors/jooble.js";
 import { usajobsConnector } from "../src/connectors/usajobs.js";
+import { careerOneStopConnector } from "../src/connectors/careeronestop.js";
 import { parseQuery } from "../src/core/query-parser.js";
 import { monthlyUsd } from "../src/core/salary.js";
 
@@ -14,6 +15,11 @@ function config(overrides = {}) {
     joobleApiKey: "",
     usajobsApiKey: "",
     usajobsEmail: "",
+    careerOneStopUserId: "",
+    careerOneStopApiToken: "",
+    atsRequestTimeoutMs: 1_000,
+    atsDetailConcurrency: 2,
+    maxJobsScannedPerSource: 100,
     ...overrides,
   };
 }
@@ -116,5 +122,62 @@ test("USAJOBS does not issue a US-only request for an explicit non-US location",
   }));
 
   assert.deepEqual(await connector.search(parseQuery("Python developer Германия")), []);
+  assert.equal(calls, 0);
+});
+
+test("CareerOneStop authenticates with a bearer token, loads relevant details, and caches the query", async () => {
+  assert.equal(careerOneStopConnector(config()).enabled, false);
+  const requests = [];
+  const token = "career-secret-token";
+  const connector = careerOneStopConnector(config({
+    careerOneStopUserId: "api-owner@example.test",
+    careerOneStopApiToken: token,
+    fetchImpl: async (url, options) => {
+      const parsed = new URL(url);
+      requests.push(parsed);
+      assert.equal(options.headers.Authorization, `Bearer ${token}`);
+      if (parsed.pathname.split("/").length > 10) {
+        assert.match(decodeURIComponent(parsed.pathname), /\/v2\/jobsearch\/api-owner@example\.test\/python developer\/0\/100\/acquisitiondate\/DESC\/0\/100\/60$/);
+        assert.equal(parsed.searchParams.get("enableJobDescriptionSnippet"), "true");
+        return Response.json({ Jobs: [
+          { JvId: "JV-42", JobTitle: "Senior Python Developer", Company: "Example Corp", DescriptionSnippet: "Python APIs and remote work", AcquisitionDate: "2026-07-30", URL: "https://example.test/jobs/42", Location: "Denver, CO", OnetCodes: ["15-1252.00"] },
+          { JvId: "JV-43", JobTitle: "Registered Nurse", Company: "Clinic", DescriptionSnippet: "Patient care", AcquisitionDate: "2026-07-30", URL: "https://example.test/jobs/43", Location: "Denver, CO" },
+        ] });
+      }
+      assert.equal(decodeURIComponent(parsed.pathname), "/v2/jobsearch/api-owner@example.test/JV-42");
+      assert.equal(parsed.searchParams.get("isHtml"), "false");
+      return Response.json({
+        JobTitle: "Senior Python Developer",
+        Company: "Example Corp",
+        Description: "Build Python APIs. Remote role. Salary $120,000 - $150,000 annually.",
+        AcquisitionDate: "2026-07-30",
+        URL: "https://example.test/jobs/42",
+        Location: "United States / Remote",
+        OnetCodes: ["15-1252.00"],
+      });
+    },
+  }));
+
+  const query = parseQuery("Python developer remote USA");
+  const [job] = await connector.search(query);
+  await connector.search(query);
+
+  assert.equal(requests.length, 2, "the same query should reuse the aggregator cache");
+  assert.equal(job.id, "careeronestop:JV-42");
+  assert.equal(job.remote, true);
+  assert.deepEqual(job.salary, { min: 120_000, max: 150_000, currency: "USD", period: "year", explicit: true });
+  assert.deepEqual(connector.getDiagnostics(), { scanned: 2, detailCandidates: 1, detailsLoaded: 1, matched: 1, warnings: [] });
+  assert.equal(JSON.stringify(connector).includes(token), false);
+});
+
+test("CareerOneStop does not issue a US-only request for an explicit non-US location", async () => {
+  let calls = 0;
+  const connector = careerOneStopConnector(config({
+    careerOneStopUserId: "owner",
+    careerOneStopApiToken: "token",
+    fetchImpl: async () => { calls += 1; return Response.json({ Jobs: [] }); },
+  }));
+
+  assert.deepEqual(await connector.search(parseQuery("Python developer Germany")), []);
   assert.equal(calls, 0);
 });

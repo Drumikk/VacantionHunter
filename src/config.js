@@ -57,6 +57,8 @@ export const config = {
   joobleApiKey: process.env.JOOBLE_API_KEY || "",
   usajobsApiKey: process.env.USAJOBS_API_KEY || "",
   usajobsEmail: process.env.USAJOBS_EMAIL || "",
+  careerOneStopUserId: process.env.CAREERONESTOP_USER_ID || "",
+  careerOneStopApiToken: process.env.CAREERONESTOP_API_TOKEN || "",
   reliefwebAppName: process.env.RELIEFWEB_APPNAME || "",
   adzunaAppId: process.env.ADZUNA_APP_ID || "",
   adzunaApiKey: process.env.ADZUNA_API_KEY || "",
