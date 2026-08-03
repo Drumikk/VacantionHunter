@@ -31,6 +31,24 @@ export class JobStore {
     return operation;
   }
 
+  async applySourceChanges(sourceId, jobs, { changedExternalIds = [] } = {}) {
+    const operation = this.#mergeQueue.then(async () => {
+      const affectedKeys = new Set([
+        ...changedExternalIds.map((externalId) => `${sourceId}:${externalId}`),
+        ...jobs.filter((job) => job.externalId != null).map((job) => `${sourceId}:${job.externalId}`),
+      ]);
+      this.#jobs = this.#jobs.filter((job) => {
+        const provenanceKeys = job.provenanceKeys || [`${job.source?.id || "unknown"}:${job.externalId || job.id}`];
+        return !provenanceKeys.some((key) => affectedKeys.has(key));
+      });
+      this.#jobs = deduplicateJobs([...this.#jobs, ...jobs]);
+      await this.save();
+      return this.#jobs;
+    });
+    this.#mergeQueue = operation.catch(() => {});
+    return operation;
+  }
+
   async save() {
     await fs.mkdir(path.dirname(this.filePath), { recursive: true });
     const tmp = `${this.filePath}.tmp`;

@@ -26,6 +26,7 @@ Cookies, пароль и пользовательская сессия не яв
 | Greenhouse, Ashby, Lever, Recruitee, Workable, Personio, SmartRecruiters | Публичные вакансии конкретных работодателей | пользовательский логин не требуется; SmartRecruiters key необязателен | Реализованы 170 live-проверенных board |
 | USAJOBS Search API | Федеральные вакансии США | API key + email в заголовках | Реализовано |
 | CareerOneStop Jobs V2 | Агрегированный официальный поиск вакансий по США | User ID + Bearer API token | Реализовано; включается после регистрации доступа |
+| Arbeidsplassen/NAV | Большинство публично размещённых вакансий Норвегии, кроме FINN.no | Bearer token NAV; публичный вращающийся token только для экспериментов | Реализован lifecycle-feed: cursor/ETag, active/update/inactive, прямые ссылки и безопасное подтверждение batch |
 | Remotive, Arbeitnow | Международные remote-вакансии | публичный API | Реализовано; возможна IP/Cloudflare-пауза |
 | Himalayas, Jobicy | Международные remote-вакансии | публичные API без ключей | Реализовано; обязательны атрибуция и оригинальные ссылки, Jobicy кэшируется на час |
 | Adzuna API | 16 национальных рынков текущего географического scope | `app_id` + `app_key` | Реализовано; все 16 рынков включаются по умолчанию после настройки ключей |
@@ -40,6 +41,8 @@ Jooble выбран широким международным слоем: офи
 USAJOBS добавлен как пример прямого tokenized API: он требует `Authorization-Key` и email в `User-Agent`, поддерживает keyword/location/remote/date filters и возвращает нормализуемую зарплату, срок приёма заявок и прямую apply-ссылку.
 
 CareerOneStop добавляет второй независимый официальный слой США. List Jobs V2 получает до 100 свежих кандидатов, локально оставляет релевантные и только для них загружает detail; запросы к detail ограничены по параллелизму, одинаковый поиск кэшируется, а Bearer token не сериализуется в UI или логах. Явный запрос по неамериканской стране не вызывает этот US-only API.
+
+Arbeidsplassen/NAV подключён как непрерывная государственная лента Норвегии, а не как периодический HTML-скрейпер. Коннектор следует `next_url`, сохраняет `Last-Modified`/ETag, получает подробности только у релевантных активных объявлений и немедленно удаляет `INACTIVE`. Изменения сначала записываются в state как pending batch, затем атомарно применяются к `JobStore` и только после этого подтверждаются: при падении процесса batch будет воспроизведён, поэтому закрытие или обновление не потеряется. Токен в state не сохраняется.
 
 ## Получение ключей
 
@@ -73,6 +76,21 @@ $env:FRANCE_TRAVAIL_CLIENT_SECRET='ваш-client-secret'
 npm start
 ```
 
+Для production-доступа к Arbeidsplassen/NAV нужно письменно принять [условия API](https://arbeidsplassen.nav.no/vilkar-api) и отправить на `nav.team.arbeidsplassen@nav.no` идентификатор организации/компании, контактный email, телефон и контактное лицо. Полученный Bearer token сохраняется только на сервере:
+
+```powershell
+$env:NAV_API_TOKEN='выданный-production-token'
+npm start
+```
+
+Для локальной проверки NAV публикует вращающийся experiment token. Приложение может получить его автоматически только после явного включения режима; это не production-настройка:
+
+```powershell
+$env:NAV_USE_PUBLIC_TOKEN='true'
+$env:NAV_LOOKBACK_DAYS='1'
+npm run smoke:live -- --source=nav-norway "sykepleier"
+```
+
 Текущая карта реализованных и следующих источников: [аудит каталога](SOURCE_CATALOG_AUDIT.md).
 
 ### Jooble — рекомендуется первым
@@ -96,7 +114,7 @@ npm start
 
 Кнопка «Проверить сейчас» вызывает `POST /api/sources/:id/check` только для выбранного коннектора. Остальные источники не опрашиваются; результат добавляется в локальное хранилище и сразу становится доступен поиску. Неизвестный ID возвращает 404, демо-источник не допускает ручного сетевого обновления.
 
-Для end-to-end проверки без UI используется `npm run smoke:live -- "<запрос>"`. Smoke-команда не скрывает отключённые источники, измеряет время каждого адаптера, считает полные/частичные совпадения и включает connector diagnostics. Флаг `--source=ashby:sola` проверяет один источник, `--source=lever` — весь тип адаптера, `--strict` возвращает ненулевой exit code при любом `disabled` или `error`.
+Для end-to-end проверки без UI используется `npm run smoke:live -- "<запрос>"`. Smoke-команда не скрывает отключённые источники, измеряет время каждого адаптера, считает полные/частичные совпадения и включает connector diagnostics. Флаг `--source=ashby:sola` проверяет один источник, `--source=lever` — весь тип адаптера, `--strict` возвращает ненулевой exit code при любом `disabled` или `error`. Состояние lifecycle-feed NAV в smoke-команде всегда изолируется во временной папке и удаляется после проверки, поэтому рабочий cursor не сдвигается.
 
 GitHub Actions workflow `live-sources.yml` выполняет точный приёмочный запрос по расписанию каждые 6 часов. Это дополнительный deployment egress и независимая проверка доступности: локальный Cloudflare/IP block не считается доказательством неработоспособности API, а отличие CI от локального результата становится наблюдаемым. Artifact и job summary сохраняются всегда; после этого workflow становится красным, если хотя бы один включённый источник завершился ошибкой. Отключённые до выдачи credentials источники учитываются отдельно и сами по себе job не роняют.
 
@@ -175,6 +193,7 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Adzuna overview/search/terms: <https://developer.adzuna.com/overview>, <https://developer.adzuna.com/docs/search>, <https://developer.adzuna.com/docs/terms_of_service>
 - USAJOBS authentication/search: <https://developer.usajobs.gov/guides/authentication>, <https://developer.usajobs.gov/api-reference/get-api-search>
 - CareerOneStop Web APIs / Jobs V2: <https://www.careeronestop.org/Developers/WebAPI/web-api.aspx>, <https://api.careeronestop.org/api-explorer/home/index/JobSearchV2_GetJobsByKeywordAndOnetCode>, <https://api.careeronestop.org/api-explorer/home/index/JobSearchV2_GetJobDetailsbyID>
+- Arbeidsplassen/NAV feed, terms and official catalog: <https://navikt.github.io/pam-stilling-feed/>, <https://arbeidsplassen.nav.no/vilkar-api>, <https://data.norge.no/nb/datasets/62409bc8-680d-3f70-98bf-d2f2beebaa50/api-navs-stillingsdatabase>
 - «Работа России» Open Data API: <https://trudvsem.ru/opendata/api>
 - Arbetsförmedlingen JobSearch API: <https://jobsearch.api.jobtechdev.se/>
 - Remote OK API: <https://remoteok.com/api>

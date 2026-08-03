@@ -213,3 +213,60 @@ test("checks one source without refreshing the others", async () => {
   assert.equal(checked.source.status, "ok");
   await assert.rejects(service.checkSource("missing", "work"), (error) => error.statusCode === 404);
 });
+
+test("commits lifecycle changes before acknowledging a source cursor", async () => {
+  const events = [];
+  const connector = {
+    id: "lifecycle",
+    name: "Lifecycle feed",
+    async search() {
+      return {
+        jobs: [{
+          id: "lifecycle:one", externalId: "one", title: "Software Engineer", company: "Example",
+          location: "Remote", url: "https://example.test/jobs/one", source: { id: "lifecycle", name: "Lifecycle feed" },
+        }],
+        changedExternalIds: ["one", "closed"],
+        syncToken: "batch-one",
+      };
+    },
+    async acknowledge(token) { events.push(["acknowledge", token]); },
+  };
+  const store = {
+    jobs: [],
+    async merge() { throw new Error("standard merge must not be used"); },
+    async applySourceChanges(sourceId, jobs, options) {
+      events.push(["apply", sourceId, jobs.map((job) => job.externalId), options.changedExternalIds]);
+    },
+  };
+  const service = new JobService({
+    connectors: [connector],
+    store,
+    config: { sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+
+  const report = await service.refresh("software engineer");
+  assert.equal(report[0].status, "fulfilled");
+  assert.deepEqual(events, [
+    ["apply", "lifecycle", ["one"], ["one", "closed"]],
+    ["acknowledge", "batch-one"],
+  ]);
+});
+
+test("does not acknowledge a lifecycle cursor when durable storage fails", async () => {
+  let acknowledged = false;
+  const connector = {
+    id: "lifecycle-failure",
+    name: "Lifecycle failure",
+    async search() { return { jobs: [], changedExternalIds: ["closed"], syncToken: "batch-failed" }; },
+    async acknowledge() { acknowledged = true; },
+  };
+  const service = new JobService({
+    connectors: [connector],
+    store: { jobs: [], async applySourceChanges() { throw new Error("disk unavailable"); } },
+    config: { sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+
+  const report = await service.refresh("software engineer");
+  assert.equal(report[0].status, "rejected");
+  assert.equal(acknowledged, false);
+});

@@ -45,7 +45,7 @@ async function responseError(response, url) {
   });
 }
 
-async function fetchValue(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1", method = "GET", body = undefined } = {}, read) {
+async function fetchValue(url, { timeoutMs = 8_000, headers = {}, retries = 1, fetchImpl = fetch, userAgent = "VacationHunter/0.1", method = "GET", body = undefined, acceptedStatuses = [] } = {}, read) {
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
@@ -54,7 +54,7 @@ async function fetchValue(url, { timeoutMs = 8_000, headers = {}, retries = 1, f
         const retryAfter = Math.min(2_000, Number(response.headers.get("retry-after") || 0) * 1_000 || 250 * (attempt + 1));
         if (attempt < retries) { await new Promise((resolve) => setTimeout(resolve, retryAfter)); continue; }
       }
-      if (!response.ok) throw await responseError(response, url);
+      if (!response.ok && !acceptedStatuses.includes(response.status)) throw await responseError(response, url);
       return await read(response);
     } catch (error) {
       lastError = error;
@@ -75,4 +75,8 @@ export async function fetchJson(url, options = {}) {
 
 export async function fetchText(url, options = {}) {
   return fetchValue(url, options, (response) => response.text());
+}
+
+export async function fetchResponse(url, options = {}) {
+  return fetchValue(url, options, (response) => response);
 }

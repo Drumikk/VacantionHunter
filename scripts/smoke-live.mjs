@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { config } from "../src/config.js";
 import { createConnectors } from "../src/connectors/index.js";
 import { assessJob } from "../src/core/authenticity.js";
@@ -9,7 +12,13 @@ const strict = process.argv.includes("--strict");
 const sourceFilter = process.argv.find((argument) => argument.startsWith("--source="))?.slice("--source=".length) || null;
 const rawQuery = process.argv.slice(2).filter((argument) => !argument.startsWith("--")).join(" ") || ".NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией";
 const query = parseQuery(rawQuery);
-const connectors = createConnectors({ ...config, enableLiveSources: true, maxJobsPerSource: Math.min(config.maxJobsPerSource, 20) })
+const smokeStateDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "vacation-hunter-smoke-"));
+const connectors = createConnectors({
+  ...config,
+  enableLiveSources: true,
+  maxJobsPerSource: Math.min(config.maxJobsPerSource, 20),
+  navStatePath: path.join(smokeStateDirectory, "nav-feed-state.json"),
+})
   .filter((connector) => connector.id !== "demo")
   .filter((connector) => !sourceFilter || connector.id === sourceFilter || connector.id.startsWith(`${sourceFilter}:`) || connector.adapter === sourceFilter);
 const startedAt = new Date().toISOString();
@@ -25,7 +34,10 @@ const results = await mapConcurrent(connectors, config.sourceConcurrency || 16, 
     };
   }
   try {
-    const jobs = (await connector.search(query)).map((job) => ({ ...job, verification: assessJob(job) }));
+    const rawResult = await connector.search(query);
+    const lifecycleBatch = Array.isArray(rawResult) ? null : rawResult;
+    const jobs = (lifecycleBatch ? lifecycleBatch.jobs || [] : rawResult).map((job) => ({ ...job, verification: assessJob(job) }));
+    if (lifecycleBatch?.syncToken) await connector.acknowledge?.(lifecycleBatch.syncToken);
     const ranked = rankJobs(jobs, query).filter((job) => isRelevantMatch(job, query));
     const full = ranked.filter((job) => job.andMatch && !job.unsafe);
     const partial = ranked.filter((job) => job.matchPercent > 0 && !job.andMatch && !job.unsafe);
@@ -56,4 +68,5 @@ const summary = {
   partialMatches: results.reduce((sum, item) => sum + item.partialMatches, 0),
 };
 console.log(JSON.stringify({ startedAt, durationMs: Date.now() - started, query, summary, report: results }, null, 2));
+await fs.rm(smokeStateDirectory, { recursive: true, force: true });
 if (strict ? summary.disabled > 0 || summary.errors > 0 : summary.ok === 0) process.exitCode = 1;

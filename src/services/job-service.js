@@ -95,9 +95,17 @@ export class JobService extends EventEmitter {
     Object.assign(status, { status: "loading", lastError: null, lastAttemptAt: new Date().toISOString() });
     this.emit("source", status);
     try {
-      const rawJobs = await connector.search(query);
+      const rawResult = await connector.search(query);
+      const lifecycleBatch = Array.isArray(rawResult) ? null : rawResult;
+      const rawJobs = lifecycleBatch ? lifecycleBatch.jobs || [] : rawResult;
       const jobs = rawJobs.map((job) => ({ ...job, verification: assessJob(job), ingestedAt: new Date().toISOString() }));
-      await this.store.merge(jobs);
+      if (lifecycleBatch) {
+        if (typeof this.store.applySourceChanges !== "function") throw new Error(`${connector.name} requires a lifecycle-aware job store`);
+        await this.store.applySourceChanges(connector.id, jobs, { changedExternalIds: lifecycleBatch.changedExternalIds || [] });
+        await connector.acknowledge?.(lifecycleBatch.syncToken);
+      } else {
+        await this.store.merge(jobs);
+      }
       Object.assign(status, { status: "ok", lastSuccessAt: new Date().toISOString(), count: jobs.length, failureCount: 0, cooldownUntil: null, diagnostics: connector.getDiagnostics?.() || null });
       this.emit("jobs", { source: connector.id, count: jobs.length, query: query.raw });
       return jobs;

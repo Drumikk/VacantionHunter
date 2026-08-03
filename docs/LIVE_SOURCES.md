@@ -1,6 +1,6 @@
 # Статус живых источников
 
-Основной снимок: 2026-07-29 22:53 UTC. Новые источники точечно проверены 2026-08-04. Текущая стандартная конфигурация содержит 207 независимо наблюдаемых коннекторов; таблица итогов ниже сохраняет базовый снимок 23 источников для воспроизводимости. Окружение: локальный Windows egress. Запрос:
+Основной снимок: 2026-07-29 22:53 UTC. Новые источники точечно проверены 2026-08-04. Текущая стандартная конфигурация содержит 208 независимо наблюдаемых коннекторов; таблица итогов ниже сохраняет базовый снимок 23 источников для воспроизводимости. Окружение: локальный Windows egress. Запрос:
 
 ```text
 .NET Разработчик с заработной платой от 4000$ в месяц, удалённо с релокацией
@@ -13,7 +13,7 @@
 | Метрика | Значение |
 |---|---:|
 | Источников в базовом снимке | 23 |
-| Источников в текущей стандартной конфигурации | 207 |
+| Источников в текущей стандартной конфигурации | 208 |
 | Успешно ответили | 13 |
 | Отключены до настройки доступа | 5 |
 | Ошибка из текущего egress | 5 |
@@ -46,6 +46,7 @@
 | Aggregator API | Jooble | ok outside РФ | API работает для международной выдачи; РФ и hh.ru не покрываются |
 | Government API | USAJOBS | disabled | Получить `USAJOBS_API_KEY` и указать регистрационный `USAJOBS_EMAIL` |
 | Government API | CareerOneStop | disabled | Запросить Web API access и указать `CAREERONESTOP_USER_ID` + `CAREERONESTOP_API_TOKEN`; unit mapping и защита секрета прошли |
+| Government feed | Arbeidsplassen/NAV | live ok / production token required | Experiment smoke: 1 000 изменений, 77 активных заголовков и 10/10 полных совпадений `sykepleier`; для постоянной работы запросить `NAV_API_TOKEN` |
 | Remote API | Remotive | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
 | Remote API | Arbeitnow | error | Cloudflare 403 для локального IP; проверить GitHub Actions/deployment egress, challenge не обходить |
 | Partner-only | LinkedIn | disabled | Нужен официальный Talent Solutions partner access; login cookies не используются |
@@ -106,6 +107,8 @@ npm run smoke:live -- --source=france-travail ".NET developer remote"
 npm run smoke:live -- --source=the-muse ".NET developer remote"
 npm run smoke:live -- --source=personio:iits ".NET developer remote"
 npm run smoke:live -- --source=smartrecruiters:AristaNetworks "software engineer remote"
+$env:NAV_USE_PUBLIC_TOKEN='true'
+npm run smoke:live -- --source=nav-norway "sykepleier"
 ```
 
 Scheduled workflow сохраняет полный JSON как GitHub Actions artifact и краткую таблицу в job summary. После добавления HH-авторизации (`HH_USER_AGENT` + `HH_ACCESS_TOKEN` либо `HH_CLIENT_ID` + `HH_CLIENT_SECRET`), `JOOBLE_API_KEY`, `USAJOBS_API_KEY` и `USAJOBS_EMAIL` в repository secrets те же API-коннекторы автоматически переходят из `disabled` в реальную проверку без изменения кода. IMAP-доступ к личной почте безопаснее держать локально либо в отдельном секрет-хранилище развёрнутого сервера, а не в CI общего репозитория.

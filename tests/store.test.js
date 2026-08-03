@@ -27,3 +27,33 @@ test("serializes concurrent merges without losing jobs or racing the atomic rena
   assert.equal(persisted.length, 12);
   assert.deepEqual(new Set(persisted.map((job) => job.id)), new Set(store.jobs.map((job) => job.id)));
 });
+
+test("applies lifecycle updates without retaining stale content and removes inactive source records", async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "vacation-hunter-lifecycle-store-"));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const store = new JobStore(path.join(directory, "jobs.json"));
+  const navSource = { id: "nav-norway", name: "Arbeidsplassen NAV" };
+  const otherSource = { id: "other", name: "Other source" };
+
+  await store.merge([
+    {
+      id: "nav-norway:active-1", externalId: "active-1", title: "Software Engineer", company: "Nordic AS",
+      location: "Oslo", url: "https://example.test/nav/active-1", description: "An obsolete and much longer description", source: navSource,
+    },
+    {
+      id: "other:keep-1", externalId: "keep-1", title: "Data Engineer", company: "Other AS",
+      location: "Bergen", url: "https://example.test/other/keep-1", description: "Keep this job", source: otherSource,
+    },
+  ]);
+
+  await store.applySourceChanges("nav-norway", [{
+    id: "nav-norway:active-1", externalId: "active-1", title: "Software Engineer", company: "Nordic AS",
+    location: "Oslo", url: "https://example.test/nav/active-1", description: "Updated", source: navSource,
+  }], { changedExternalIds: ["active-1"] });
+
+  assert.equal(store.jobs.length, 2);
+  assert.equal(store.jobs.find((job) => job.externalId === "active-1").description, "Updated");
+
+  await store.applySourceChanges("nav-norway", [], { changedExternalIds: ["active-1"] });
+  assert.deepEqual(store.jobs.map((job) => job.id), ["other:keep-1"]);
+});
