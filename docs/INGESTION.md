@@ -46,7 +46,7 @@ Arbeidsplassen/NAV подключён как непрерывная госуда
 
 ## Получение ключей
 
-Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, The Muse, Remotive, Arbeitnow и настроенные публичные ATS-доски, включая Workable и Personio. Их не нужно авторизовывать в браузере. Для The Muse можно необязательно указать `THE_MUSE_API_KEY`, чтобы поднять квоту; без ключа страницы кэшируются минимум на час. SmartRecruiters Posting API также поддерживает необязательный серверный `SMARTRECRUITERS_API_KEY`; локальный Cloudflare challenge не обходится. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
+Без ключей автоматически работают «Работа России», Arbetsförmedlingen JobTech, Remote OK, официальный RSS We Work Remotely, Hacker News Who Is Hiring, Himalayas, Jobicy, Remotive, Arbeitnow и настроенные публичные ATS-доски, включая Workable и Personio. Их не нужно авторизовывать в браузере. Endpoint The Muse технически может отвечать анонимно, но действующие API Terms требуют зарегистрировать приложение, поэтому для постоянной работы задайте `THE_MUSE_API_KEY`; страницы кэшируются минимум на час. Публичные SmartRecruiters Posting API endpoints работают без авторизации, а `SMARTRECRUITERS_API_KEY` имеет смысл только для владельца собственной организации в SmartRecruiters Credential Manager; локальный Cloudflare challenge не обходится. Для ReliefWeb нужен не секретный токен, а предварительно одобренный `appname`:
 
 ```powershell
 $env:RELIEFWEB_APPNAME='ваше-одобренное-имя'
