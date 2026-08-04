@@ -1,5 +1,5 @@
 const $ = (selector) => document.querySelector(selector);
-const state = { parsed: null, response: null, searching: false, watches: [], watchBusy: false, sources: [], sourceBusy: new Set(), notification: null, notificationBusy: false, discoveredChats: [], applications: [], applicationSummary: { total: 0, active: 0, counts: {} }, applicationBusy: new Set(), applicationDrafts: new Map(), pipelineOpen: false };
+const state = { parsed: null, response: null, searching: false, searchController: null, searchSequence: 0, refreshReport: [], watches: [], watchBusy: false, sources: [], sourceBusy: new Set(), notification: null, notificationBusy: false, discoveredChats: [], applications: [], applicationSummary: { total: 0, active: 0, counts: {} }, applicationBusy: new Set(), applicationDrafts: new Map(), pipelineOpen: false };
 const formatter = new Intl.NumberFormat("ru-RU");
 const applicationLabels = { saved: "Сохранено", applied: "Отклик отправлен", screening: "Скрининг", interview: "Интервью", offer: "Оффер", rejected: "Отказ", withdrawn: "Не актуально" };
 const pipelineColumns = [
@@ -36,6 +36,45 @@ async function api(path, payload, method = "POST") {
   const data = response.status === 204 ? null : await response.json();
   if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
   return data;
+}
+
+async function streamApi(path, payload, { signal, onEvent }) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
+    body: JSON.stringify(payload),
+    signal,
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `HTTP ${response.status}`);
+  }
+  if (!response.body) throw new Error("Браузер не поддерживает потоковые ответы");
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffered = "";
+  const consumeLines = async (final = false) => {
+    const lines = buffered.split("\n");
+    buffered = final ? "" : lines.pop();
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const event = JSON.parse(line);
+      if (event.type === "error") throw new Error(event.error || "Поток поиска завершился с ошибкой");
+      await onEvent(event);
+    }
+  };
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      buffered += decoder.decode(value || new Uint8Array(), { stream: !done });
+      await consumeLines(done);
+      if (done) break;
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }
 
 function queryKey(query) { return String(query || "").trim().replace(/\s+/g, " ").toLocaleLowerCase("ru-RU"); }
@@ -297,6 +336,7 @@ function sourceAuthText(source) {
     api_key_headers: "API-ключ + email",
     bearer_token: "Bearer-токен",
     bearer_token_user_id: "Bearer-токен + User ID",
+    subscription_key: "Subscription key",
     identified_user_agent: "Контактный User-Agent",
   }[source.authType] || source.authType;
 }
@@ -432,7 +472,7 @@ function renderSourceReport(refreshReport, sources) {
   const box = $("#sourceReport");
   if (!refreshReport.length) { box.classList.add("hidden"); return; }
   const names = new Map(sources.map((source) => [source.id, source.name]));
-  const label = { fulfilled: "обновлён", rejected: "ошибка", skipped: "пауза", disabled: "не настроен" };
+  const label = { fulfilled: "обновлён", rejected: "ошибка", skipped: "пауза", disabled: "не настроен", cancelled: "отменён" };
   const errorText = (value) => {
     if (value === "fetch failed") return "Нет сетевого доступа из текущего окружения";
     if (value?.includes("cloudflare_challenge")) return "Антибот-защита источника; повтор после паузы";
@@ -443,20 +483,78 @@ function renderSourceReport(refreshReport, sources) {
 }
 
 async function runSearch({ refresh = $("#refreshSources").checked } = {}) {
-  if (state.searching) return;
+  state.searchController?.abort();
+  const controller = new AbortController();
+  const sequence = state.searchSequence + 1;
+  state.searchController = controller;
+  state.searchSequence = sequence;
   state.searching = true;
+  state.refreshReport = [];
   $("#processing").classList.remove("hidden");
-  $("#processingText").textContent = refresh ? "Запрашиваем live API, нормализуем поля, проверяем риски и удаляем дубли…" : "Разбираем теги, оцениваем совпадения и сортируем результаты…";
+  $("#processingText").textContent = refresh ? "Показываем локальные данные и начинаем параллельный опрос источников…" : "Разбираем теги, оцениваем совпадения и сортируем результаты…";
+  let latestResponse = null;
+  let rendered = false;
+
+  const renderStreamResponse = (response) => {
+    if (!response || sequence !== state.searchSequence) return;
+    latestResponse = { ...response, refreshReport: [...state.refreshReport] };
+    renderQuery(latestResponse.query);
+    renderResults(latestResponse, { scroll: !rendered });
+    rendered = true;
+  };
+
   try {
-    const response = await api("/api/search", { query: $("#query").value, sort: sortSpec(), refresh, limit: 100 });
-    renderQuery(response.query); renderResults(response);
-    return response;
+    await streamApi("/api/search/stream", {
+      query: $("#query").value,
+      sort: sortSpec(),
+      refresh,
+      limit: 100,
+    }, {
+      signal: controller.signal,
+      onEvent: async (event) => {
+        if (sequence !== state.searchSequence) return;
+        if (event.type === "initial") {
+          renderStreamResponse(event.response);
+          const total = event.progress?.total || 0;
+          $("#processingText").textContent = refresh
+            ? `Локальная выдача уже показана. Проверено 0 из ${total} источников; новые вакансии появятся сразу после ответа каждого источника.`
+            : "Локальная выдача готова.";
+          return;
+        }
+        if (event.type === "progress") {
+          state.refreshReport.push(event.result);
+          if (event.response) renderStreamResponse(event.response);
+          else renderSourceReport(state.refreshReport, state.sources);
+          const completed = event.progress?.completed || state.refreshReport.length;
+          const total = event.progress?.total || completed;
+          const found = latestResponse?.total || 0;
+          $("#processingText").textContent = `Проверено ${completed} из ${total} источников · сейчас в выдаче ${found}. Результаты обновляются по мере поступления.`;
+          return;
+        }
+        if (event.type === "done") {
+          state.refreshReport = event.response?.refreshReport || state.refreshReport;
+          renderStreamResponse(event.response);
+          const completed = event.progress?.completed || 0;
+          const total = event.progress?.total || completed;
+          $("#processingText").textContent = refresh
+            ? `Готово: проверено ${completed} из ${total} источников, в выдаче ${latestResponse?.total || 0}.`
+            : `Готово: в выдаче ${latestResponse?.total || 0}.`;
+        }
+      },
+    });
+    return latestResponse;
   } catch (error) {
+    if (error.name === "AbortError" || sequence !== state.searchSequence) return null;
     $("#processingText").textContent = `Не удалось выполнить поиск: ${error.message}`;
     return null;
   } finally {
-    state.searching = false;
-    setTimeout(() => $("#processing").classList.add("hidden"), 500);
+    if (state.searchController === controller) {
+      state.searchController = null;
+      state.searching = false;
+      setTimeout(() => {
+        if (state.searchSequence === sequence && !state.searching) $("#processing").classList.add("hidden");
+      }, 700);
+    }
   }
 }
 
@@ -580,7 +678,7 @@ $("#savedSearchList").addEventListener("click", async (event) => {
 });
 
 const events = new EventSource("/api/events");
-events.addEventListener("jobs", () => { if ($("#watchSearch").checked && state.response) runSearch({ refresh: false }); });
+events.addEventListener("jobs", () => { if (!state.searching && $("#watchSearch").checked && state.response) runSearch({ refresh: false }); });
 events.addEventListener("source", (event) => {
   try {
     const changed = JSON.parse(event.data);

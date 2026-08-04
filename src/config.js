@@ -64,6 +64,8 @@ export const config = {
   navUsePublicToken: process.env.NAV_USE_PUBLIC_TOKEN === "true",
   navLookbackDays: Number(process.env.NAV_LOOKBACK_DAYS || 180),
   navMaxFeedPagesPerSync: Number(process.env.NAV_MAX_FEED_PAGES_PER_SYNC || 5),
+  jobMarketFinlandApiKey: process.env.JOBMARKET_FINLAND_API_KEY || "",
+  jobMarketFinlandMaxResponseBytes: Number(process.env.JOBMARKET_FINLAND_MAX_RESPONSE_BYTES || 64_000_000),
   reliefwebAppName: process.env.RELIEFWEB_APPNAME || "",
   adzunaAppId: process.env.ADZUNA_APP_ID || "",
   adzunaApiKey: process.env.ADZUNA_API_KEY || "",
@@ -104,5 +106,6 @@ export const config = {
   applicationStorePath: path.join(rootDir, "data", "application-store.json"),
   hhEmailStatePath: path.join(rootDir, "data", "hh-email-state.json"),
   navStatePath: path.join(rootDir, "data", "nav-feed-state.json"),
+  jobMarketFinlandStatePath: path.join(rootDir, "data", "job-market-finland-state.json"),
   demoPath: path.join(rootDir, "data", "demo-jobs.json"),
 };

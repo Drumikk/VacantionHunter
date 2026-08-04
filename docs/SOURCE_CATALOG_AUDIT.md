@@ -10,16 +10,16 @@
 
 ## Реальное состояние приложения
 
-После текущего расширения оркестратор знает 208 независимо наблюдаемых источников при стандартной конфигурации: 38 API/RSS/feed/policy-источников плюс 170 конкретных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters. Из них 180 работают без новых credentials, остальные явно показывают требуемую настройку. Каждый источник имеет отдельные health, timeout, retry и cooldown; общее число одновременных опросов ограничено `SOURCE_CONCURRENCY`, поэтому падение или медленный ответ одной компании не останавливает остальные и не создаёт сетевой шторм.
+После текущего расширения оркестратор знает 210 независимо наблюдаемых источников при стандартной конфигурации: 40 API/RSS/feed/policy-источников плюс 170 конкретных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters. Из них 180 работают без новых credentials, остальные явно показывают требуемую настройку. Каждый источник имеет отдельные health, timeout, retry и cooldown; общее число одновременных опросов ограничено `SOURCE_CONCURRENCY`, поэтому падение или медленный ответ одной компании не останавливает остальные и не создаёт сетевой шторм.
 
 | Слой | Подключено | Доступ | Примечание |
 |---|---:|---|---|
-| Государственные API/feed | 6 | «Работа России» и JobTech без ключа; USAJOBS, CareerOneStop, France Travail и Arbeidsplassen/NAV с credentials | Самые устойчивые и юридически прозрачные данные; NAV поддерживает обновления и удаления через lifecycle-feed |
+| Государственные API/feed | 7 | «Работа России» и JobTech без ключа; USAJOBS, CareerOneStop, France Travail, Arbeidsplassen/NAV и Job Market Finland с credentials | Самые устойчивые и юридически прозрачные данные; NAV и Finland поддерживают обновления и удаления через lifecycle-feed |
 | Глобальные/remote API и RSS | 7 | Remotive, Arbeitnow, Remote OK, WWR, HN, Himalayas, Jobicy без пользовательского логина | Атрибуция сохраняется, Jobicy опрашивается не чаще раза в час, HTML login scraping не используется |
 | Агрегаторы и региональные API | 20 | Jooble + 16 стран Adzuna + Reed + SuperJob + The Muse | Adzuna, Reed и SuperJob включаются после добавления ключей; The Muse работает анонимно, а необязательный ключ повышает квоту |
 | Международные организации | 1 | ReliefWeb с одобренным `appname` | Подключается одной переменной окружения |
 | Публичные ATS работодателей | 170 board | Без пользовательского логина | Greenhouse 67, Ashby 39, Lever 12, Recruitee 7, Workable 19, Personio 16, SmartRecruiters 10 |
-| Ограниченные платформы | 4 | HH API/email, LinkedIn, Indeed | HH необязателен; LinkedIn/Indeed отключены без партнёрства |
+| Ограниченные платформы | 5 | HH API/email, LinkedIn, Indeed, Levels.fyi Jobs | HH необязателен; LinkedIn/Indeed/Levels.fyi отключены без разрешённого партнёрского канала |
 
 ## Что добавлено в этой итерации
 
@@ -40,6 +40,8 @@
 | France Travail | официальный API активных вакансий | OAuth client credentials | реализован; до настройки пары `FRANCE_TRAVAIL_CLIENT_ID`/`FRANCE_TRAVAIL_CLIENT_SECRET` виден как disabled |
 | CareerOneStop | официальный Jobs V2 API Министерства труда США | User ID + Bearer API token | реализован; list → локальный prefilter → ограниченный detail, одинаковые запросы кэшируются |
 | Arbeidsplassen/NAV | официальный непрерывный feed вакансий Норвегии | production Bearer token NAV; публичный token только для экспериментов | реализован и live-проверен: cursor/ETag, релевантный detail, ACTIVE/INACTIVE, write-ahead replay и удаление закрытых вакансий |
+| Job Market Finland | официальный KEHA Job Posting Search API v2, NDJSON | `KIPA-Subscription-Key`, выдаваемый после регистрации организации | реализован и покрыт fixtures/unit: полный PUBLISHED snapshot, затем PUBLISHED/ARCHIVED delta, write-ahead replay и удаление закрытых вакансий; live ждёт ключ и allowlist |
+| Levels.fyi Jobs | публичная доска, но без открытого jobs API | только письменное API/feed-разрешение | зарегистрирован как `partner-only`: Terms запрещают автоматический scraping, опубликованный API/MCP относится к compensation data и не подменяется вакансионным API |
 | Workable | официальный публичный careers endpoint | нет | generic-адаптер + 19 company boards, каждая live-проверена структурированным JSON |
 | The Muse | официальный публичный Jobs API | необязательный API key | реализован: категоризация запроса, 2 страницы на категорию, локальная точная фильтрация и часовой кэш |
 | Personio | официальный XML feed карьерной страницы | нет | generic-адаптер + 16 европейских и трансатлантических company boards |
@@ -52,11 +54,11 @@
 Количество покрываемых сайтов следует увеличивать слоями, а не писать сотни хрупких HTML-парсеров.
 
 1. Один адаптер на ATS-платформу. Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters уже дают 170 отдельных источников. Следующие высокоэффективные шаги — дополнительные проверенные slugs существующих адаптеров и только документированные career endpoints новых ATS-семейств. Для каждой компании хранится только slug и метаданные.
-2. Официальные государственные API. France Travail и lifecycle-feed Arbeidsplassen/NAV уже реализованы. EURES требует одобренного партнёрского канала, а открытая выгрузка Canada Job Bank — это аналитический CSV без ID работодателя и прямых apply URL, поэтому оба источника не маскируются под полноценный live search API.
+2. Официальные государственные API. France Travail и lifecycle-feed Arbeidsplassen/NAV и Job Market Finland уже реализованы. EURES требует одобренного партнёрского канала, а открытая выгрузка Canada Job Bank — это аналитический CSV без ID работодателя и прямых apply URL, поэтому оба источника не маскируются под полноценный live search API.
 3. API-ключи агрегаторов. Adzuna, Reed и SuperJob уже имеют готовые адаптеры и подключаются после регистрации; для следующих сервисов сначала проверяются лицензия, квоты и требования к атрибуции.
 4. RSS/Atom/JSON feeds. Подключаются общим feed-адаптером с allowlist, лимитом размера, XML-защитой, условными запросами и обязательной ссылкой на источник.
 5. Разрешённый HTML. Отдельный адаптер возможен лишь после проверки robots.txt и условий использования; без обхода CAPTCHA, Cloudflare, login wall и rate limits.
-6. Партнёрские источники. LinkedIn, Indeed, закрытые freelance-площадки и другие login-only сайты остаются отключёнными, пока нет официального API/OAuth/feed соглашения.
+6. Партнёрские источники. LinkedIn, Indeed, Levels.fyi Jobs, закрытые freelance-площадки и другие restricted-сайты остаются отключёнными, пока нет официального API/OAuth/feed соглашения.
 
 ## Очередь расширения
 

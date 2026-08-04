@@ -7,6 +7,7 @@ data/notification-outbox.json
 data/application-store.json
 data/hh-email-state.json
 data/nav-feed-state.json
+data/job-market-finland-state.json
 data/*.tmp
 coverage/
 outputs/

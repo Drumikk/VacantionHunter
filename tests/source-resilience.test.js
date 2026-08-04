@@ -148,6 +148,61 @@ test("refresh limits total source concurrency while preserving report order", as
   assert.deepEqual(report.map((item) => item.source), connectors.map((item) => item.id));
 });
 
+test("refresh publishes source progress in completion order", async () => {
+  const connectors = [
+    { id: "slow", delay: 30 },
+    { id: "fast", delay: 5 },
+    { id: "medium", delay: 15 },
+  ].map(({ id, delay }) => ({
+    id,
+    name: id,
+    async search() {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return [];
+    },
+  }));
+  const service = new JobService({
+    connectors,
+    store: { jobs: [], async load() {}, async merge() {} },
+    config: { sourceConcurrency: 3, sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+  const progress = [];
+
+  const report = await service.refresh("backend developer", {
+    onProgress(result, state) { progress.push({ source: result.source, ...state }); },
+  });
+
+  assert.deepEqual(report.map((item) => item.source), ["slow", "fast", "medium"]);
+  assert.deepEqual(progress.map((item) => item.source), ["fast", "medium", "slow"]);
+  assert.deepEqual(progress.map((item) => item.completed), [1, 2, 3]);
+  assert.deepEqual(progress.map((item) => item.total), [3, 3, 3]);
+});
+
+test("refresh cancellation prevents queued sources from starting", async () => {
+  const calls = [];
+  const connectors = ["first", "second", "third"].map((id) => ({
+    id,
+    name: id,
+    async search() { calls.push(id); return []; },
+  }));
+  const service = new JobService({
+    connectors,
+    store: { jobs: [], async load() {}, async merge() {} },
+    config: { sourceConcurrency: 1, sourceAuthCooldownMs: 60_000, sourceRateLimitCooldownMs: 30_000, sourceErrorCooldownMs: 1_000 },
+  });
+  const controller = new AbortController();
+
+  const report = await service.refresh("backend developer", {
+    signal: controller.signal,
+    onProgress(result) {
+      if (result.source === "first") controller.abort();
+    },
+  });
+
+  assert.deepEqual(calls, ["first"]);
+  assert.deepEqual(report.map((item) => item.status), ["fulfilled", "cancelled", "cancelled"]);
+});
+
 test("creates an independently observable connector for every ATS board", () => {
   const connectors = createConnectors({
     enableLiveSources: true,
@@ -246,6 +301,7 @@ test("commits lifecycle changes before acknowledging a source cursor", async () 
 
   const report = await service.refresh("software engineer");
   assert.equal(report[0].status, "fulfilled");
+  assert.equal(report[0].changed, true);
   assert.deepEqual(events, [
     ["apply", "lifecycle", ["one"], ["one", "closed"]],
     ["acknowledge", "batch-one"],

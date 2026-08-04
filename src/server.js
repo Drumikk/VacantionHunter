@@ -36,6 +36,112 @@ async function body(req) {
   return value ? JSON.parse(value) : {};
 }
 
+function createNdjsonWriter(res) {
+  res.writeHead(200, {
+    "Content-Type": "application/x-ndjson; charset=utf-8",
+    "Cache-Control": "no-store, no-transform",
+    Connection: "keep-alive",
+    "X-Accel-Buffering": "no",
+  });
+  res.flushHeaders?.();
+
+  let closed = false;
+  let queue = Promise.resolve(true);
+  res.on("close", () => { closed = true; });
+  res.on("error", () => { closed = true; });
+
+  const write = (event) => {
+    queue = queue.then(async () => {
+      if (closed || res.destroyed || res.writableEnded) return false;
+      try {
+        if (res.write(`${JSON.stringify(event)}\n`)) return true;
+        return await new Promise((resolve) => {
+          const cleanup = () => {
+            res.off("drain", onDrain);
+            res.off("close", onClose);
+            res.off("error", onClose);
+          };
+          const onDrain = () => { cleanup(); resolve(true); };
+          const onClose = () => { cleanup(); resolve(false); };
+          res.once("drain", onDrain);
+          res.once("close", onClose);
+          res.once("error", onClose);
+        });
+      } catch {
+        closed = true;
+        return false;
+      }
+    });
+    return queue;
+  };
+
+  return {
+    get closed() { return closed || res.destroyed || res.writableEnded; },
+    write,
+    async end() {
+      await queue;
+      if (!closed && !res.destroyed && !res.writableEnded) res.end();
+    },
+  };
+}
+
+async function streamSearch(req, res, data) {
+  const query = service.parse(data.query);
+  const sort = data.sort || [];
+  const limit = data.limit || 100;
+  const refresh = Boolean(data.refresh);
+  const totalSources = refresh ? service.getSources().filter((source) => source.refreshable).length : 0;
+  const controller = new AbortController();
+  res.on("close", () => {
+    if (!res.writableEnded) controller.abort();
+  });
+  const writer = createNdjsonWriter(res);
+
+  try {
+    const initial = service.searchSnapshot(query, { sort, limit });
+    const opened = await writer.write({
+      type: "initial",
+      response: initial,
+      progress: { completed: 0, total: totalSources },
+    });
+    if (!opened) {
+      controller.abort();
+      return;
+    }
+
+    if (!refresh) {
+      await writer.write({ type: "done", response: initial, progress: { completed: 0, total: 0 } });
+      return;
+    }
+
+    const finalReport = await service.refresh(query, {
+      signal: controller.signal,
+      onProgress: async (result, progress) => {
+        if (writer.closed) {
+          controller.abort();
+          return;
+        }
+        const response = result.status === "fulfilled" && result.changed
+          ? service.searchSnapshot(query, { sort, limit })
+          : null;
+        const written = await writer.write({ type: "progress", result, progress, response });
+        if (!written) controller.abort();
+      },
+    });
+    if (controller.signal.aborted || writer.closed) return;
+
+    await writer.write({
+      type: "done",
+      response: service.searchSnapshot(query, { sort, limit, refreshReport: finalReport }),
+      progress: { completed: finalReport.length, total: totalSources },
+    });
+  } catch (error) {
+    if (!writer.closed) await writer.write({ type: "error", error: error.message });
+  } finally {
+    await writer.end();
+  }
+}
+
 async function serveStatic(urlPath, res) {
   const requested = urlPath === "/" ? "index.html" : decodeURIComponent(urlPath.slice(1));
   const resolved = path.resolve(publicDir, requested);
@@ -73,6 +179,12 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (req.method === "POST" && url.pathname === "/api/parse-query") { const data = await body(req); return json(res, 200, service.parse(data.query)); }
+    if (req.method === "POST" && url.pathname === "/api/search/stream") {
+      const data = await body(req);
+      if (!data.query?.trim()) return json(res, 400, { error: "Введите поисковый запрос" });
+      await streamSearch(req, res, data);
+      return;
+    }
     if (req.method === "POST" && url.pathname === "/api/search") { const data = await body(req); if (!data.query?.trim()) return json(res, 400, { error: "Введите поисковый запрос" }); return json(res, 200, await service.search({ rawQuery: data.query, sort: data.sort || [], refresh: Boolean(data.refresh), limit: data.limit || 100 })); }
     const sourceCheck = url.pathname.match(/^\/api\/sources\/([^/]+)\/check$/);
     if (req.method === "POST" && sourceCheck) { const data = await body(req); return json(res, 200, await service.checkSource(decodeURIComponent(sourceCheck[1]), data.query)); }

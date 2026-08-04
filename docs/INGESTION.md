@@ -91,6 +91,23 @@ $env:NAV_LOOKBACK_DAYS='1'
 npm run smoke:live -- --source=nav-norway "sykepleier"
 ```
 
+### Job Market Finland — официальный lifecycle-feed
+
+1. Подать заявку организации через [инструкцию Job Market Finland](https://tyomarkkinatori.fi/en/instructions-and-support/interfaces/interfaces-for-job-postings). KEHA проверяет Business ID, сначала выдаёт тестовый, затем production-доступ.
+2. Выполнить требования KEHA к сетевому доступу и сохранить выданный `KIPA-Subscription-Key` только в локальном `.env`.
+3. Указать ключ и перезапустить сервер:
+
+```powershell
+$env:JOBMARKET_FINLAND_API_KEY='выданный-subscription-key'
+npm run smoke:live -- --source=job-market-finland "software engineer"
+```
+
+Первый успешный запрос получает полный NDJSON snapshot объявлений `PUBLISHED`; следующие используют интервалы изменения для `PUBLISHED` и `ARCHIVED`. Batch сначала сохраняется как pending, затем атомарно заменяет/изменяет provenance источника в `JobStore` и только после этого подтверждает cursor. Обязательная атрибуция «Job Market Finland’s customer information system» сохраняется в каждой вакансии. Данные нельзя пересылать третьим сторонам вне разрешённого e-service без отдельного согласования.
+
+### Levels.fyi Jobs — только партнёрский канал
+
+Доска <https://www.levels.fyi/jobs> присутствует в каталоге, но автоматический HTML scraping не включён: [Terms](https://www.levels.fyi/about/terms.html) запрещают scraping/crawlers/data mining. Опубликованный [API access](https://www.levels.fyi/api-access/) относится к compensation data, а не к выдаче вакансий. Коннектор `levels-fyi` останется `partner-only`, пока Levels.fyi письменно не предоставит jobs API/feed и разрешение на этот сценарий.
+
 Текущая карта реализованных и следующих источников: [аудит каталога](SOURCE_CATALOG_AUDIT.md).
 
 ### Jooble — рекомендуется первым
@@ -209,6 +226,8 @@ Telegram подключается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_C
 - Personio open positions XML feed: <https://developer.personio.de/docs/retrieving-open-job-positions>
 - SmartRecruiters Posting API: <https://developers.smartrecruiters.com/docs/posting-api>
 - France Travail API Offres d'emploi: <https://www.data.gouv.fr/dataservices/api-offres-demploi>
+- Job Market Finland onboarding, search API and terms: <https://tyomarkkinatori.fi/en/instructions-and-support/interfaces/interfaces-for-job-postings>, <https://tyomarkkinatori.fi/jobpostingprovider/documentation/KIPA-search-jobpostings-en.html>, <https://tyomarkkinatori.fi/en/instructions-and-support/interfaces/interfaces-for-job-postings/terms-of-use-for-job-market-finlands-job-posting-apis>
+- Levels.fyi Jobs, Terms and API access: <https://www.levels.fyi/jobs>, <https://www.levels.fyi/about/terms.html>, <https://www.levels.fyi/api-access/>
 - LinkedIn User Agreement: <https://www.linkedin.com/legal/user-agreement>
 - LinkedIn partner Jobs API: <https://learn.microsoft.com/en-us/linkedin/talent/apply-connect/create-apply-connect-jobs>
 - Indeed Partner API guides: <https://docs.indeed.com/api-guides/>

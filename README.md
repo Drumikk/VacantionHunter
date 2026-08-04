@@ -12,7 +12,7 @@
 - ранжирование: полные обязательные совпадения → взвешенная релевантность → зарплата → свежесть → надёжность;
 - дедупликация по ID источника, canonical URL, fingerprint и fuzzy title/company/location;
 - проверка вакансии по происхождению, компании, сроку, HTTP/JobPosting и риск-фразам;
-- 208 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, официальный непрерывный feed Arbeidsplassen/NAV, 16 рынков Adzuna, публичные API The Muse и CareerOneStop и 170 live-проверенных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters; HH оставлен как необязательный резервный канал;
+- 210 независимо наблюдаемых источников в стандартной конфигурации: государственные и remote API, официальные lifecycle-feed Arbeidsplassen/NAV и Job Market Finland, 16 рынков Adzuna, публичные API The Muse и CareerOneStop и 170 live-проверенных карьерных досок Greenhouse/Ashby/Lever/Recruitee/Workable/Personio/SmartRecruiters; HH оставлен как необязательный резервный канал, а Levels.fyi явно отмечен как partner-only;
 - явные policy-статусы для LinkedIn и Indeed: они не скрейпятся без официального партнёрского доступа;
 - локальный демонстрационный набор для офлайн-режима; при включённых live-источниках он по умолчанию не смешивается с реальной выдачей;
 - сохраняемые наблюдения за поиском: отдельное JSON-хранилище, фоновые обновления и SSE-уведомления для опции «следить за новыми»;
@@ -32,6 +32,10 @@ pnpm start
 ```
 
 Открыть `http://127.0.0.1:4173`.
+
+Подробный пошаговый запуск из обычного Windows PowerShell, проверка внешней сети и разбор ошибок: [запуск вне песочницы](docs/RUNNING_LOCALLY.md).
+
+Поиск использует потоковый `POST /api/search/stream`: локальные совпадения появляются сразу, а выдача и отчёт источников обновляются после каждого завершившегося коннектора. Новый поиск отменяет оставшуюся очередь предыдущего запроса.
 
 Для быстрого офлайн-запуска:
 
@@ -72,6 +76,8 @@ NAV_API_TOKEN=выданный_NAV_bearer_token
 NAV_USE_PUBLIC_TOKEN=false
 NAV_LOOKBACK_DAYS=180
 NAV_MAX_FEED_PAGES_PER_SYNC=5
+JOBMARKET_FINLAND_API_KEY=выданный_KEHA_subscription_key
+JOBMARKET_FINLAND_MAX_RESPONSE_BYTES=64000000
 RELIEFWEB_APPNAME=предварительно_одобренное_имя_приложения
 ADZUNA_APP_ID=идентификатор_приложения
 ADZUNA_API_KEY=полученный_ключ

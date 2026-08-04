@@ -1,4 +1,4 @@
-function restrictedSource({ id, name, attributionUrl, setupUrl, note }) {
+function restrictedSource({ id, name, attributionUrl, setupUrl, note, regions = ["global"] }) {
   const disabledReason = `Требуется официальный партнёрский доступ: ${setupUrl}`;
   return {
     id,
@@ -6,6 +6,7 @@ function restrictedSource({ id, name, attributionUrl, setupUrl, note }) {
     attributionUrl,
     setupUrl,
     note,
+    regions,
     adapter: "partner-only",
     authType: "partner",
     credentialFields: [],
@@ -31,6 +32,14 @@ export function restrictedConnectors() {
       attributionUrl: "https://www.indeed.com/",
       setupUrl: "https://docs.indeed.com/",
       note: "Публичного API поисковой выдачи нет; для получения вакансий нужен одобренный партнёрский feed/API.",
+    }),
+    restrictedSource({
+      id: "levels-fyi",
+      name: "Levels.fyi Jobs",
+      attributionUrl: "https://www.levels.fyi/jobs",
+      setupUrl: "https://www.levels.fyi/api-access/",
+      note: "Job board существует, но Terms запрещают scraping; опубликованный API/MCP относится к compensation data. Автоматическая вакансионная интеграция включается только после письменного API/feed-разрешения Levels.fyi.",
+      regions: ["global", "europe", "americas", "oceania"],
     }),
   ];
 }

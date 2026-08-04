@@ -101,14 +101,22 @@ export class JobService extends EventEmitter {
       const jobs = rawJobs.map((job) => ({ ...job, verification: assessJob(job), ingestedAt: new Date().toISOString() }));
       if (lifecycleBatch) {
         if (typeof this.store.applySourceChanges !== "function") throw new Error(`${connector.name} requires a lifecycle-aware job store`);
-        await this.store.applySourceChanges(connector.id, jobs, { changedExternalIds: lifecycleBatch.changedExternalIds || [] });
+        await this.store.applySourceChanges(connector.id, jobs, {
+          changedExternalIds: lifecycleBatch.changedExternalIds || [],
+          replaceSourceSnapshot: Boolean(lifecycleBatch.replaceSourceSnapshot),
+        });
         await connector.acknowledge?.(lifecycleBatch.syncToken);
       } else {
         await this.store.merge(jobs);
       }
       Object.assign(status, { status: "ok", lastSuccessAt: new Date().toISOString(), count: jobs.length, failureCount: 0, cooldownUntil: null, diagnostics: connector.getDiagnostics?.() || null });
       this.emit("jobs", { source: connector.id, count: jobs.length, query: query.raw });
-      return jobs;
+      return {
+        jobs,
+        changed: lifecycleBatch
+          ? Boolean(jobs.length || lifecycleBatch.changedExternalIds?.length || lifecycleBatch.replaceSourceSnapshot)
+          : jobs.length > 0,
+      };
     } catch (error) {
       const failureCount = status.failureCount + 1;
       const cooldown = nextCooldown(error, failureCount, this.config);
@@ -127,24 +135,32 @@ export class JobService extends EventEmitter {
     }
   }
 
-  async refresh(rawQuery, { sourceIds = null } = {}) {
+  async refresh(rawQuery, { sourceIds = null, onProgress = null, signal = null } = {}) {
     const query = typeof rawQuery === "string" ? this.parse(rawQuery) : rawQuery;
     if (query.raw && !this.lastQueries.includes(query.raw)) this.lastQueries = [query.raw, ...this.lastQueries].slice(0, 10);
     const selected = this.connectors.filter((connector) => connector.id !== "demo" && (!sourceIds || sourceIds.includes(connector.id)));
+    let completed = 0;
     return mapConcurrent(selected, this.config.sourceConcurrency || 16, async (connector) => {
       const status = this.sourceStatus.get(connector.id);
-      if (connector.enabled === false) {
-        return { source: connector.id, status: "disabled", count: 0, error: connector.disabledReason };
+      let result;
+      if (signal?.aborted) {
+        result = { source: connector.id, status: "cancelled", count: 0, error: null };
+      } else if (connector.enabled === false) {
+        result = { source: connector.id, status: "disabled", count: 0, error: connector.disabledReason };
+      } else if (status.cooldownUntil && Date.parse(status.cooldownUntil) > Date.now()) {
+        result = { source: connector.id, status: "skipped", count: 0, error: status.lastError, cooldownUntil: status.cooldownUntil };
+      } else {
+        try {
+          const ingestion = await this.ingestConnector(connector, query);
+          result = { source: connector.id, status: "fulfilled", count: ingestion.jobs.length, changed: ingestion.changed, error: null };
+        } catch (error) {
+          result = { source: connector.id, status: "rejected", count: 0, error: error.message, cooldownUntil: status.cooldownUntil };
+        }
       }
-      if (status.cooldownUntil && Date.parse(status.cooldownUntil) > Date.now()) {
-        return { source: connector.id, status: "skipped", count: 0, error: status.lastError, cooldownUntil: status.cooldownUntil };
-      }
-      try {
-        const jobs = await this.ingestConnector(connector, query);
-        return { source: connector.id, status: "fulfilled", count: jobs.length, error: null };
-      } catch (error) {
-        return { source: connector.id, status: "rejected", count: 0, error: error.message, cooldownUntil: status.cooldownUntil };
-      }
+
+      completed += 1;
+      if (onProgress) await onProgress(result, { completed, total: selected.length });
+      return result;
     });
   }
 
@@ -164,12 +180,18 @@ export class JobService extends EventEmitter {
     return { result, source: this.sourceStatus.get(id) };
   }
 
+  searchSnapshot(rawQuery, { sort = [], limit = 100, refreshReport = [] } = {}) {
+    const query = typeof rawQuery === "string" ? this.parse(rawQuery) : rawQuery;
+    const safeLimit = Math.min(Math.max(0, Number(limit) || 100), 250);
+    const results = rankJobs(this.searchableJobs(), query, { sort }).filter((job) => isRelevantMatch(job, query)).slice(0, safeLimit);
+    return { query, total: results.length, results, refreshReport, sources: this.getSources() };
+  }
+
   async search({ rawQuery, sort = [], refresh = false, limit = 100 }) {
     const query = this.parse(rawQuery);
     let refreshReport = [];
     if (refresh) refreshReport = await this.refresh(query);
-    const results = rankJobs(this.searchableJobs(), query, { sort }).filter((job) => isRelevantMatch(job, query)).slice(0, Math.min(limit, 250));
-    return { query, total: results.length, results, refreshReport, sources: this.getSources() };
+    return this.searchSnapshot(query, { sort, limit, refreshReport });
   }
 
   async addWatch(rawQuery) {

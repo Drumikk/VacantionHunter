@@ -31,7 +31,7 @@ export class JobStore {
     return operation;
   }
 
-  async applySourceChanges(sourceId, jobs, { changedExternalIds = [] } = {}) {
+  async applySourceChanges(sourceId, jobs, { changedExternalIds = [], replaceSourceSnapshot = false } = {}) {
     const operation = this.#mergeQueue.then(async () => {
       const affectedKeys = new Set([
         ...changedExternalIds.map((externalId) => `${sourceId}:${externalId}`),
@@ -39,7 +39,7 @@ export class JobStore {
       ]);
       this.#jobs = this.#jobs.filter((job) => {
         const provenanceKeys = job.provenanceKeys || [`${job.source?.id || "unknown"}:${job.externalId || job.id}`];
-        return !provenanceKeys.some((key) => affectedKeys.has(key));
+        return !provenanceKeys.some((key) => affectedKeys.has(key) || replaceSourceSnapshot && key.startsWith(`${sourceId}:`));
       });
       this.#jobs = deduplicateJobs([...this.#jobs, ...jobs]);
       await this.save();
