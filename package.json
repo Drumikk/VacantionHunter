@@ -10,7 +10,8 @@
     "dev": "node --watch src/server.js",
     "test": "node --test",
     "check": "node --check src/server.js && node --test",
-    "smoke:live": "node scripts/smoke-live.mjs"
+    "smoke:live": "node scripts/smoke-live.mjs",
+    "audit:russian-sources": "node scripts/audit-russian-company-sources.mjs"
   },
   "engines": {
     "node": ">=20"

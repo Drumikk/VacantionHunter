@@ -1,0 +1,1327 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "file": "Airtable - Global [Russian] Companies list.pdf",
+    "exportedAt": "2023-03-15",
+    "publicView": "https://airtable.com/shr1aPoPcWthHqCxB/tblk3YFaWOqtMnb7R/viwA0vLIAS21vkGv0",
+    "rowCount": 202
+  },
+  "policy": {
+    "linkedin": "exclude",
+    "blankJobSite": "catalog-only"
+  },
+  "research": {
+    "checkedAt": "2026-08-11",
+    "supplementalSources": {
+      "22": [
+        {
+          "url": "https://careers.epam.com/en/jobs",
+          "kind": "official-career-site",
+          "status": "active"
+        }
+      ],
+      "31": [
+        {
+          "url": "https://career.quantori.com/",
+          "kind": "official-career-site",
+          "status": "active"
+        }
+      ],
+      "82": [
+        {
+          "url": "https://jobs.ashbyhq.com/salmon-group",
+          "kind": "official-ats",
+          "status": "active",
+          "evidenceUrl": "https://careers.salmon.ph/open-roles"
+        }
+      ],
+      "86": [
+        {
+          "url": "https://anna.money/careers/",
+          "kind": "official-career-site",
+          "status": "active-empty",
+          "integration": "teamtailor-public-widget"
+        }
+      ],
+      "88": [
+        {
+          "url": "https://plata.careers/vacancy",
+          "kind": "official-career-site",
+          "status": "active",
+          "companyAlias": "Plata"
+        }
+      ],
+      "139": [
+        {
+          "url": "https://between-pro.com/vacancies",
+          "kind": "official-career-site",
+          "status": "active-empty"
+        }
+      ],
+      "143": [
+        {
+          "url": "https://join.com/companies/yoffix",
+          "kind": "official-ats",
+          "status": "active"
+        }
+      ],
+      "151": [
+        {
+          "url": "https://buddy.ai/en/careers",
+          "kind": "official-career-site",
+          "status": "unreachable-from-audit-environment"
+        }
+      ],
+      "160": [
+        {
+          "url": "https://colife.ru/vacancies",
+          "kind": "official-career-site",
+          "status": "active"
+        }
+      ],
+      "180": [
+        {
+          "url": "https://hire.bonrepublic.com/",
+          "kind": "official-career-site",
+          "status": "active-empty"
+        }
+      ]
+    },
+    "unresolved": [
+      { "row": 29, "company": "Borzo", "reason": "no-current-corporate-career-site-found" },
+      { "row": 42, "company": "Refocus", "reason": "former-career-url-is-closed" },
+      { "row": 107, "company": "SpatialChat", "reason": "official-career-path-returns-not-found" },
+      { "row": 145, "company": "AMMA", "reason": "official-career-path-returns-not-found" },
+      { "row": 148, "company": "SegmentStream", "reason": "linkedin-only-in-pdf-and-former-career-pages-redirect-home" },
+      { "row": 152, "company": "Coding Invaders", "reason": "no-verifiable-current-career-site-found" },
+      { "row": 153, "company": "Revealbot", "reason": "rebranded-company-has-no-current-career-page" },
+      { "row": 163, "company": "Victa", "reason": "linkedin-only-in-pdf-and-company-site-is-ambiguous" },
+      { "row": 164, "company": "Conte.ai", "reason": "no-current-career-page-found" },
+      { "row": 165, "company": "Brickit", "reason": "official-career-path-is-a-soft-404" },
+      { "row": 169, "company": "Headframe", "reason": "official-career-path-returns-not-found" },
+      { "row": 170, "company": "PharmBonus", "reason": "official-career-path-returns-not-found" },
+      { "row": 171, "company": "Mad Curve", "reason": "official-career-path-returns-not-found" },
+      { "row": 172, "company": "IVM Markets", "reason": "official-career-path-returns-not-found" },
+      { "row": 173, "company": "LF.Group", "reason": "separate-career-site-not-found-after-acquisition" },
+      { "row": 175, "company": "Moeco", "reason": "official-career-path-returns-not-found" },
+      { "row": 189, "company": "InTone", "reason": "company-site-is-ambiguous" },
+      { "row": 192, "company": "Zarta", "reason": "official-site-has-no-career-section" },
+      { "row": 193, "company": "not8", "reason": "company-is-no-longer-active" },
+      { "row": 199, "company": "Green Growth", "reason": "no-current-career-page-found" }
+    ]
+  },
+  "rows": [
+    {
+      "row": 1,
+      "rowId": "recybG169unRP3nMl",
+      "company": "",
+      "jobSite": ""
+    },
+    {
+      "row": 2,
+      "rowId": "reccdZb7xXJkz8xX6",
+      "company": "",
+      "jobSite": ""
+    },
+    {
+      "row": 3,
+      "rowId": "recfxn2SCxBl0yWxY",
+      "company": "Miro",
+      "jobSite": "https://miro.com/careers/open-positions/"
+    },
+    {
+      "row": 4,
+      "rowId": "recYDrtXHMkwwuIIW",
+      "company": "Semrush",
+      "jobSite": "https://careers.semrush.com/en/jobs/"
+    },
+    {
+      "row": 5,
+      "rowId": "recZRTzEqKaaODRBd",
+      "company": "Wrike",
+      "jobSite": "https://www.wrike.com/jobs/"
+    },
+    {
+      "row": 6,
+      "rowId": "recFdnzJZlIM63Ebw",
+      "company": "Acronis",
+      "jobSite": "https://www.acronis.com/en-us/careers/"
+    },
+    {
+      "row": 7,
+      "rowId": "recmCxilL4x49ntqJ",
+      "company": "Jetbrains",
+      "jobSite": "https://www.jetbrains.com/careers/jobs/"
+    },
+    {
+      "row": 8,
+      "rowId": "recanFnlmhZllyNss",
+      "company": "inDrive",
+      "jobSite": "https://indrive.com/en/career/"
+    },
+    {
+      "row": 9,
+      "rowId": "reczTMzrvcZxqSOKX",
+      "company": "Picsart",
+      "jobSite": "https://picsart.com/jobs/vacancies"
+    },
+    {
+      "row": 10,
+      "rowId": "rec2Gvzl34VEdXxzH",
+      "company": "Lightspeed eCom (ex-Ecwid)",
+      "jobSite": "https://boards.greenhouse.io/lightspeedhq"
+    },
+    {
+      "row": 11,
+      "rowId": "recohS62LpgXeLWvW",
+      "company": "Revolut",
+      "jobSite": "https://www.revolut.com/careers/"
+    },
+    {
+      "row": 12,
+      "rowId": "recrAdrOpvf4eAcLm",
+      "company": "Affirm",
+      "jobSite": "https://www.affirm.com/careers"
+    },
+    {
+      "row": 13,
+      "rowId": "rectbggGyQ1T6WhTi",
+      "company": "Noom",
+      "jobSite": "https://noom.eightfold.ai/careers"
+    },
+    {
+      "row": 14,
+      "rowId": "rec5wnf8xfNRhgQxq",
+      "company": "Exness",
+      "jobSite": "https://exness-careers.com/jobs/"
+    },
+    {
+      "row": 15,
+      "rowId": "rec7yVDZa433LjEyO",
+      "company": "Arrival",
+      "jobSite": "https://talent.arrival.com/"
+    },
+    {
+      "row": 16,
+      "rowId": "reciFUtboCBXvdZlS",
+      "company": "Personio",
+      "jobSite": "https://www.personio.com/about-personio/careers/"
+    },
+    {
+      "row": 17,
+      "rowId": "recDK5syUqqxBOH71",
+      "company": "GoPuff",
+      "jobSite": "https://www.gopuff.com/go/careers"
+    },
+    {
+      "row": 18,
+      "rowId": "recIsEq99pXmooGIT",
+      "company": "Playrix",
+      "jobSite": "https://playrix.com/job/open/"
+    },
+    {
+      "row": 19,
+      "rowId": "recOpN2ZiwXZNsIk0",
+      "company": "Wargaming",
+      "jobSite": "https://wargaming.com/en/careers/"
+    },
+    {
+      "row": 20,
+      "rowId": "recrf9LcR5DWmtFbr",
+      "company": "ABBYY",
+      "jobSite": "https://www.abbyy.com/company/careers/open-positions/"
+    },
+    {
+      "row": 21,
+      "rowId": "rec2Zc6VlL7zDN3Yr",
+      "company": "Luxoft",
+      "jobSite": "https://career.luxoft.com/"
+    },
+    {
+      "row": 22,
+      "rowId": "recx0AH241cKp3jo0",
+      "company": "EPAM",
+      "jobSite": ""
+    },
+    {
+      "row": 23,
+      "rowId": "rec8PLR2fJH5XcyOC",
+      "company": "Playkot",
+      "jobSite": "https://ru.playkot.com/jobs"
+    },
+    {
+      "row": 24,
+      "rowId": "rec25Sc22vMDpAHbf",
+      "company": "PandaDoc",
+      "jobSite": "https://www.pandadoc.com/careers/"
+    },
+    {
+      "row": 25,
+      "rowId": "recFWZYeUzQMyhOOB",
+      "company": "Emerging Travel Group",
+      "jobSite": "https://www.emergingtravel.com/career/"
+    },
+    {
+      "row": 26,
+      "rowId": "recYx5isCdlWvN5m8",
+      "company": "Webflow",
+      "jobSite": "https://webflow.com/careers/roles"
+    },
+    {
+      "row": 27,
+      "rowId": "recc7Iie6faIpskue",
+      "company": "Formlabs",
+      "jobSite": "https://careers.formlabs.com/all-open-roles/"
+    },
+    {
+      "row": 28,
+      "rowId": "recjdaj6moqQOD9Iy",
+      "company": "Bumble",
+      "jobSite": "https://bumble.wd3.myworkdayjobs.com/Bumble_Careers"
+    },
+    {
+      "row": 29,
+      "rowId": "recEA9s5Ts9GXa6Iw",
+      "company": "Borzo",
+      "jobSite": ""
+    },
+    {
+      "row": 30,
+      "rowId": "recKeUW00n6tKXTGl",
+      "company": "G5 Entertainment AB",
+      "jobSite": "https://jobs.g5e.com/"
+    },
+    {
+      "row": 31,
+      "rowId": "recDB5Bdxip53M1SL",
+      "company": "Quantori",
+      "jobSite": ""
+    },
+    {
+      "row": 32,
+      "rowId": "reczN83zJNRfrH4jH",
+      "company": "airSlate",
+      "jobSite": "https://jobs.lever.co/airslate"
+    },
+    {
+      "row": 33,
+      "rowId": "recvZV358N0eJ13qp",
+      "company": "Altium",
+      "jobSite": "https://careers.altium.com/ru/"
+    },
+    {
+      "row": 34,
+      "rowId": "recYbStt1fipheAho",
+      "company": "BrainRocket",
+      "jobSite": "https://www.brainrocket.com/careers#all"
+    },
+    {
+      "row": 35,
+      "rowId": "reccT0MrrgI9g6FHu",
+      "company": "Exinity",
+      "jobSite": "https://group.exinity.com/careers"
+    },
+    {
+      "row": 36,
+      "rowId": "recZSM3iCv0hhIrrr",
+      "company": "Joom",
+      "jobSite": "https://www.joom-group.com/en/vacancies"
+    },
+    {
+      "row": 37,
+      "rowId": "rec3qRvwHyPeObxXO",
+      "company": "Novakid",
+      "jobSite": "https://hr.novakidschool.com/"
+    },
+    {
+      "row": 38,
+      "rowId": "recMM5Nz6Lc56QBTK",
+      "company": "TradingView",
+      "jobSite": "https://www.tradingview.com/careers/"
+    },
+    {
+      "row": 39,
+      "rowId": "recWWVgYfG4IlU4kt",
+      "company": "Careerist",
+      "jobSite": "https://www.careerist.com/jobs"
+    },
+    {
+      "row": 40,
+      "rowId": "recr1cUsNXSSSl0YG",
+      "company": "Vivid Money",
+      "jobSite": "https://careers.vivid.money/#vacancies"
+    },
+    {
+      "row": 41,
+      "rowId": "recNLQyk0FJVdzk13",
+      "company": "WayRay",
+      "jobSite": "https://wayray.com/culture/#jobs"
+    },
+    {
+      "row": 42,
+      "rowId": "recWiSGjLu2Lig7Qw",
+      "company": "Refocus",
+      "jobSite": ""
+    },
+    {
+      "row": 43,
+      "rowId": "recWMlmIDm8Iin9nQ",
+      "company": "Flo Health",
+      "jobSite": "https://flo.health/careers"
+    },
+    {
+      "row": 44,
+      "rowId": "reczm1Y5qihGzugER",
+      "company": "Osome",
+      "jobSite": "https://careers.osome.com/?_ga=2.49668838.1188512649.1677533171-2030363540.1677533171#jobs"
+    },
+    {
+      "row": 45,
+      "rowId": "rec5VSIo2lvRLACr9",
+      "company": "BitFury",
+      "jobSite": "https://boards.greenhouse.io/bitfury"
+    },
+    {
+      "row": 46,
+      "rowId": "receZfFmmlQXBTBNs",
+      "company": "Armis Security",
+      "jobSite": "https://www.armis.com/careers/"
+    },
+    {
+      "row": 47,
+      "rowId": "recfUYOAhvAFLlrij",
+      "company": "BigID",
+      "jobSite": "https://bigid.com/company/careers/#job_board"
+    },
+    {
+      "row": 48,
+      "rowId": "recocvaxLPXma81DB",
+      "company": "Nexters",
+      "jobSite": "https://nexters.com/en/about/alljobs"
+    },
+    {
+      "row": 49,
+      "rowId": "recB95j6tNju1lnhF",
+      "company": "People AI",
+      "jobSite": "https://people.ai/about-us/careers/"
+    },
+    {
+      "row": 50,
+      "rowId": "recGj7IzF0XMprEZO",
+      "company": "Lokalise",
+      "jobSite": "https://lokalise.com/job"
+    },
+    {
+      "row": 51,
+      "rowId": "rec6TZSkjSHfhGpeu",
+      "company": "Sumsub",
+      "jobSite": "https://sumsub.com/careers/all/"
+    },
+    {
+      "row": 52,
+      "rowId": "recpdHMYVZCafmhHI",
+      "company": "Tonik",
+      "jobSite": "https://careers.sequoiacap.com/jobs/tonik"
+    },
+    {
+      "row": 53,
+      "rowId": "reco73TeL5QR4HOVy",
+      "company": "Rapyd",
+      "jobSite": "https://www.rapyd.net/company/careers-search/"
+    },
+    {
+      "row": 54,
+      "rowId": "recSImIbC8ZNZIB6I",
+      "company": "Beamery",
+      "jobSite": "https://careers.beamery.com/jobs/?department=&location=#results"
+    },
+    {
+      "row": 55,
+      "rowId": "rechJMIqyVi6h7IoM",
+      "company": "GAMETEQ",
+      "jobSite": "https://tbilisi.headhunter.ge/employer/9235034"
+    },
+    {
+      "row": 56,
+      "rowId": "reczqKUdnaim2hcIQ",
+      "company": "Virtuozzo",
+      "jobSite": "https://apply.workable.com/virtuozzo/"
+    },
+    {
+      "row": 57,
+      "rowId": "recK7nGRkv8PCkobW",
+      "company": "Glera Games",
+      "jobSite": "https://glera-games.com/jobs/"
+    },
+    {
+      "row": 58,
+      "rowId": "rec1RvFjpSvBc2OBf",
+      "company": "Easybrain",
+      "jobSite": "https://easybrain.com/careers"
+    },
+    {
+      "row": 59,
+      "rowId": "recoP9VGZFmzUaCLk",
+      "company": "tinyBuild GAMES",
+      "jobSite": "https://www.tinybuild.com/jobs"
+    },
+    {
+      "row": 60,
+      "rowId": "recQGOqvkwCpP6szg",
+      "company": "Quadcode",
+      "jobSite": "https://jobs.quadcode.com/jobs"
+    },
+    {
+      "row": 61,
+      "rowId": "recS1CcgK9OZsdsTB",
+      "company": "ManyChat",
+      "jobSite": "https://manychat.com/careers"
+    },
+    {
+      "row": 62,
+      "rowId": "recN3cYdEjhALM6YC",
+      "company": "QuickNode",
+      "jobSite": "https://boards.greenhouse.io/quiknodeinc"
+    },
+    {
+      "row": 63,
+      "rowId": "recv1CkhRArVvoiU1",
+      "company": "ClickHouse",
+      "jobSite": "https://clickhouse.com/company/careers"
+    },
+    {
+      "row": 64,
+      "rowId": "recv73BffBi2qpMSL",
+      "company": "Accel Club",
+      "jobSite": "https://accelclub.notion.site/Accel-Club-Job-Board"
+    },
+    {
+      "row": 65,
+      "rowId": "recEWL9hQNp0G8ODJ",
+      "company": "OneSoil",
+      "jobSite": "https://onesoil.ai/en/careers"
+    },
+    {
+      "row": 66,
+      "rowId": "recJ412sB2NkL9tpu",
+      "company": "3Commas",
+      "jobSite": "https://careers.3commas.io/?_ga=2.34897761.1176207138.1675187412-423833572.1675187412"
+    },
+    {
+      "row": 67,
+      "rowId": "recPP4Im7BkWMIUHr",
+      "company": "Prisma Labs",
+      "jobSite": "https://prismalabs.notion.site/Careers-at-Prisma-Labs-eb709e36aba8405c8c189fad1c226389"
+    },
+    {
+      "row": 68,
+      "rowId": "recSkSY1Obm6td56o",
+      "company": "Finom",
+      "jobSite": "https://finom.jobs.personio.de/"
+    },
+    {
+      "row": 69,
+      "rowId": "recTiSfOywzdGZcrz",
+      "company": "Improvado",
+      "jobSite": "https://jobs.lever.co/improvadoio"
+    },
+    {
+      "row": 70,
+      "rowId": "recArYGCxW6szYdk3",
+      "company": "CodeSignal",
+      "jobSite": "https://codesignal.com/careers/"
+    },
+    {
+      "row": 71,
+      "rowId": "recAwc6KJLrUQygXb",
+      "company": "Kodland",
+      "jobSite": "https://kodlandcareer.notion.site/kodlandcareer/Jobs-at-Kodland-32dbf4cd9577449bab2a6945f89c47ba"
+    },
+    {
+      "row": 72,
+      "rowId": "recdTHeBKYXGBBKlO",
+      "company": "Legionfarm",
+      "jobSite": "https://jobs.lever.co/legion-farm"
+    },
+    {
+      "row": 73,
+      "rowId": "receEDsDtGKy6ZXUQ",
+      "company": "Profi",
+      "jobSite": "https://apply.workable.com/profi/"
+    },
+    {
+      "row": 74,
+      "rowId": "recg7pnCRPCtSOkFx",
+      "company": "Scentbird",
+      "jobSite": "https://scentbird.breezy.hr/"
+    },
+    {
+      "row": 75,
+      "rowId": "rechT0CNbbCXbbbI8",
+      "company": "Krisp",
+      "jobSite": "https://krisp.ai/careers/#job_listings\n\nhttps://staff.am/en/company/krisp"
+    },
+    {
+      "row": 76,
+      "rowId": "recjzG6vbhcjUSJii",
+      "company": "Immigram",
+      "jobSite": "https://immigram.io/careers#positions"
+    },
+    {
+      "row": 77,
+      "rowId": "reclhsoASRU7txK3t",
+      "company": "SuperAnnotate",
+      "jobSite": "https://jobs.lever.co/superannotate/"
+    },
+    {
+      "row": 78,
+      "rowId": "recEWDf8TryrqchBg",
+      "company": "Temporal",
+      "jobSite": "https://jobs.lever.co/temporal/"
+    },
+    {
+      "row": 79,
+      "rowId": "recKJuESUqPvk9Pcr",
+      "company": "Palta",
+      "jobSite": "https://boards.greenhouse.io/paltaltd"
+    },
+    {
+      "row": 80,
+      "rowId": "recTP2qFrUaR1ESme",
+      "company": "Outschool",
+      "jobSite": "https://boards.greenhouse.io/outschool"
+    },
+    {
+      "row": 81,
+      "rowId": "recZAxkKo6iBUjfWj",
+      "company": "ZeroAvia",
+      "jobSite": "http://zeroavia.applytojob.com/apply/"
+    },
+    {
+      "row": 82,
+      "rowId": "rec3pfY2tijDX8Jjm",
+      "company": "Salmon",
+      "jobSite": "https://www.linkedin.com/posts/aleksei-shuravin-613527197_salmon-fintech-holdings-ltd-is-actively-activity-7028645961669189632-jFyq/?utm_source=share&utm_medium=member_desktop"
+    },
+    {
+      "row": 83,
+      "rowId": "reccuHnHg1VzVBhMB",
+      "company": "WeLoveNoCode",
+      "jobSite": "https://welovenocode.notion.site/Open-Positions-in-Welovenocode-public-4aaf2271b6404be39a92893ccdc58b0d"
+    },
+    {
+      "row": 84,
+      "rowId": "recy6HdwqjWpUL9CK",
+      "company": "Compass Pathways",
+      "jobSite": "https://compasspathways.com/join-us/#careers"
+    },
+    {
+      "row": 85,
+      "rowId": "recfknUoCr04rBQha",
+      "company": "Welltory",
+      "jobSite": "https://vc.ru/s/welltory/vacancies"
+    },
+    {
+      "row": 86,
+      "rowId": "recgHSz7E0x8WqnYe",
+      "company": "ANNA Money",
+      "jobSite": ""
+    },
+    {
+      "row": 87,
+      "rowId": "rechyoxjol90v54az",
+      "company": "Humaniq",
+      "jobSite": "https://humaniq.com/careers"
+    },
+    {
+      "row": 88,
+      "rowId": "recmW9YHypfM4FUzg",
+      "company": "Different Technologies",
+      "jobSite": ""
+    },
+    {
+      "row": 89,
+      "rowId": "recqquW16hHrPreR5",
+      "company": "Ahrefs",
+      "jobSite": "https://ahrefs.com/jobs"
+    },
+    {
+      "row": 90,
+      "rowId": "recChfF6F6FMx366X",
+      "company": "Sila Nanotechnologies",
+      "jobSite": "https://www.silanano.com/careers"
+    },
+    {
+      "row": 91,
+      "rowId": "recMQjTPjrnZXozXn",
+      "company": "Rarible",
+      "jobSite": "https://jobs.lever.co/Rarible"
+    },
+    {
+      "row": 92,
+      "rowId": "recUhEjP31j6O9DXw",
+      "company": "Siren Group",
+      "jobSite": "https://www.sirenltd.com/careers/"
+    },
+    {
+      "row": 93,
+      "rowId": "recVPRyboDfGbeqUW",
+      "company": "Teleport",
+      "jobSite": "https://goteleport.com/careers/"
+    },
+    {
+      "row": 94,
+      "rowId": "recG481x4Xq5lBGIv",
+      "company": "CoinsPaid",
+      "jobSite": "https://jobs.eu.lever.co/coinspaid/"
+    },
+    {
+      "row": 95,
+      "rowId": "recupBH4BECBeUmkm",
+      "company": "Universal Hydrogen",
+      "jobSite": "https://hydrogen.aero/careers/"
+    },
+    {
+      "row": 96,
+      "rowId": "recIMFTzYATCv31fm",
+      "company": "ElectroNeek",
+      "jobSite": "https://electroneek.com/careers/"
+    },
+    {
+      "row": 97,
+      "rowId": "recyfdn7DCchyE3hx",
+      "company": "PVG Indonesia",
+      "jobSite": "https://pvg.co.id/job"
+    },
+    {
+      "row": 98,
+      "rowId": "recvQ1HUpCqJlYq95",
+      "company": "Tabby",
+      "jobSite": "https://tabby.ai/en-AE/careers"
+    },
+    {
+      "row": 99,
+      "rowId": "recbjbdZKU6WYYt82",
+      "company": "Endel",
+      "jobSite": "https://endel.io/jobs"
+    },
+    {
+      "row": 100,
+      "rowId": "recwXx1KXUMPkWDLH",
+      "company": "Prodly",
+      "jobSite": "https://boards.greenhouse.io/prodlyjobs"
+    },
+    {
+      "row": 101,
+      "rowId": "rectsNUJnL0WyaG1c",
+      "company": "Zededa",
+      "jobSite": "https://zededa.com/company/careers/"
+    },
+    {
+      "row": 102,
+      "rowId": "recD0JKcuvy6Mlajm",
+      "company": "Space307",
+      "jobSite": "https://space307.team/senior_data_analyst?utm_source=jtbf&utm_medium=referral&utm_campaign=partner"
+    },
+    {
+      "row": 103,
+      "rowId": "reczdTLgK9Y2jwbRk",
+      "company": "Oxygen",
+      "jobSite": "https://telegra.ph/Android-Developer-03-08-2"
+    },
+    {
+      "row": 104,
+      "rowId": "rechg2wChuiRukzyl",
+      "company": "VOLKA GAMES",
+      "jobSite": "https://jobs.lever.co/volka"
+    },
+    {
+      "row": 105,
+      "rowId": "recDRtb3hH3SVbOhm",
+      "company": "Parsimonia FZ",
+      "jobSite": "http://parsimonia.tech/#rec548047983"
+    },
+    {
+      "row": 106,
+      "rowId": "reckNHqvFYq8JHWoQ",
+      "company": "Meracux",
+      "jobSite": "https://mercaux.com/careers.html"
+    },
+    {
+      "row": 107,
+      "rowId": "rec0ZvxJZIOgxeZ8q",
+      "company": "SpatialChat",
+      "jobSite": ""
+    },
+    {
+      "row": 108,
+      "rowId": "recOgrPu5eCGMOPo6",
+      "company": "Neon",
+      "jobSite": "https://neon.tech/careers"
+    },
+    {
+      "row": 109,
+      "rowId": "recyqfbvBqBPWZ582",
+      "company": "Cattle Care",
+      "jobSite": "https://cattlecare.notion.site/Job-Description-Chief-Operating-Officer-Cattle-Care-c9bfa6ce36e643c69792ce53a66085fb"
+    },
+    {
+      "row": 110,
+      "rowId": "rec4VzWWLIXPVVSOv",
+      "company": "Ecoplatform",
+      "jobSite": "https://azure-protest-54e.notion.site/Ecoplatform-Job-Board-752512919da24a6cb0669e12caf2004f"
+    },
+    {
+      "row": 111,
+      "rowId": "rec6IHwqnMSzsN6Uf",
+      "company": "Collectly",
+      "jobSite": "https://jobs.lever.co/CollectlyInc."
+    },
+    {
+      "row": 112,
+      "rowId": "rec9rOwyQ7WfQhnvb",
+      "company": "Skipp",
+      "jobSite": "https://www.skipp.dev/talent"
+    },
+    {
+      "row": 113,
+      "rowId": "recknGWG4UnyVSsOn",
+      "company": "Luminai",
+      "jobSite": "https://jobs.lever.co/digitalbrain"
+    },
+    {
+      "row": 114,
+      "rowId": "recEPAv3hUqTYrlZZ",
+      "company": "B9",
+      "jobSite": "https://bnine.com/careers/"
+    },
+    {
+      "row": 115,
+      "rowId": "recQGGqYJQjvNeDSa",
+      "company": "Narrative BI",
+      "jobSite": "https://narrativebi.notion.site/Work-at-Narrative-BI-2724d8946b7c4835916446cb57263117"
+    },
+    {
+      "row": 116,
+      "rowId": "rec0dCYTZddgfYrN5",
+      "company": "Optic",
+      "jobSite": "https://www.optic.xyz/careers#section--job-listings"
+    },
+    {
+      "row": 117,
+      "rowId": "rec1VNtw5gnoi3xvl",
+      "company": "110 Industries",
+      "jobSite": "https://bonddaria.notion.site/110-Industries-is-hiring-03eca12a1d1a47988bb13c3d5afc53fc"
+    },
+    {
+      "row": 118,
+      "rowId": "reczN8hEVXeJP0EqL",
+      "company": "Adapty",
+      "jobSite": "https://adapty.io/jobs/"
+    },
+    {
+      "row": 119,
+      "rowId": "recuaCyQLKswO5Fwj",
+      "company": "Fluence Labs",
+      "jobSite": "https://fluence.one/join.html"
+    },
+    {
+      "row": 120,
+      "rowId": "rec5gyyWMqKaewLN5",
+      "company": "Softr",
+      "jobSite": "https://www.softr.io/jobs"
+    },
+    {
+      "row": 121,
+      "rowId": "rec7vZyK3VY5121o0",
+      "company": "Lunchclub",
+      "jobSite": "https://jobs.lever.co/lunchclub"
+    },
+    {
+      "row": 122,
+      "rowId": "recanJx003QpHplrf",
+      "company": "GPU AUDIO",
+      "jobSite": "https://www.gpu.audio/jobs"
+    },
+    {
+      "row": 123,
+      "rowId": "recgGuZrYcjBjUer1",
+      "company": "Qonversion",
+      "jobSite": "https://angel.co/company/qonversion/jobs"
+    },
+    {
+      "row": 124,
+      "rowId": "recls8ehwtCwoVaST",
+      "company": "Zerion",
+      "jobSite": "https://jobs.lever.co/zerion"
+    },
+    {
+      "row": 125,
+      "rowId": "recl5EDJ4BFF1uLsV",
+      "company": "Veryfi",
+      "jobSite": "https://www.veryfi.com/jobs/"
+    },
+    {
+      "row": 126,
+      "rowId": "recBl8Oz7580oA6yc",
+      "company": "Evolwe AI",
+      "jobSite": "https://humancosmos.notion.site/Product-Manager-8d840110de344b44a9be704d8ae3f5fb"
+    },
+    {
+      "row": 127,
+      "rowId": "recDd4EODH6Yqc8yd",
+      "company": "ZenPulsar",
+      "jobSite": "https://zenpulsar.notion.site/Python-Developer-Middle-Senior-4d46f6fc9a6942b0a63d13addc9a83e6"
+    },
+    {
+      "row": 128,
+      "rowId": "recGH0IFjRN1CLfpo",
+      "company": "Dbrain",
+      "jobSite": "https://jobs.dbrain.io/"
+    },
+    {
+      "row": 129,
+      "rowId": "recLLQRQvWLMrMn8U",
+      "company": "Hypemasters",
+      "jobSite": "https://apply.workable.com/hypemasters/"
+    },
+    {
+      "row": 130,
+      "rowId": "recSy7lKnCSUJcXHA",
+      "company": "Wizart",
+      "jobSite": "https://wizart.ai/careers#positions"
+    },
+    {
+      "row": 131,
+      "rowId": "recSNTt8c80TNrry1",
+      "company": "Gavity",
+      "jobSite": "https://gaviti.com/careers/"
+    },
+    {
+      "row": 132,
+      "rowId": "recWUBqpSxSxI22OD",
+      "company": "Podcastle",
+      "jobSite": "https://podcastle.ai/careers"
+    },
+    {
+      "row": 133,
+      "rowId": "recwyWcZ9g1nBvMr6",
+      "company": "nGrow",
+      "jobSite": "https://www.ngrow.ai/jobs"
+    },
+    {
+      "row": 134,
+      "rowId": "recrUucn04QmWQT4c",
+      "company": "Neatsy",
+      "jobSite": "https://neatsy.notion.site/neatsy/Careers-at-Neatsy-d100c73967b44a7292da17b2daf6b27d"
+    },
+    {
+      "row": 135,
+      "rowId": "recxo19x5UXlaPU7S",
+      "company": "Crystal Blockchain",
+      "jobSite": "https://boards.greenhouse.io/crystal"
+    },
+    {
+      "row": 136,
+      "rowId": "recA1ua4w2LM1SveL",
+      "company": "Pixellu",
+      "jobSite": "https://careers.pixellu.com/"
+    },
+    {
+      "row": 137,
+      "rowId": "rec6WcCQclNfm9aOH",
+      "company": "Sanas",
+      "jobSite": "https://boards.greenhouse.io/sanas"
+    },
+    {
+      "row": 138,
+      "rowId": "rec7uj4tFBE0WrCPl",
+      "company": "Kewazo",
+      "jobSite": "https://www.kewazo.com/career-at-kewazo"
+    },
+    {
+      "row": 139,
+      "rowId": "recax8vsX6GDHDEzN",
+      "company": "Between",
+      "jobSite": ""
+    },
+    {
+      "row": 140,
+      "rowId": "recaAmXWoL1o0IEUs",
+      "company": "Inworld AI",
+      "jobSite": "https://www.inworld.ai/careers#job-openings"
+    },
+    {
+      "row": 141,
+      "rowId": "recdGj3jGiQ3XIzId",
+      "company": "Readymag",
+      "jobSite": "https://readymag.com/readymag/we-are-hiring/"
+    },
+    {
+      "row": 142,
+      "rowId": "recdsh5cpFAMBeGqu",
+      "company": "Heartex",
+      "jobSite": "https://heartex.com/careers#openings"
+    },
+    {
+      "row": 143,
+      "rowId": "recezIKBfSCs1n3iv",
+      "company": "Yoffix",
+      "jobSite": ""
+    },
+    {
+      "row": 144,
+      "rowId": "recfZFJAYdUWL3XRu",
+      "company": "Cube Dev",
+      "jobSite": "https://cube.dev/careers"
+    },
+    {
+      "row": 145,
+      "rowId": "recf16dkMtJeD2WAR",
+      "company": "AMMA",
+      "jobSite": ""
+    },
+    {
+      "row": 146,
+      "rowId": "recDbUUZ8KOank0Go",
+      "company": "Maroo",
+      "jobSite": "https://maroo.notion.site/Maroo-RU-54a73883a1304e44a8b835c426f7d7c7"
+    },
+    {
+      "row": 147,
+      "rowId": "recDASyr3yoO2cpzL",
+      "company": "Superdao",
+      "jobSite": "https://jobs.superdao.co/"
+    },
+    {
+      "row": 148,
+      "rowId": "recJyn7I0AXtV6sBe",
+      "company": "SegmentStream",
+      "jobSite": "https://www.linkedin.com/jobs/search/?currentJobId=3485693562&f_C=18603659&geoId=92000000&originToLandingJobPostings=3485693562"
+    },
+    {
+      "row": 149,
+      "rowId": "recPIFTMhyjmZVqJB",
+      "company": "Nuanu",
+      "jobSite": "https://nuanu.notion.site/Nuanu-is-Hiring-d981d76df05549aca435fa6149743266"
+    },
+    {
+      "row": 150,
+      "rowId": "recSQzt0Z3XinWEAq",
+      "company": "Telegram",
+      "jobSite": "https://telegram.org/jobs"
+    },
+    {
+      "row": 151,
+      "rowId": "recTCTal7ePXoe0BK",
+      "company": "Buddy.ai",
+      "jobSite": ""
+    },
+    {
+      "row": 152,
+      "rowId": "recVpRDP6A8UIMO46",
+      "company": "Coding Invaders",
+      "jobSite": ""
+    },
+    {
+      "row": 153,
+      "rowId": "recV7NEARSRxYzHBR",
+      "company": "Revealbot",
+      "jobSite": ""
+    },
+    {
+      "row": 154,
+      "rowId": "rec0evuc67wtAcvzE",
+      "company": "Zero",
+      "jobSite": "https://zerosystems.com/about/careers/"
+    },
+    {
+      "row": 155,
+      "rowId": "rec0eyqSH2YFey2Jd",
+      "company": "YouTravel.me",
+      "jobSite": "https://ytme.atlassian.net/wiki/spaces/TM/overview?homepageId=1142587551"
+    },
+    {
+      "row": 156,
+      "rowId": "rec2q8RRBfESTIouR",
+      "company": "Enki",
+      "jobSite": "https://angel.co/company/enki/jobs"
+    },
+    {
+      "row": 157,
+      "rowId": "recH6PGDyWmjcw2c3",
+      "company": "Cindicator",
+      "jobSite": "https://www.notion.so/Jobs-at-Cindicator-37ea0aed8b7b4a7799999c94ea00f3a2"
+    },
+    {
+      "row": 158,
+      "rowId": "rec1VMwGLVe4Lib3E",
+      "company": "DestinyX",
+      "jobSite": "https://www.remotehub.com/company/destinyx/jobs"
+    },
+    {
+      "row": 159,
+      "rowId": "recNjgttmiaXrXOQD",
+      "company": "Right Balance",
+      "jobSite": "https://rightbalance.io/join"
+    },
+    {
+      "row": 160,
+      "rowId": "recSHHD7YjU9y4PVX",
+      "company": "Colife",
+      "jobSite": ""
+    },
+    {
+      "row": 161,
+      "rowId": "rechSZFQcRZ51ibPF",
+      "company": "Monite",
+      "jobSite": "https://monite.notion.site/Careers-Monite-9ad0d34fcd0e4ec5ba1017aab6df686f#9a37bf483e5a465f82eca8192a432b0f"
+    },
+    {
+      "row": 162,
+      "rowId": "recdBzBoG9aH8d1En",
+      "company": "Eschatology Entertainment",
+      "jobSite": "https://ee.peopleforce.io/careers/?source_id=13785"
+    },
+    {
+      "row": 163,
+      "rowId": "rec9HZXEUvN1Ul3Wz",
+      "company": "Victa",
+      "jobSite": "https://www.linkedin.com/posts/trueslash_wanted-preferably-alive-seniorlead-android-activity-7034635873744732160-EvUO/?utm_source=share&utm_medium=member_desktop"
+    },
+    {
+      "row": 164,
+      "rowId": "recCvMIcLdNU4FIOj",
+      "company": "Conte.ai",
+      "jobSite": ""
+    },
+    {
+      "row": 165,
+      "rowId": "rectOHXa5ekbI4Y9x",
+      "company": "Brickit",
+      "jobSite": ""
+    },
+    {
+      "row": 166,
+      "rowId": "rec5vpvdzRKS6Jt0q",
+      "company": "Fibery",
+      "jobSite": "https://fibery.io/blog/careers-head-of-marketing-growth/"
+    },
+    {
+      "row": 167,
+      "rowId": "rec1mnv7XvtLrtqxC",
+      "company": "Workclass",
+      "jobSite": "https://glints.com/my/company/workclass-jobs/c363e310-02a2-44b7-adcb-d99ca6da171a"
+    },
+    {
+      "row": 168,
+      "rowId": "recaweBfZC6qDKbEM",
+      "company": "Haut.AI",
+      "jobSite": "https://haut.ai/#wearehiring"
+    },
+    {
+      "row": 169,
+      "rowId": "reczUAKSrUuXn172w",
+      "company": "Headframe",
+      "jobSite": ""
+    },
+    {
+      "row": 170,
+      "rowId": "recVzQ5zjSvXH2DsK",
+      "company": "PharmBonus",
+      "jobSite": ""
+    },
+    {
+      "row": 171,
+      "rowId": "recq8AXaX5TNah9ko",
+      "company": "Mad Curve",
+      "jobSite": ""
+    },
+    {
+      "row": 172,
+      "rowId": "recd4QBDdCfeW8WR6",
+      "company": "IVM Markets",
+      "jobSite": ""
+    },
+    {
+      "row": 173,
+      "rowId": "recXtcor9jHtfddk6",
+      "company": "LF.Group",
+      "jobSite": ""
+    },
+    {
+      "row": 174,
+      "rowId": "rec6hULRFAc2pJrS3",
+      "company": "Kadmos",
+      "jobSite": "https://www.kadmos.io/career/job-list"
+    },
+    {
+      "row": 175,
+      "rowId": "rec7JPMca0ON1cD0j",
+      "company": "Moeco",
+      "jobSite": ""
+    },
+    {
+      "row": 176,
+      "rowId": "rec2MTNtfooyZDFmT",
+      "company": "Termius",
+      "jobSite": "https://jobs.lever.co/Termius/"
+    },
+    {
+      "row": 177,
+      "rowId": "recKs3DRgmRhxGKr3",
+      "company": "IntellectoKids",
+      "jobSite": "https://career.intellectokids.com/career"
+    },
+    {
+      "row": 178,
+      "rowId": "recyxmKgVx81778ez",
+      "company": "i-BrainTech",
+      "jobSite": "https://www.i-brain.tech/careers"
+    },
+    {
+      "row": 179,
+      "rowId": "recBJegr4VXuJFcxv",
+      "company": "Farel",
+      "jobSite": "https://telegra.ph/Senior-DevOps-Engineer-02-28"
+    },
+    {
+      "row": 180,
+      "rowId": "recjHIzRvwic1IZgm",
+      "company": "Bonrepublic",
+      "jobSite": ""
+    },
+    {
+      "row": 181,
+      "rowId": "recgqe7wmyldA8rKb",
+      "company": "Helio Games",
+      "jobSite": "https://heliogames.com/careers"
+    },
+    {
+      "row": 182,
+      "rowId": "rec5BhpmBj8hiBlBp",
+      "company": "Hexens",
+      "jobSite": "https://hexens.io/careers"
+    },
+    {
+      "row": 183,
+      "rowId": "reccaEAlmasB1H1Jr",
+      "company": "Grintern",
+      "jobSite": "https://grintern-talent.freshteam.com/jobs/"
+    },
+    {
+      "row": 184,
+      "rowId": "recbLmEw1dm8GrhTu",
+      "company": "Aspect App",
+      "jobSite": "https://aspectapp.notion.site/aspectapp/Social-Media-Manager-1eec65fafd8c423a8dd272773070f8ca"
+    },
+    {
+      "row": 185,
+      "rowId": "rec2AGy8r6OfQBWih",
+      "company": "HUMANS",
+      "jobSite": "https://humanswork.notion.site/Content-community-lead-c90d3a335b4c4bdf968cb835f49172ce"
+    },
+    {
+      "row": 186,
+      "rowId": "reckBHqY0qDCbcxaL",
+      "company": "Imperfect Tech",
+      "jobSite": "https://imperfect-tech.notion.site/Job-Board-b75d9553e4224d29a5de52ebe26264ed"
+    },
+    {
+      "row": 187,
+      "rowId": "recV5Zj8NMmGjaB5t",
+      "company": "Mirror",
+      "jobSite": "https://boards.greenhouse.io/mirror"
+    },
+    {
+      "row": 188,
+      "rowId": "recXgqWt2VgmYYdtM",
+      "company": "Vektor AI",
+      "jobSite": "https://vektor-ai.notion.site/Vektor-AI-Careers-549753aef2dd44d3911e9c6be2911106"
+    },
+    {
+      "row": 189,
+      "rowId": "rec854tblC0mHFVQM",
+      "company": "InTone",
+      "jobSite": ""
+    },
+    {
+      "row": 190,
+      "rowId": "recanf7ijQiweKEej",
+      "company": "Laoshi",
+      "jobSite": "https://laoshi.io/careers/"
+    },
+    {
+      "row": 191,
+      "rowId": "recjQU40XgtjP5x7o",
+      "company": "MigRun",
+      "jobSite": "https://www.migrun.tech/jobs"
+    },
+    {
+      "row": 192,
+      "rowId": "recb81Mgggwj0Ajwz",
+      "company": "Zarta",
+      "jobSite": ""
+    },
+    {
+      "row": 193,
+      "rowId": "reciPTLvl4EgwM2A0",
+      "company": "not8",
+      "jobSite": ""
+    },
+    {
+      "row": 194,
+      "rowId": "rec0CC8v1RHkwuL6l",
+      "company": "Babylon Voice",
+      "jobSite": "https://angel.co/company/manan-ai/jobs"
+    },
+    {
+      "row": 195,
+      "rowId": "reckfIIbwWaUg8Pr0",
+      "company": "EdgeDB",
+      "jobSite": "https://www.edgedb.com/careers"
+    },
+    {
+      "row": 196,
+      "rowId": "recKSbwliKkBjZFta",
+      "company": "OXORIO",
+      "jobSite": "https://oxorioteam.notion.site/Careers-da7d5b13b81b495b9a8b3eaacdd424ab"
+    },
+    {
+      "row": 197,
+      "rowId": "recBQljX9BisytQ7P",
+      "company": "Headroom Inc.",
+      "jobSite": "https://join.team/headroom"
+    },
+    {
+      "row": 198,
+      "rowId": "recdOy72bX6ZBWMso",
+      "company": "Cooper Pet Care",
+      "jobSite": "https://cooperpetcare.com/careers/"
+    },
+    {
+      "row": 199,
+      "rowId": "reczY2tFm2wUltH0A",
+      "company": "Green Growth",
+      "jobSite": ""
+    },
+    {
+      "row": 200,
+      "rowId": "recCWoPvKFiGDzz52",
+      "company": "Skich",
+      "jobSite": "https://skich.notion.site/Careers-0957d6a578324c0fb17f72afd08b10f5"
+    },
+    {
+      "row": 201,
+      "rowId": "recQNOWPoDjcGAmn2",
+      "company": "Anymaster",
+      "jobSite": "https://mixed-porter-ecb.notion.site/Jobs-at-Anymaster-05c778cd95fa4132bbdc617d1c7802fe"
+    },
+    {
+      "row": 202,
+      "rowId": "recxRjGrTmdW8I6gp",
+      "company": "Toldy",
+      "jobSite": "https://telegra.ph/Toldy--Frontend--React-03-02"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnvFile } from "./env.js";
+import { expandRussianCompanyCatalog } from "./source-catalog.js";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 loadEnvFile(path.join(rootDir, ".env"));
@@ -23,7 +24,19 @@ function registryEntries(registry, key, envName) {
   return [...(Array.isArray(registry[key]) ? registry[key] : []), ...csv(envName)];
 }
 
+function readRussianCompanyCatalog() {
+  const filePath = process.env.RUSSIAN_COMPANY_CATALOG_PATH || path.join(rootDir, "config", "russian-company-sources.json");
+  if (process.env.ENABLE_RUSSIAN_COMPANY_SOURCES === "false") return { filePath, data: { rows: [] } };
+  try { return { filePath, data: JSON.parse(fs.readFileSync(filePath, "utf8")) }; }
+  catch (error) {
+    if (error.code === "ENOENT") return { filePath, data: { rows: [] } };
+    throw new Error(`Invalid Russian company source catalog ${filePath}: ${error.message}`);
+  }
+}
+
 const registry = readRegistry();
+const russianCompanyCatalog = readRussianCompanyCatalog();
+const russianCompanySources = expandRussianCompanyCatalog({ registry: registry.data, catalog: russianCompanyCatalog.data });
 const adzunaCountries = csv("ADZUNA_COUNTRIES");
 
 export const config = {
@@ -38,6 +51,10 @@ export const config = {
   sourceConcurrency: Number(process.env.SOURCE_CONCURRENCY || 16),
   maxJobsPerSource: Number(process.env.MAX_JOBS_PER_SOURCE || 100),
   maxJobsScannedPerSource: Number(process.env.MAX_JOBS_SCANNED_PER_SOURCE || 500),
+  maxGenericDetailPages: Number(process.env.MAX_GENERIC_DETAIL_PAGES || 4),
+  careerPageTimeoutMs: Number(process.env.CAREER_PAGE_TIMEOUT_MS || 8_000),
+  careerPageCacheMs: Number(process.env.CAREER_PAGE_CACHE_MS || 15 * 60 * 1000),
+  careerPageMaxBytes: Number(process.env.CAREER_PAGE_MAX_BYTES || 2_000_000),
   enableLiveSources: process.env.ENABLE_LIVE_SOURCES !== "false",
   enableDemoSource: process.env.ENABLE_DEMO_SOURCE === "true" || process.env.ENABLE_LIVE_SOURCES === "false",
   httpUserAgent: process.env.HTTP_USER_AGENT || "VacationHunter/0.1",
@@ -92,14 +109,17 @@ export const config = {
   sourceRateLimitCooldownMs: Number(process.env.SOURCE_RATE_LIMIT_COOLDOWN_MS || 15 * 60 * 1000),
   sourceErrorCooldownMs: Number(process.env.SOURCE_ERROR_COOLDOWN_MS || 60 * 1000),
   sourceRegistryPath: registry.filePath,
+  russianCompanyCatalogPath: russianCompanyCatalog.filePath,
+  russianCompanySourceAudit: russianCompanySources.audit,
   sourceScope: registry.data.scope || {},
-  greenhouseBoards: registryEntries(registry.data, "greenhouseBoards", "GREENHOUSE_BOARDS"),
-  ashbyBoards: registryEntries(registry.data, "ashbyBoards", "ASHBY_BOARDS"),
-  leverSites: registryEntries(registry.data, "leverSites", "LEVER_SITES"),
+  greenhouseBoards: [...registryEntries(registry.data, "greenhouseBoards", "GREENHOUSE_BOARDS"), ...russianCompanySources.greenhouseBoards],
+  ashbyBoards: [...registryEntries(registry.data, "ashbyBoards", "ASHBY_BOARDS"), ...russianCompanySources.ashbyBoards],
+  leverSites: [...registryEntries(registry.data, "leverSites", "LEVER_SITES"), ...russianCompanySources.leverSites],
   recruiteeBoards: registryEntries(registry.data, "recruiteeBoards", "RECRUITEE_BOARDS"),
-  workableBoards: registryEntries(registry.data, "workableBoards", "WORKABLE_BOARDS"),
-  personioBoards: registryEntries(registry.data, "personioBoards", "PERSONIO_BOARDS"),
+  workableBoards: [...registryEntries(registry.data, "workableBoards", "WORKABLE_BOARDS"), ...russianCompanySources.workableBoards],
+  personioBoards: [...registryEntries(registry.data, "personioBoards", "PERSONIO_BOARDS"), ...russianCompanySources.personioBoards],
   smartRecruitersCompanies: registryEntries(registry.data, "smartRecruitersCompanies", "SMARTRECRUITERS_COMPANIES"),
+  careerPages: russianCompanySources.careerPages,
   storePath: path.join(rootDir, "data", "job-store.json"),
   watchStorePath: path.join(rootDir, "data", "watch-store.json"),
   notificationOutboxPath: path.join(rootDir, "data", "notification-outbox.json"),

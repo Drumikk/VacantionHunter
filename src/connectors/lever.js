@@ -54,7 +54,7 @@ export function leverConnectors(config) {
         for (let skip = 0; skip < maxScanned; skip += pageSize) {
           const params = new URLSearchParams({ mode: "html", skip: String(skip), limit: String(pageSize) });
           try {
-            const page = postingIndex(await fetchText(`${baseUrl}/v0/postings/${encodeURIComponent(site.slug)}?${params}`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch }));
+            const page = postingIndex(await fetchText(`${baseUrl}/v0/postings/${encodeURIComponent(site.slug)}?${params}`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch }));
             index.push(...page);
             if (page.length < pageSize) { indexCompleted = true; break; }
           } catch (error) {
@@ -73,7 +73,7 @@ export function leverConnectors(config) {
             const candidate = candidates[nextCandidate];
             nextCandidate += 1;
             try {
-              rawJobs.push(await fetchJson(`${baseUrl}/v0/postings/${encodeURIComponent(site.slug)}/${encodeURIComponent(candidate.id)}`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch }));
+              rawJobs.push(await fetchJson(`${baseUrl}/v0/postings/${encodeURIComponent(site.slug)}/${encodeURIComponent(candidate.id)}`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch }));
             } catch (error) {
               warnings.push({ postingId: candidate.id, title: candidate.title, error: error.message, code: typeof error.code === "string" ? error.code : error.name || "source_error" });
             }

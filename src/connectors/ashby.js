@@ -27,7 +27,7 @@ export function ashbyConnectors(config) {
     return {
       ...source,
       async search(query) {
-        const data = await fetchJson(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board.slug)}?includeCompensation=true`, { timeoutMs: config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch });
+        const data = await fetchJson(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board.slug)}?includeCompensation=true`, { timeoutMs: config.atsRequestTimeoutMs || config.requestTimeoutMs, userAgent: config.httpUserAgent, retries: 1, fetchImpl: config.fetchImpl || fetch });
         return (data.jobs || []).filter((item) => item.isListed !== false).map((item) => {
           const description = stripHtml(item.descriptionHtml || item.descriptionPlain || "");
           const locations = (item.secondaryLocations || []).map((location) => location.location);

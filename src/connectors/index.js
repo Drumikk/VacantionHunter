@@ -29,6 +29,7 @@ import { franceTravailConnector } from "./france-travail.js";
 import { theMuseConnector } from "./the-muse.js";
 import { personioConnectors } from "./personio.js";
 import { smartRecruitersConnectors } from "./smartrecruiters.js";
+import { careerPageConnectors } from "./career-page.js";
 
 export function createConnectors(config) {
   const connectors = config.enableDemoSource === false ? [] : [demoConnector(config.demoPath)];
@@ -37,7 +38,7 @@ export function createConnectors(config) {
       hhEmailConnector(config), hhConnector(config), joobleConnector(config), usajobsConnector(config), careerOneStopConnector(config), navConnector(config), jobMarketFinlandConnector(config), remotiveConnector(config), arbeitnowConnector(config),
       trudvsemConnector(config), jobtechConnector(config), remoteOkConnector(config), weWorkRemotelyConnector(config), hnWhoIsHiringConnector(config), reliefWebConnector(config),
       himalayasConnector(config), jobicyConnector(config), reedConnector(config), superJobConnector(config), franceTravailConnector(config), theMuseConnector(config),
-      ...restrictedConnectors(), ...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config), ...recruiteeConnectors(config), ...workableConnectors(config), ...personioConnectors(config), ...smartRecruitersConnectors(config), ...adzunaConnectors(config),
+      ...restrictedConnectors(), ...greenhouseConnectors(config), ...ashbyConnectors(config), ...leverConnectors(config), ...recruiteeConnectors(config), ...workableConnectors(config), ...personioConnectors(config), ...smartRecruitersConnectors(config), ...careerPageConnectors(config), ...adzunaConnectors(config),
     );
   }
   return connectors;
